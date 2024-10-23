@@ -1,4 +1,5 @@
 ## packages ----
+library(here)
 library(httr)
 library(curl)
 library(jsonlite)
@@ -16,6 +17,7 @@ library(highcharter)
 
 
 ## directories ----
+dirShiny <- here()
 dirData <- "/home/ellie/data/antarctic-data-wobec"
 if(length(list.files(dirData)) == 0){
   message(
@@ -25,26 +27,69 @@ if(length(list.files(dirData)) == 0){
 }
 
 ## plotting functions ----
-source(here::here("R", "makeplots.R"))
+source(here("R", "makeplots.R"))
 
 ## datasets ----
-
-## used in preparing the data
-## and setting the leaflet map crs
-tile_size <- 512
-# gbif_extent <- 12367396.2185
-
-## https://data.bas.ac.uk/items/aaec1295-b0a8-4c49-a751-d964c326ce8d/
-coast <- file.path(dirData, "coastline-medium") |>
-  st_read() |>
-  st_transform("EPSG:4326")
-
-
 data <- list(
-  `Polarview Ice Concentration` = list(
-    rast_filepath = file.path(dirData, "www.polarview.aq"),
-    tiles_filepath = file.path(dirData, "www.polarview.aq", "tiles"),
-    layernames = c("2023-09-01", "2023-10-01", "2023-11-01", "2023-12-01"),
-    ylab = "Ice Concentration (%)"
+  `Monthly Maximum Temperature` = list(
+    filepaths = file.path(dirData, "Reanalysis-NCEP-DOE", "tmax_2m_mon_mean.nc"),
+    rastfile = file.path(dirShiny, "data", "tmax_rast"),
+    tilesfolder = file.path(dirShiny, "www", "tmax_tiles"),
+    layernames = c(),
+    attrib = "NCEP/DOE",
+    plotyrange = c(),
+    ylab = "Monthly Max Temp (degC)"
+  ),
+  `Wind Speeds, Monthly Mean` = list(
+    filepaths = file.path(dirData, "Reanalysis-NCEP-DOE", "wspd_10m_mon_mean.nc"),
+    rastfile = file.path(dirShiny, "data", "wind_rast"),
+    tilesfolder = file.path(dirShiny, "www", "wind_tiles"),
+    layernames = c(),
+    attrib = "NCEP/DOE",
+    plotyrange = c(),
+    ylab = "Wind Speed (m/s)"
+  ),
+  `Monthly Mean Temperature 1-20m BGL` = list(
+    filepaths = file.path(dirData, "Reanalysis-NCEP-DOE", "tmp_10-200cm_mon_mean.nc"),
+    rastfile = file.path(dirShiny, "data", "tmp20m_rast"),
+    tilesfolder = file.path(dirShiny, "www", "tmp20m_tiles"),
+    layernames = c(),
+    attrib = "NCEP/DOE",
+    plotyrange = c(),
+    ylab = "Temperature (degC)"
+  ),
+  ## https://topex.ucsd.edu/marine_topo/
+  ## https://topex.ucsd.edu/pub/global_topo_1min/README_PERMISSIONS.txt
+  `Seafloor Topography` = list(
+    filepaths = file.path(dirData, "DEM", "topo_25.1.nc"),
+    rastfile = file.path(dirShiny, "data", "bathy_rast"),
+    tilesfolder = file.path(dirShiny, "www", "bathy_tiles"),
+    layernames = c("Depths"),
+    attrib = "Smith and Sandwell 1997",
+    plotyrange = c(),
+    ylab = ""
+  ),
+  ## https://tc.copernicus.org/preprints/tc-2017-223/tc-2017-223.pdf
+  `Digital Elevation Model of Antarctica` = list(
+    filepaths = file.path(dirData, "DEM", "Antarctica_Cryosat2_1km_DEMv1.0.tif"),
+    rastfile = file.path(dirShiny, "data", "dem_rast"),
+    tilesfolder = file.path(dirShiny, "www", "dem_tiles"),
+    layernames = c("Elevation"),
+    attrib = "Slater, Shepherd, et al 2017",
+    plotyrange = c(0, 4100),
+    ylab = "Elevation (m) drived from data acquired July 2010-16"
   )
 )
+
+tile_size <- 512
+
+## National Ice Center Antarctic daily sea ice charts
+usnic <- "https://usicecenter.gov/File/DownloadArchive?prd=22"
+nic_zip <- file.path(dirShiny, "www", "tmp.kmz")
+nic_dir <- file.path(dirShiny, "www", "tmp")
+
+pal <- colorFactor(
+  c("#5de5a1","#31abf2"),
+  c("CT81","CT18")
+)
+

@@ -66,6 +66,7 @@ server <- function(input, output, session) {
     detectRetina = TRUE
   )
 
+
   ## for polar crs need to custom define leaflet options
   ## https://thomasswilliams.github.io/development/r/2022/06/18/leaflet-and-r.html
   ## https://tile.gbif.org/ui/3031/EPSG3031-leaflet.js
@@ -84,6 +85,16 @@ server <- function(input, output, session) {
 
   ## render the leaflet map
   output$map <- renderLeaflet({
+    leaflet(options = gbif_map_options) |>
+      addTiles(
+        urlTemplate = "https://tile.gbif.org/3031/omt/{z}/{x}/{y}@1x.png?style=gbif-light",
+        attribution = "OpenStreetMap | GBIF",
+        layerId = "antartica_tiles",
+        options = tile_options
+      )
+  })
+  observe({
+    ## GBIF species occurrence layers
     speciesOccurance <- paste(
       "https://api.gbif.org/v2/map/occurrence/density/{z}/{x}/{y}@1x.png?srs=EPSG%3A3031",
       paste0("taxonKey=", input$taxonkey),
@@ -91,16 +102,37 @@ server <- function(input, output, session) {
       "style=purpleYellow.point",
       sep = "&"
     )
-    leaflet(options = gbif_map_options) |>
-      addTiles(
-        urlTemplate = "https://tile.gbif.org/3031/omt/{z}/{x}/{y}@1x.png?style=gbif-light",
-        attribution = "OpenStreetMap | GBIF",
-        layerId = "antartica_tiles",
-        options = tile_options
-      ) |>
+    leafletProxy("map") |>
+      removeTiles(layerId = "sppGBIF") |>
       addTiles(
         urlTemplate = speciesOccurance,
+        attribution = "Occurrence Records GBIF",
+        layerId = "sppGBIF",
         options = tile_options
+      )
+  })
+  observe({
+    print(input$icedate)
+    ## USNIC kmz polylines
+    # download.file(
+    #   paste0(usnic, format(input$icedate, "%m%d%Y")),
+    #   destfile = nic_zip,
+    #   mode = "wb"
+    # )
+    # unzip(nic_zip, exdir = nic_dir)
+    iceEdge <- nic_dir |>
+      list.files(pattern = "\\.kml$", full.names = TRUE) |>
+      st_read() |>
+      select(Name) |>
+      st_zm(drop = TRUE)
+
+    leafletProxy("map") |>
+      clearShapes() |>
+      addPolylines(
+        data = iceEdge,
+        color = ~pal(Name),
+        opacity = 0.7,
+        weight = 4
       )
   })
 
@@ -149,7 +181,6 @@ server <- function(input, output, session) {
         ),
         options = tile_options
       ) |>
-      addPolygons(data = coast) |>
       addDrawToolbar(
         targetGroup = "draw",
         singleFeature = TRUE,

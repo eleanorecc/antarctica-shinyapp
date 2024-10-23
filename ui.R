@@ -49,6 +49,14 @@ ui <- page_sidebar(
       human and machine observation records from GBIF.",
       style = "font-size: 12px; color: #606891"
     ),
+    sliderInput(
+      inputId = "icedate",
+      label = "Select Date Range:",
+      min = as.Date("2012-01-01"),
+      max = Sys.Date(),
+      value = Sys.Date(),
+      timeFormat = "%Y-%m-%d"
+    ),
     textInput(
       inputId = "taxonkey",
       label = "GBIF Taxon Key",

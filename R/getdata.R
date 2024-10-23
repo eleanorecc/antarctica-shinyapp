@@ -6,81 +6,106 @@ getdata <- FALSE
 syncdata <- FALSE
 testrun <- TRUE
 
-## polygons around south pole
-polygon12 <- "POLYGON((0 -60, 30 -60, 60 -60, 90 -60, 120 -60, 150 -60, 180 -60, -150 -60, -120 -60, -90 -60, -60 -60, -30 -60, 0 -60))"
-polygon12sf <- polygon12 |>
-  st_as_sfc(crs = 4326) |>
-  st_transform(3031)
-polygon4 <- "POLYGON((-11 -62, 16 -74, -34 -82, -44 -68, -11 -62))"
-polygon4sf <- polygon4 |>
-  st_as_sfc(crs = 4326) |>
-  st_transform(3031)
 
-
-
-## test example --
-## Polarview Sentinel-1 imagery
-
-## dates for which to get data
-## polarview ice concentration data is available daily
-acquisitiondates <- as.Date(
-  c("2023-09-01", "2023-10-01", "2023-11-01", "2023-12-01"),
-  format="%Y-%m-%d"
-)
-
-## test out using blueant
+## datasets to download ----
 if(getdata){
-  example_data <- sources_seaice(
-    "Polarview Sentinel-1 imagery",
-    acquisition_date = acquisitiondates,
-    polygon = polygon12sf,
-    formats = "geotiff"
-  )
-  conf <- dirData |>
-    bb_config() |>
-    bb_add(example_data)
 
-  if(syncdata){
-    bb_sync(
-      conf,
-      verbose = TRUE,
-      confirm_downloads_larger_than = 0.5,
-      dry_run = testrun
+  ## blueant datasets
+  # cersat_ice_conc <- sources_seaice(
+  #   "CERSAT SSM/I sea ice concentration",
+  # )
+  # usnic_ice_edge <- sources_seaice(
+  #   "National Ice Center Antarctic daily sea ice charts",
+  # )
+  # aqua_modis_chla <- sources_ocean_colour(
+  #   "Oceandata MODIS Aqua Level-3 mapped monthly 9km chl-a",
+  # )
+  # aqua_modis_sst <- sources_sst(
+  #   "Oceandata MODIS Aqua Level-3 mapped monthly 9km SST",
+  # )
+  # ncep_reanalysis2 <- sources_reanalysis(
+  #   "NCEP-DOE Reanalysis 2",
+  # )
+  # cryosat2_dem <- sources_topography(
+  #   "CryoSat-2 digital elevation model",
+  # )
+  # bathymetry <- sources_topography(
+  #   "Smith and Sandwell bathymetry",
+  # )
+
+
+  ## download directly from sources...
+
+  ## NCEP-DOE Reanalysis 2
+  ## would use RNCEP R package but issue with tcltk on server, and with gcc and gfortran for tgp pkg locally...
+  url_ncep <- "https://psl.noaa.gov/thredds/fileServer/Datasets/ncep.reanalysis2/Monthlies/gaussian_grid/"
+  lyrs <- c(
+    "tmax.2m.mon.mean.nc",
+    "tmp.0-10cm.mon.mean.nc",
+    "tmp.10-200cm.mon.mean.nc",
+    "wspd.10m.mon.mean.nc",
+    "icec.sfc.mon.mean.nc"
+  )
+  ## monthly max temp,
+  ## monthly 0-10cm BGL temp,
+  ## monthly 10-200cm BGL temp,
+  ## monthly mean wind speed,
+  ## monthly surface ice concentration
+  for(x in lyrs){
+    nm <- x |>
+      str_replace_all("\\.", "_") |>
+      str_replace("_nc", ".nc")
+    download.file(
+      url = paste0(url_ncep, x),
+      destfile = file.path(dirData, "Reanalysis-NCEP-DOE", nm),
+      mode = "wb"
     )
   }
+
+  ## CryoSat-2 digital elevation model
+  ## already has EPSG3031 crs
+  download.file(
+    url = "http://www.cpom.ucl.ac.uk/csopr/icesheets3/data/Antarctica_Cryosat2_1km_DEMv1.0.tif",
+    destfile = file.path(dirData, "DEM", "Antarctica_Cryosat2_1km_DEMv1.0.tif"),
+    mode = "wb"
+  )
+
+  ## Smith and Sandwell bathymetry
+  download.file(
+    url = "https://topex.ucsd.edu/pub/global_topo_1min/topo_25.1.nc",
+    destfile = file.path(dirData, "DEM", "topo_25.1.nc"),
+    mode = "wb"
+  )
+
+
+  ## additional datasets from copernicus marine portal
+
+  ## rates of change in surface ocean pH at 0.25 degree resolution
+  ## https://data.marine.copernicus.eu/product/GLOBAL_OMI_HEALTH_carbon_ph_trend/description
+
+
+  ## monthly mean biogeochemical parameters at 0.25 degree resolution
+  ## https://data.marine.copernicus.eu/product/GLOBAL_ANALYSISFORECAST_BGC_001_028/description
+
+  ## chla, nitrate, phosphate, siilicate, dissolved oxygen, dissolved iron,
+  ## primary production, phytoplankton, pH, surface partial pressure of carbon dioxyde
+  ## 50 vertical levels are ranging from 0 to 5700 meters
+
+
+  ## monthly ocean surface carbon
+  ## https://data.marine.copernicus.eu/product/MULTIOBS_GLO_BIO_CARBON_SURFACE_REP_015_008/description
+
+  ## surface ocean pCO2, air-sea fluxes, pH, total alkalinity,
+  ## dissoved inorganic carbon, saturation state wrt calcite and aragonite
+
+
+  ## COGS
+  # cog.url <- "ftp://palantir.boku.ac.at/Public/ClimateData/v4_cogeo/AllDataRasters/"
+  # con <- curl(cog.url, "r", handle = new_handle(dirlistonly = TRUE))
+  # read.table(con)
+  # close(con)
+
 }
 
-## polarview bowerbird download isn't working
-## use instead http directly https://seaice.uni-bremen.de/data-archive/
-if(getdata){
-  ## s6250 means southern hemisphere 6250 resolution
-  base_url <- "https://data.seaice.uni-bremen.de/amsr2/asi_daygrid_swath/s6250"
-  tiflinks <- lapply(acquisitiondates, function(dt){
-    yr <- substr(dt, 1, 4)
-    mn <- str_to_lower(month(dt, label = TRUE))
-    url <- sprintf("%s/%s/%s/Antarctic", base_url, yr, mn)
-    res <- GET(url)
-    txt <- content(res, "text")
-    ## current most recent version is v5.4
-    tif <- str_extract_all(txt, '(?<=href=")[^"]+v5.4\\.tif(?=")')
-    sprintf("%s/%s/%s/Antarctic/%s", base_url, yr, mn, unlist(tif))
-  })
-  dt <- acquisitiondates |>
-    str_replace_all("-", "") |>
-    paste(collapse = "|")
-  tiflinks <- unlist(tiflinks) |>
-    grep(pattern = dt, value = TRUE)
 
-  for(x in tiflinks){
-    file_name <- file.path(dirData, "www.polarview.aq", basename(x))
-    ## only download if file does not yet exist
-    if(!file.exists(file_name)){
-      tryCatch({
-        download.file(x, file_name, mode = "wb")
-      }, error = function(e){
-        cat("Error downloading:", file_name, "\n")
-      })
-    }
-  }
-  closeAllConnections()
-}
+
