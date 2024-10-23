@@ -1,9 +1,10 @@
 ## packages ----
 library(httr)
+library(curl)
+library(jsonlite)
 library(dplyr)
 library(stringr)
 library(lubridate)
-library(blueant)
 library(terra)
 library(sf)
 library(shiny)
@@ -15,7 +16,7 @@ library(highcharter)
 
 
 ## directories ----
-dirData <- here::here("data")
+dirData <- "/home/ellie/data/antarctic-data-wobec"
 if(length(list.files(dirData)) == 0){
   message(
     "dirData is not found-- if on a remote server,
@@ -30,8 +31,13 @@ source(here::here("R", "makeplots.R"))
 
 ## used in preparing the data
 ## and setting the leaflet map crs
-gbif_tile_size <- 512
-extent <- 12367396.2185
+tile_size <- 512
+# gbif_extent <- 12367396.2185
+
+## https://data.bas.ac.uk/items/aaec1295-b0a8-4c49-a751-d964c326ce8d/
+coast <- file.path(dirData, "coastline-medium") |>
+  st_read() |>
+  st_transform("EPSG:4326")
 
 
 data <- list(
