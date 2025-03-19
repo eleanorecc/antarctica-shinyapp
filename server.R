@@ -2,31 +2,6 @@ server <- function(input, output, session) {
 
   ## map ----
 
-  ## handling user-uploaded data
-  ## increase upload limit to 30MB (from default of 5) in options
-  options(shiny.maxRequestSize = 30*1024^2)
-
-  shpdata <- reactive({
-    ## req ensures this code only runs when a file is uploaded
-    req(input$shapefile)
-
-    ## unzip the uploaded shapefile
-    dirtmp <- tempdir()
-    unzip(input$shapefile$datapath, exdir = dirtmp)
-    tmpfile <- list.files(dirtmp, pattern = "\\.shp$", full.names = TRUE)
-    if(length(tmpfile) == 1){
-      shpfile <- st_read(tmpfile)
-      if(st_crs(shpfile) != st_crs("EPSG:3031")){
-        shpfile <- st_transform(shpfile, "EPSG:3031")
-      }
-    }
-    if(length(tmpfile) != 1){
-      ## TODO check the shp has at least 30% overlap with map latitudes?
-      shpfile <- NULL
-    }
-    return(shpfile)
-  })
-
   ## for polar crs need to custom define leaflet options
   ## https://thomasswilliams.github.io/development/r/2022/06/18/leaflet-and-r.html
   ## https://tile.gbif.org/ui/3031/EPSG3031-leaflet.js
@@ -66,6 +41,8 @@ server <- function(input, output, session) {
 
   ## render the leaflet map
   output$map <- renderLeaflet({
+    # input <- list()
+    # input$taxonkey <- 212
     speciesOccurance <- paste(
       "https://api.gbif.org/v2/map/occurrence/density/{z}/{x}/{y}@1x.png?srs=EPSG%3A3031",
       paste0("taxonKey=", input$taxonkey),
@@ -73,6 +50,10 @@ server <- function(input, output, session) {
       "style=purpleYellow.point",
       sep = "&"
     )
+
+    ## adjust the shiny map to display the tiles with screen slider between two sides so can compare two variables/stats/decades
+    ## make two time series plots static at bottom based on selected variable/stat
+    ## https://github.com/digidem/leaflet-side-by-side
 
     leaflet(options = map_options) |>
       addTiles(
@@ -82,44 +63,55 @@ server <- function(input, output, session) {
         options = gbif_tile_options
       ) |>
 
+      # addCmsWMTSTiles(
+      #   product = "SST_GLO_SST_L4_NRT_OBSERVATIONS_010_001",
+      #   layer = "analysed_sst",
+      #   variable = "Sea surface temperature (SST)",
+      #   tilematrixset = "EPSG:3031",
+      #   options = WMSTileOptions(
+      #     format = "image/png",
+      #     transparent = TRUE
+      #   )
+      # ) |>
+      # attribution = cms_cite_product("GLOBAL_ANALYSISFORECAST_PHY_001_024")
+
       ## TODO sort issue with misalignment of tiles...
-      addTiles(
-        urlTemplate = "mytiles/{z}/{x}/{y}.png",
-        group = "Polarview Ice Concentration",
-        options = tileOptions(
-          tileSize = gbif_tile_size,
-          noWrap = TRUE,
-          opacity = 0.2,
-          continuousWorld = TRUE
-        )
-      ) |>
+      # addTiles(
+      #   urlTemplate = "mytiles/{z}/{x}/{y}.png",
+      #   group = "Polarview Ice Concentration",
+      #   options = tileOptions(
+      #     tileSize = gbif_tile_size,
+      #     noWrap = TRUE,
+      #     opacity = 0.2,
+      #     continuousWorld = TRUE
+      #   )
+      # ) |>
       addTiles(
         urlTemplate = speciesOccurance,
-        options = gbif_tile_options,
-        attribution = "GBIF.org"
+        options = gbif_tile_options
       ) |>
-      addGraticule(
-        interval = 10,
-        style = list(
-          color = "black",
-          opacity = 0.5,
-          weight = 0.4
-        )
-      ) |>
-      addDrawToolbar(
-        targetGroup = "draw",
-        singleFeature = TRUE,
-        polygonOptions = FALSE,
-        markerOptions = FALSE,
-        rectangleOptions = FALSE,
-        circleOptions = FALSE,
-        circleMarkerOptions = FALSE,
-        editOptions = editToolbarOptions(
-          edit = TRUE,
-          remove = TRUE,
-          selectedPathOptions = selectedPathOptions()
-        )
-      ) |>
+      # addDrawToolbar(
+      #   targetGroup = "draw",
+      #   singleFeature = TRUE,
+      #   polygonOptions = FALSE,
+      #   markerOptions = FALSE,
+      #   rectangleOptions = FALSE,
+      #   circleOptions = FALSE,
+      #   circleMarkerOptions = FALSE,
+      #   editOptions = editToolbarOptions(
+      #     edit = FALSE,
+      #     remove = TRUE,
+      #     selectedPathOptions = selectedPathOptions()
+      #   )
+      # ) |>
+      # addMeasurePathToolbar(
+      #   options = measurePathOptions(
+      #     showOnHover = FALSE,
+      #     minPixelDistance = 30,
+      #     showDistances = TRUE,
+      #     showArea = FALSE
+      #   )
+      # ) |>
       addLayersControl(overlayGroups = c(names(data))) |>
       hideGroup(names(data))
   })
@@ -165,4 +157,16 @@ server <- function(input, output, session) {
       cross_section_plot(plotdata())
     }
   })
+
+  ## define CRS for  using Copernicus Marine Service tiles with EPSG 32761
+  leafletCRS(
+    crsClass = "L.Proj.CRS",
+    code = "EPSG:32761",
+    proj4def = "+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+  )
+
+
+
+
+
 }

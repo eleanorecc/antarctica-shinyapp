@@ -1,13 +1,106 @@
-source(here::here("global.R"))
+multiyear_summaries <- function(dataDir, ncvarname){
+  require(ncdf4)
+  require(lubridate)
+  require(terra)
+  require(dplyr)
 
-## don't run script
-wrangledata <- FALSE
+  nc_file <- list.files(dataDir, pattern = "\\.nc$", full.names = TRUE)
+  nc_data <- nc_open(nc_file)
+
+  lon <- ncvar_get(nc_data, "longitude")
+  lat <- ncvar_get(nc_data, "latitude")
+  time <- ncvar_get(nc_data, "time")
+
+  # ncvarname <- "CHL"
+  x <- ncvar_get(nc_data, ncvarname)
+
+  ## get 3 time periods
+  ## time is in days since 1900-01-01
+  dates <- as.Date(time, origin = "1900-01-01")
+  yrs <- as.numeric(format(dates, "%Y"))
+
+  ## are these the time periods we should use?
+  ## data sometimes start from 1993 but most start from mid 1997
+  T1998_2006 <- which(yrs >= 1998 & yrs <= 2006)
+  T2007_2015 <- which(yrs >= 2007 & yrs <= 2015)
+  T2016_2024 <- which(yrs >= 2016 & yrs <= 2024)
 
 
-## test example --
-## Polarview Sentinel-1 imagery
-if(wrangledata){
-  tiffs_folder <- file.path(dirData, "www.polarview.aq")
+  ## get per-pixel annual averages of:
+  ## all/summer/winter months
+  include_years <- 1998:2024
+  annual_averages <- array(NA, dim = c(length(lon), length(lat), length(include_years)))
+  summer_averages <- array(NA, dim = c(length(lon), length(lat), length(include_years)))
+  winter_averages <- array(NA, dim = c(length(lon), length(lat), length(include_years)))
+
+  avgsfun <- function(i, months){
+    j <- which(yrs == include_years[i])
+    yavg <- rowMeans(x[,,j], na.rm = TRUE, dims = 2)
+    annual_averages[,,i] <- yavg
+    df <- expand.grid(lon = lon, lat = lat) |>
+      mutate(x = as.vector(yavg), xsd = as.vector(ysd)) |>
+      mutate(x = ifelse(is.nan(x), NA, x))
+  }
+
+  annual_list <- lapply(seq_along(include_years), function(i){
+    j <- which(yrs == include_years[i])
+
+    yavg <- rowMeans(x[,,j], na.rm = TRUE, dims = 2)
+    ysd <- apply(x[,,j], MARGIN = c(1, 2), FUN = sd, na.rm = TRUE)
+
+    annual_averages[,,i] <- yavg
+    annual_stdev[,,i] <- ysd
+
+    expand.grid(lon = lon, lat = lat) |>
+      mutate(x = as.vector(yavg), xsd = as.vector(ysd)) |>
+      mutate(x = ifelse(is.nan(x), NA, x))
+  })
+  summer_list <- lapply(seq_along(include_years), function(i){
+    j <- which(yrs == include_years[i])
+
+    ## summer months
+    j <- j[format(dates[j], "%m") %in% c("06", "07", "08")]
+
+    yavg <- rowMeans(x[,,j], na.rm = TRUE, dims = 2)
+    ysd <- apply(x[,,j], MARGIN = c(1, 2), FUN = sd, na.rm = TRUE)
+
+    summer_averages[,,i] <- yavg
+    summer_stdev[,,i] <- ysd
+
+    expand.grid(lon = lon, lat = lat) |>
+      mutate(x = as.vector(yavg), xsd = as.vector(ysd)) |>
+      mutate(x = ifelse(is.nan(x), NA, x))
+  })
+
+
+
+
+  names(annual_averages_list) <- as.character(include_years)
+
+  aadf <- annual_list |>
+    bind_rows(.id = "year") |>
+    group_by(year) |>
+    mutate(area_annual_mean = mean(x, na.rm = TRUE)) |>
+    ungroup() |>
+    mutate(timeperiod = case_when(
+      year %in% 1998:2006 ~ "1998-2006",
+      year %in% 2007:2015 ~ "2007-2015",
+      year %in% 2016:2024 ~ "2016-2024"
+    )) |>
+    group_by(timeperiod) |>
+    mutate(
+      timeperiod_areamean = mean(area_annual_mean, na.rm = TRUE),
+
+    ) |>
+
+  return(list(
+    table = aadf,
+    array = annual_averages
+  ))
+}
+
+maketiles <- function(tiffs_folder, ){
+
   rast1 <- tiffs_folder |>
     list.files("v5.4.tif", full.names = TRUE) |>
     rast()

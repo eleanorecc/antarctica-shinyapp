@@ -27,7 +27,7 @@ wrangle_data <- function(coords, layer){
   return(plotdata)
 }
 
-time_series_plot <- function(plotdata){
+time_series_hcplot <- function(plotdata){
 
   tsplot <- highchart() |>
     hc_xAxis(
@@ -153,4 +153,12 @@ cross_section_plot <- function(plotdata){
   }
 
   return(xsplot)
+}
+
+time_series_plot <- function(){
+  ## plot nearly transparent line for each pixel
+  ## with the average as a dark line
+
+
+  return(tsplot)
 }
