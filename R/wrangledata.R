@@ -1,9 +1,6 @@
 ## function to get averages
-timeperiod_summaries <- function(x, include_years, metric = c("mean", "sum"), months, spatialweights){
+annual_summaries <- function(x, include_years, months, metric = c("mean", "sum")){
   dim2 <- dim(x)[1:2]
-
-  ## first get per-pixel annual means, averaging monthly values
-  message("note: this is assuming there is one raster layer per month each year")
 
   y <- array(NA, dim = c(dim2, length(include_years)))
   if(metric == "mean"){
@@ -22,8 +19,32 @@ timeperiod_summaries <- function(x, include_years, metric = c("mean", "sum"), mo
       y[is.nan(y)] <- NA
     }
   }
+  return(y)
+}
 
-  ## then get time period (per-pixel) averages
+seaice_extents <- function(x, cutoff, spatialweights, metric = c("minext", "maxext")){
+  x[x < cutoff] <- NA
+  x[x >= cutoff] <- 1
+
+  totalarea <- x |>
+    sweep(MARGIN = c(1,2), FUN = "*", spatialweights) |>
+    apply(MARGIN = 3, FUN = sum, na.rm = TRUE)
+
+  ## if x is 365 daily ice concentrations then i is doy
+  ## if x is 9 annual ice extents then i is year number
+  if(metric == "minext"){ i = which.min(totalarea) }
+  if(metric == "maxext"){ i = which.max(totalarea) }
+
+  return(list(
+    extent = x[,,i],
+    df = data.frame(index = i, coveragearea = totalarea)
+  ))
+}
+
+timeperiod_averages <- function(y, spatialweights){
+  dim2 <- dim(y)[1:2]
+
+  ## get time period (per-pixel) averages
   ## and interannual variability
   prd_avgs <- array(NA, dim = c(dim2, 3))
   prd_var <- array(NA, dim = c(dim2, 3))
@@ -33,8 +54,9 @@ timeperiod_summaries <- function(x, include_years, metric = c("mean", "sum"), mo
     prd_var[,,i] <- apply(y[,,k], MARGIN = c(1, 2), FUN = var, na.rm = TRUE)
   }
 
-  ## also return a timeseries table
-  ## taking spatially-weighted averages and sd of pixel values from annual averages
+  ## timeseries table
+  ## taking spatially-weighted means
+  ## and sd of pixel values from the annual values
   yrwgtsum <- y |>
     sweep(MARGIN = c(1,2), FUN = "*", spatialweights) |>
     apply(MARGIN = 3, FUN = sum, na.rm = TRUE)
@@ -45,7 +67,7 @@ timeperiod_summaries <- function(x, include_years, metric = c("mean", "sum"), mo
   yrsd <- apply(y, MARGIN = 3, FUN = sd, na.rm = TRUE)
   yrmean <- apply(y, MARGIN = 3, FUN = mean, na.rm = TRUE)
 
-  tstab <- data.frame(year = include_years, yrmean, yrsd, nonNAarea, yrwgtsum) |>
+  tstab <- data.frame(yrmean, yrsd, nonNAarea, yrwgtsum) |>
     mutate(yrwgtmean = yrwgtsum/nonNAarea)
 
   return(list(
@@ -57,7 +79,7 @@ timeperiod_summaries <- function(x, include_years, metric = c("mean", "sum"), mo
 
 
 ## function to get annual minimum extent
-timeperiod_extents <- function(x, include_years, spatialweights){
+seaice_extents <- function(x, include_years, spatialweights){
   dim2 <- dim(x)[1:2]
 
   ## first get per-pixel annual means, averaging monthly values
