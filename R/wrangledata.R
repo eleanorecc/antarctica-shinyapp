@@ -57,7 +57,7 @@ timeperiod_averages <- function(y, spatialweights){
   ))
 }
 
-seaice_extents <- function(x, cutoff, spatialweights, metric = c("minext", "maxext")){
+extents_and_sums <- function(x, cutoff, spatialweights, metric = c("minext", "maxext")){
   x[x < cutoff] <- NA
   x[x >= cutoff] <- 1
 
@@ -67,12 +67,13 @@ seaice_extents <- function(x, cutoff, spatialweights, metric = c("minext", "maxe
 
   ## if x is 365 daily ice concentrations then i is doy
   ## if x is 9 annual ice extents then i is year number
-  if(metric == "minext"){ i = which.min(totalarea) }
-  if(metric == "maxext"){ i = which.max(totalarea) }
+  if(metric == "minext"){i = which.min(totalarea)}
+  if(metric == "maxext"){i = which.max(totalarea)}
 
   return(list(
     extent = x[,,i],
-    df = data.frame(index = i, coveragearea = totalarea)
+    sum = rowSums(x, na.rm = TRUE, dims = 2),
+    df = data.frame(index = i, coveragearea = totalarea[i])
   ))
 }
 

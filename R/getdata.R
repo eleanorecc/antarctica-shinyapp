@@ -1,14 +1,14 @@
-dataparams <- function(getdates, bbcoords){
+dataparams <- function(getdates, bboxcoords){
   getdates <- as.Date(getdates, format="%Y-%m-%d")
 
   return(list(
     start_datetime = paste0(getdates[1], "T00:00:00"),
     end_datetime = paste0(getdates[length(getdates)], "T00:00:00"),
-    min_longitude = min(bbcoords$lon),
-    min_latitude = min(bbcoords$lat),
-    max_longitude = max(bbcoords$lon),
-    max_latitude = max(bbcoords$lat),
-    min_depth = -1,
+    min_longitude = min(bboxcoords$lon),
+    min_latitude = min(bboxcoords$lat),
+    max_longitude = max(bboxcoords$lon),
+    max_latitude = max(bboxcoords$lat),
+    min_depth = 0.5,
     max_depth = 10
   ))
 }
@@ -19,9 +19,10 @@ dataparams <- function(getdates, bbcoords){
 ## https://help.marine.copernicus.eu/en/articles/863825
 ## how-to-download-data-via-the-copernicus-marine-toolbox-in-r
 
-get_seaice <- function(params, user, pass){
+get_seaice <- function(params, datasetID, user, pass, saveRdata){
   require(lubridate)
   require(reticulate)
+  require(terra)
 
   cmt <- import("copernicusmarine")
   cmt$login(user, pass)
@@ -30,18 +31,20 @@ get_seaice <- function(params, user, pass){
   saveDir <- file.path(dirData, "seaiceExtent")
 
   yrs <- substr(c(params$start_datetime, params$end_datetime), 1, 4)
-  ystart <- as.Date(paste0(yrs[1]:yrs[2], "-01-01"))
+  yrs <- yrs[1]:yrs[2]
+  ystart <- as.Date(paste0(yrs, "-01-01"))
 
   ## initialize dataframe
   df <- data.frame(
+    year = numeric(),
     index = numeric(),
     coveragearea = numeric()
   )
   cmt$subset(
-    dataset_id = "",
-    variables = "siconc",
-    start_datetime = ystart[1],
-    end_datetime = ystart[1] + years(1) - days(1),
+    dataset_id = datasetID,
+    variables = list("siconc"),
+    start_datetime = paste0(ystart[1], "T00:00:00"),
+    end_datetime = paste0(ystart[1] + years(1) - days(1), "T00:00:00"),
     minimum_longitude = params$min_longitude,
     minimum_latitude = params$min_latitude,
     maximum_longitude = params$max_longitude,
@@ -50,31 +53,32 @@ get_seaice <- function(params, user, pass){
     maximum_depth = params$max_depth,
     output_filename = nm,
     output_directory = saveDir,
-    force_download = TRUE,
     overwrite = TRUE
   )
   nctmp <- read_ncdata(saveDir, "siconc")
 
-  ## initialize array
+  ## initialize arrays
   dim2 <- dim(nctmp)[1:2]
-  y <- array(NA, dim = c(dim2, length(yrs)))
+  extents <- array(NA, dim = c(dim2, length(yrs)))
+  sums <- array(NA, dim = c(dim2, length(yrs)))
 
   r <- rast(file.path(saveDir, nm))
   spatialweights <- rast(ext(r), resolution = res(r), crs = crs(r)) |>
     cellSize(unit = "km") |>
     t() |>
     as.array()
+  tmp <- extents_and_sums(nctmp, cutoff = 0.8, spatialweights, metric = "minext")
+  df <- rbind(df, cbind(year = yrs[1], tmp$df))
+  extents[,,1] <- tmp$extent
+  sums[,,1] <- tmp$sum
 
-  ext <- seaice_extents(nctmp, cutoff = 0.8, spatialweights, metric = "minext")
-  y[,,1] <- ext$extent
-  df <- rbind(df, ext$df)
-
+  ## annual min extents and sums
   for(i in 2:length(ystart)){
     cmt$subset(
-      dataset_id = "",
-      variables = "siconc",
-      start_datetime = ystart[i],
-      end_datetime = ystart[i] + years(1) - days(1),
+      dataset_id = datasetID,
+      variables = list("siconc"),
+      start_datetime = paste0(ystart[1], "T00:00:00"),
+      end_datetime = paste0(ystart[1] + years(1) - days(1), "T00:00:00"),
       minimum_longitude = params$min_longitude,
       minimum_latitude = params$min_latitude,
       maximum_longitude = params$max_longitude,
@@ -83,30 +87,44 @@ get_seaice <- function(params, user, pass){
       maximum_depth = params$max_depth,
       output_filename = nm,
       output_directory = saveDir,
-      force_download = TRUE,
       overwrite = TRUE
     )
     nctmp <- read_ncdata(saveDir, "siconc")
-    ext <- seaice_extents(nctmp, cutoff = 0.8, spatialweights, metric = "minext")
-
-    y[,,i] <- ext$extent
-    df <- rbind(df, ext$df)
+    tmp <- extents_and_sums(nctmp, cutoff = 0.8, spatialweights, metric = "minext")
+    df <- rbind(df, cbind(year = yrs[i], tmp$df))
+    extents[,,i] <- tmp$extent
+    sums[,,i] <- tmp$sum
   }
-
-
-  y <- array(NA, dim = c(dim2, length(include_years)))
-  if(metric == "mean"){
-    for(i in seq_along(include_years)){
-      k <- which(yrs == include_years[i])
-      k <- k[months]
-
-    }
-  }
-
-
-
+  save(
+    list(extents, sums, df),
+    file = file.path(saveDir, saveRdata)
+  )
+  return(list(
+    extents = extents,
+    sums = sums,
+    df = df
+  ))
 }
 
+## one dataset 1993-2020, another with 2021-2025 interm data
+## 1993 to 2021-06-30 in cmems_mod_glo_phy_my_0.083deg_P1D-m
+## 2021-07-01 to 2025 in cmems_mod_glo_phy_myint_0.083deg_P1D-m
+
+## does year need to be split across date other than January 1st??
+## what to do about 2021 split over two datasets around July 1st??
+
+# c("1998-01-01", "2020-12-31") |>
+#   dataparams(weddell_gyre_coords) |>
+#   get_seaice(
+#     "cmems_mod_glo_phy_my_0.083deg_P1D-m",
+#     user, pass, "seaice_1998_2020.Rdata"
+#   )
+# c("2022-01-01", "2024-12-31") |>
+#   dataparams(weddell_gyre_coords) |>
+#   get_seaice(
+#     "cmems_mod_glo_phy_myint_0.083deg_P1D-m",
+#     user, pass, "seaice_2020_2024.Rdata"
+#   )
 
 
 getdata <- function(datasets = datlst, getdates){

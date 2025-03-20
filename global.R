@@ -37,7 +37,7 @@ if(length(list.files(dirData)) == 0){
 ## https://doi.org/10.15784/601652
 ## https://eos.org/editors-vox/science-in-a-frozen-ocean
 weddell_gyre_coords <- data.frame(
-  lat = c(-60, -50, -85, -85, -60),
+  lat = c(-60, -50, -80, -80, -60),
   lon = c(-60, 40, 40, -60, -60)
 )
 weddell_gyre <- weddell_gyre_coords |>
