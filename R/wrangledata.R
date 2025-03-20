@@ -1,97 +1,161 @@
-multiyear_summaries <- function(dataDir, ncvarname){
+## function to get averages
+timeperiod_summaries <- function(x, include_years, metric = c("mean", "sum"), months, spatialweights){
+  dim2 <- dim(x)[1:2]
+
+  ## first get per-pixel annual means, averaging monthly values
+  message("note: this is assuming there is one raster layer per month each year")
+
+  y <- array(NA, dim = c(dim2, length(include_years)))
+  if(metric == "mean"){
+    for(i in seq_along(include_years)){
+      k <- which(yrs == include_years[i])
+      k <- k[months]
+      y[,,i] <- rowMeans(x[,,k], na.rm = TRUE, dims = 2)
+      y[is.nan(y)] <- NA
+    }
+  }
+  if(metric == "sum"){
+    for(i in seq_along(include_years)){
+      k <- which(yrs == include_years[i])
+      k <- k[months]
+      y[,,i] <- rowSums(x[,,k], na.rm = TRUE, dims = 2)
+      y[is.nan(y)] <- NA
+    }
+  }
+
+  ## then get time period (per-pixel) averages
+  ## and interannual variability
+  prd_avgs <- array(NA, dim = c(dim2, 3))
+  prd_var <- array(NA, dim = c(dim2, 3))
+  for(i in 1:3){
+    k <- (9*i-8):(9*i)
+    prd_avgs[,,i] <- rowMeans(y[,,k], na.rm = TRUE, dims = 2)
+    prd_var[,,i] <- apply(y[,,k], MARGIN = c(1, 2), FUN = var, na.rm = TRUE)
+  }
+
+  ## also return a timeseries table
+  ## taking spatially-weighted averages and sd of pixel values from annual averages
+  yrwgtsum <- y |>
+    sweep(MARGIN = c(1,2), FUN = "*", spatialweights) |>
+    apply(MARGIN = 3, FUN = sum, na.rm = TRUE)
+  nonNAarea <- y |>
+    sweep(MARGIN = c(1,2), FUN = function(a, b){ ifelse(is.na(a), NA, b) }, spatialweights) |>
+    apply(MARGIN = 3, FUN = sum, na.rm = TRUE)
+  ## does sd also need to be spatially weighted??
+  yrsd <- apply(y, MARGIN = 3, FUN = sd, na.rm = TRUE)
+  yrmean <- apply(y, MARGIN = 3, FUN = mean, na.rm = TRUE)
+
+  tstab <- data.frame(year = include_years, yrmean, yrsd, nonNAarea, yrwgtsum) |>
+    mutate(yrwgtmean = yrwgtsum/nonNAarea)
+
+  return(list(
+    averages = prd_avgs,
+    variability = prd_var,
+    table = tstab
+  ))
+}
+
+
+## function to get annual minimum extent
+timeperiod_extents <- function(x, include_years, spatialweights){
+  dim2 <- dim(x)[1:2]
+
+  ## first get per-pixel annual means, averaging monthly values
+  message("note: this is assuming there is one raster layer per day each year")
+
+  y <- array(NA, dim = c(dim2, length(include_years)))
+  if(metric == "mean"){
+    for(i in seq_along(include_years)){
+      k <- which(yrs == include_years[i])
+      k <- k[months]
+      y[,,i] <- rowMeans(x[,,k], na.rm = TRUE, dims = 2)
+      y[is.nan(y)] <- NA
+    }
+  }
+  if(metric == "sum"){
+    for(i in seq_along(include_years)){
+      k <- which(yrs == include_years[i])
+      k <- k[months]
+      y[,,i] <- rowSums(x[,,k], na.rm = TRUE, dims = 2)
+      y[is.nan(y)] <- NA
+    }
+  }
+
+  ## then get time period (per-pixel) averages
+  ## and interannual variability
+  prd_avgs <- array(NA, dim = c(dim2, 3))
+  prd_var <- array(NA, dim = c(dim2, 3))
+  for(i in 1:3){
+    k <- (9*i-8):(9*i)
+    prd_avgs[,,i] <- rowMeans(y[,,k], na.rm = TRUE, dims = 2)
+    prd_var[,,i] <- apply(y[,,k], MARGIN = c(1, 2), FUN = var, na.rm = TRUE)
+  }
+
+  ## also return a timeseries table
+  ## taking spatially-weighted averages and sd of pixel values from annual averages
+  yrwgtsum <- y |>
+    sweep(MARGIN = c(1,2), FUN = "*", spatialweights) |>
+    apply(MARGIN = 3, FUN = sum, na.rm = TRUE)
+  nonNAarea <- y |>
+    sweep(MARGIN = c(1,2), FUN = function(a, b){ ifelse(is.na(a), NA, b) }, spatialweights) |>
+    apply(MARGIN = 3, FUN = sum, na.rm = TRUE)
+  ## does sd also need to be spatially weighted??
+  yrmean <- apply(y, MARGIN = 3, FUN = mean, na.rm = TRUE)
+
+  tstab <- data.frame(year = include_years, yrmean, yrsd, nonNAarea, yrwgtsum) |>
+    mutate(yrwgtmean = yrwgtsum/nonNAarea)
+
+  return(list(
+    extents = prd_extents,
+    averages = prd_avgs,
+    table = tstab
+  ))
+}
+
+variable_summaries <- function(dataDir, ncvarname){
   require(ncdf4)
   require(lubridate)
   require(terra)
-  require(dplyr)
 
   nc_file <- list.files(dataDir, pattern = "\\.nc$", full.names = TRUE)
   nc_data <- nc_open(nc_file)
 
-  lon <- ncvar_get(nc_data, "longitude")
-  lat <- ncvar_get(nc_data, "latitude")
-  time <- ncvar_get(nc_data, "time")
-
-  # ncvarname <- "CHL"
-  x <- ncvar_get(nc_data, ncvarname)
-
-  ## get 3 time periods
+  ## interpreting time dimension
   ## time is in days since 1900-01-01
+  ## data sometimes start from 1993 but most start from mid 1997
+  time <- ncvar_get(nc_data, "time")
   dates <- as.Date(time, origin = "1900-01-01")
   yrs <- as.numeric(format(dates, "%Y"))
-
-  ## are these the time periods we should use?
-  ## data sometimes start from 1993 but most start from mid 1997
-  T1998_2006 <- which(yrs >= 1998 & yrs <= 2006)
-  T2007_2015 <- which(yrs >= 2007 & yrs <= 2015)
-  T2016_2024 <- which(yrs >= 2016 & yrs <= 2024)
-
-
-  ## get per-pixel annual averages of:
-  ## all/summer/winter months
   include_years <- 1998:2024
-  annual_averages <- array(NA, dim = c(length(lon), length(lat), length(include_years)))
-  summer_averages <- array(NA, dim = c(length(lon), length(lat), length(include_years)))
-  winter_averages <- array(NA, dim = c(length(lon), length(lat), length(include_years)))
 
-  avgsfun <- function(i, months){
-    j <- which(yrs == include_years[i])
-    yavg <- rowMeans(x[,,j], na.rm = TRUE, dims = 2)
-    annual_averages[,,i] <- yavg
-    df <- expand.grid(lon = lon, lat = lat) |>
-      mutate(x = as.vector(yavg), xsd = as.vector(ysd)) |>
-      mutate(x = ifelse(is.nan(x), NA, x))
+  ## do spatial weighting when take averages??
+  ## at the poles lat long grid vary significantly in size
+  r <- rast(nc_file)
+  spatialweights <- rast(ext(r), resolution = res(r), crs = crs(r)) |>
+    cellSize(unit="km") |>
+    t() |>
+    as.array()
+  rm(r)
+
+
+  ## read in the data itself
+  ## ncvarname = "CHL"
+  x <- ncvar_get(nc_data, ncvarname)
+
+  if(ncvarname == "SEAICE(??)"){
+    icedays <- timeperiod_averages(x, 1998:2024, 1:12, metric = "sum", spatialweights)
+
+    iceextent <- timeperiod_extents(x, 1998:2024, spatialweights)
+
+  } else {
+    annual <- timeperiod_averages(x, include_years, 1:12, metric = "mean", spatialweights)
+    summer <- timeperiod_averages(x, include_years, 7:9, metric = "mean", spatialweights)
+    winter <- timeperiod_averages(x, include_years, 1:3, metric = "mean", spatialweights)
+
+    aa <- list(annual$averages, summer$averages, winter$averages)
+    vv <- list(annual$variability, summer$variability, winter$variability)
+    tt <- bind_rows(annual$table, summer$table, winter$table)
   }
-
-  annual_list <- lapply(seq_along(include_years), function(i){
-    j <- which(yrs == include_years[i])
-
-    yavg <- rowMeans(x[,,j], na.rm = TRUE, dims = 2)
-    ysd <- apply(x[,,j], MARGIN = c(1, 2), FUN = sd, na.rm = TRUE)
-
-    annual_averages[,,i] <- yavg
-    annual_stdev[,,i] <- ysd
-
-    expand.grid(lon = lon, lat = lat) |>
-      mutate(x = as.vector(yavg), xsd = as.vector(ysd)) |>
-      mutate(x = ifelse(is.nan(x), NA, x))
-  })
-  summer_list <- lapply(seq_along(include_years), function(i){
-    j <- which(yrs == include_years[i])
-
-    ## summer months
-    j <- j[format(dates[j], "%m") %in% c("06", "07", "08")]
-
-    yavg <- rowMeans(x[,,j], na.rm = TRUE, dims = 2)
-    ysd <- apply(x[,,j], MARGIN = c(1, 2), FUN = sd, na.rm = TRUE)
-
-    summer_averages[,,i] <- yavg
-    summer_stdev[,,i] <- ysd
-
-    expand.grid(lon = lon, lat = lat) |>
-      mutate(x = as.vector(yavg), xsd = as.vector(ysd)) |>
-      mutate(x = ifelse(is.nan(x), NA, x))
-  })
-
-
-
-
-  names(annual_averages_list) <- as.character(include_years)
-
-  aadf <- annual_list |>
-    bind_rows(.id = "year") |>
-    group_by(year) |>
-    mutate(area_annual_mean = mean(x, na.rm = TRUE)) |>
-    ungroup() |>
-    mutate(timeperiod = case_when(
-      year %in% 1998:2006 ~ "1998-2006",
-      year %in% 2007:2015 ~ "2007-2015",
-      year %in% 2016:2024 ~ "2016-2024"
-    )) |>
-    group_by(timeperiod) |>
-    mutate(
-      timeperiod_areamean = mean(area_annual_mean, na.rm = TRUE),
-
-    ) |>
 
   return(list(
     table = aadf,

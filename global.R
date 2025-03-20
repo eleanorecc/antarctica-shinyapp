@@ -10,19 +10,14 @@
 ## (3) salinity
 
 ## packages ----
-library(httr2)
+library(here)
 library(dplyr)
-library(stringr)
-library(lubridate)
-library(terra)
 library(sf)
 library(shiny)
 library(leaflet)
 # library(leafem)
 # library(leaflet.extras)
 library(plotly)
-library(reticulate)
-library(here)
 
 ## directories ----
 dirData <- here("data")

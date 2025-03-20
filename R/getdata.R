@@ -5,6 +5,9 @@ datlst <- c(
 )
 
 getdata <- function(datasets = datlst, getdates, user = NULL, pass = NULL){
+  require(stringr)
+  require(lubridate)
+  require(httr2)
 
   getdates <- as.Date(getdates, format="%Y-%m-%d")
   start_datetime <- paste0(getdates[1], "T00:00:00")
@@ -165,6 +168,9 @@ getdata <- function(datasets = datlst, getdates, user = NULL, pass = NULL){
   }
   if("oceancolor" %in% datasets){
 
+    library(tidyr)
+    library(stringr)
+    library(CopernicusMarine)
     prd <- cms_products_list() |>
       rowwise() |>
       filter(tempExtentBegin <= "1998-01-01") |>
