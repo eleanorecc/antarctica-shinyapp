@@ -1,10 +1,115 @@
-datlst <- c(
-  "dem", "bathymetry",
-  "seaice_daily_conc", "seaice_monthly_conc",
-  "chla_modis", "biogeochem", "pH_roc", "surface_carbon"
-)
+dataparams <- function(getdates, bbcoords){
+  getdates <- as.Date(getdates, format="%Y-%m-%d")
 
-getdata <- function(datasets = datlst, getdates, user = NULL, pass = NULL){
+  return(list(
+    start_datetime = paste0(getdates[1], "T00:00:00"),
+    end_datetime = paste0(getdates[length(getdates)], "T00:00:00"),
+    min_longitude = min(bbcoords$lon),
+    min_latitude = min(bbcoords$lat),
+    max_longitude = max(bbcoords$lon),
+    max_latitude = max(bbcoords$lat),
+    min_depth = -1,
+    max_depth = 10
+  ))
+}
+
+## copernicus marine data
+## for sea ice concentration, chlorophyll a, and salinity
+
+## https://help.marine.copernicus.eu/en/articles/863825
+## how-to-download-data-via-the-copernicus-marine-toolbox-in-r
+
+get_seaice <- function(params, user, pass){
+  require(lubridate)
+  require(reticulate)
+
+  cmt <- import("copernicusmarine")
+  cmt$login(user, pass)
+
+  nm <- "seaice_min_extents.nc"
+  saveDir <- file.path(dirData, "seaiceExtent")
+
+  yrs <- substr(c(params$start_datetime, params$end_datetime), 1, 4)
+  ystart <- as.Date(paste0(yrs[1]:yrs[2], "-01-01"))
+
+  ## initialize dataframe
+  df <- data.frame(
+    index = numeric(),
+    coveragearea = numeric()
+  )
+  cmt$subset(
+    dataset_id = "",
+    variables = "siconc",
+    start_datetime = ystart[1],
+    end_datetime = ystart[1] + years(1) - days(1),
+    minimum_longitude = params$min_longitude,
+    minimum_latitude = params$min_latitude,
+    maximum_longitude = params$max_longitude,
+    maximum_latitude = params$max_latitude,
+    minimum_depth = params$min_depth,
+    maximum_depth = params$max_depth,
+    output_filename = nm,
+    output_directory = saveDir,
+    force_download = TRUE,
+    overwrite = TRUE
+  )
+  nctmp <- read_ncdata(saveDir, "siconc")
+
+  ## initialize array
+  dim2 <- dim(nctmp)[1:2]
+  y <- array(NA, dim = c(dim2, length(yrs)))
+
+  r <- rast(file.path(saveDir, nm))
+  spatialweights <- rast(ext(r), resolution = res(r), crs = crs(r)) |>
+    cellSize(unit = "km") |>
+    t() |>
+    as.array()
+
+  ext <- seaice_extents(nctmp, cutoff = 0.8, spatialweights, metric = "minext")
+  y[,,1] <- ext$extent
+  df <- rbind(df, ext$df)
+
+  for(i in 2:length(ystart)){
+    cmt$subset(
+      dataset_id = "",
+      variables = "siconc",
+      start_datetime = ystart[i],
+      end_datetime = ystart[i] + years(1) - days(1),
+      minimum_longitude = params$min_longitude,
+      minimum_latitude = params$min_latitude,
+      maximum_longitude = params$max_longitude,
+      maximum_latitude = params$max_latitude,
+      minimum_depth = params$min_depth,
+      maximum_depth = params$max_depth,
+      output_filename = nm,
+      output_directory = saveDir,
+      force_download = TRUE,
+      overwrite = TRUE
+    )
+    nctmp <- read_ncdata(saveDir, "siconc")
+    ext <- seaice_extents(nctmp, cutoff = 0.8, spatialweights, metric = "minext")
+
+    y[,,i] <- ext$extent
+    df <- rbind(df, ext$df)
+  }
+
+
+  y <- array(NA, dim = c(dim2, length(include_years)))
+  if(metric == "mean"){
+    for(i in seq_along(include_years)){
+      k <- which(yrs == include_years[i])
+      k <- k[months]
+
+    }
+  }
+
+
+
+}
+
+
+
+getdata <- function(datasets = datlst, getdates){
   require(stringr)
   require(lubridate)
   require(httr2)

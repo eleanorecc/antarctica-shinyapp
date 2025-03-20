@@ -101,7 +101,7 @@ maud_rise_center <- data.frame(lat = -65.46003868, lon = 2.95221053) |>
   st_transform(st_crs(3031))
 
 
-
+## for the shiny app
 gbif_tile_size <- 512
 extent <- 12367396.2185
 # data <- list(
