@@ -19,7 +19,7 @@ dataparams <- function(getdates, bboxcoords){
 ## https://help.marine.copernicus.eu/en/articles/863825
 ## how-to-download-data-via-the-copernicus-marine-toolbox-in-r
 
-get_seaice <- function(params, datasetID, user, pass, saveName){
+get_seaice <- function(params, user, pass){
   require(lubridate)
   require(reticulate)
   require(terra)
@@ -31,7 +31,7 @@ get_seaice <- function(params, datasetID, user, pass, saveName){
   cmt <- import("copernicusmarine")
   cmt$login(user, pass)
 
-  nm <- "seaice_min_extents.nc"
+  nm <- "seaice_cover_fraction.nc"
   saveDir <- file.path(dirData, "seaiceExtent")
 
   yrs <- substr(c(params$start_datetime, params$end_datetime), 1, 4)
@@ -44,6 +44,8 @@ get_seaice <- function(params, datasetID, user, pass, saveName){
     index = numeric(),
     coveragearea = numeric()
   )
+  ## start with firstdataset, switch when reach split point
+  datasetID <- "cmems_mod_glo_phy_my_0.083deg_P1D-m"
   cmt$subset(
     dataset_id = datasetID,
     variables = list("siconc"),
@@ -98,7 +100,29 @@ get_seaice <- function(params, datasetID, user, pass, saveName){
       output_directory = saveDir,
       overwrite = TRUE
     )
-    nctmp <- read_ncdata(saveDir, "siconc")
+    nctmp <- read_ncdata(file.path(saveDir, nm), "siconc")
+
+    if(ystart[i] == "2021-01-01"){
+      datasetID <- "cmems_mod_glo_phy_myint_0.083deg_P1D-m"
+      ## download other part of 2021 year
+      cmt$subset(
+        dataset_id = datasetID,
+        variables = list("siconc"),
+        start_datetime = paste0(ystart[i], "T00:00:00"),
+        end_datetime = paste0(ystart[i] + years(1) - days(1), "T00:00:00"),
+        minimum_longitude = params$min_longitude,
+        minimum_latitude = params$min_latitude,
+        maximum_longitude = params$max_longitude,
+        maximum_latitude = params$max_latitude,
+        minimum_depth = params$min_depth,
+        maximum_depth = params$max_depth,
+        output_filename = "part2_seaice.nc",
+        output_directory = saveDir,
+        overwrite = TRUE
+      )
+      nctmp2 <- read_ncdata(file.path(saveDir, "part2_seaice.nc"), "siconc")
+      nctmp <- array(c(nctmp, nctmp2), dim = c(dim2, 365))
+    }
     tmp <- extents_and_sums(nctmp, cutoff = useCutoff, spatialweights, metric = "minext")
     df <- rbind(df, cbind(year = yrs[i], tmp$df))
     extents[,,i] <- tmp$extent
@@ -106,16 +130,18 @@ get_seaice <- function(params, datasetID, user, pass, saveName){
   }
 
   ## save data
-  write.csv(df, file.path(saveDir, sprintf("coverage_%s_%s.csv", metric, saveName)))
+  write.csv(df, file.path(saveDir, "seaice_coverage_minext.csv"))
+  saveRDS(extents, file.path(saveDir, "seaice_minext.rds"))
+  saveRDS(sums, file.path(saveDir, "seaice_icedays.rds"))
 
   extents |>
     apply(MARGIN = c(1,3), FUN = function(x){rev(x)}) |>
     rast(ext(r), crs = crs(r)) |>
-    writeRaster(file.path(saveDir, sprintf("%s_%s.csv", metric, saveName)))
+    writeRaster(file.path(saveDir, "seaice_minext.tif"))
   sums |>
     apply(MARGIN = c(1,3), FUN = function(x){rev(x)}) |>
     rast(ext(r), crs = crs(r)) |>
-    writeRaster(file.path(saveDir, sprintf("sums_%s.csv", saveName)))
+    writeRaster(file.path(saveDir, "seaice_icedays.tif"))
 
   return(list(
     extents = extents,
@@ -127,22 +153,10 @@ get_seaice <- function(params, datasetID, user, pass, saveName){
 ## one dataset 1993-2020, another with 2021-2025 interm data
 ## 1993 to 2021-06-30 in cmems_mod_glo_phy_my_0.083deg_P1D-m
 ## 2021-07-01 to 2025 in cmems_mod_glo_phy_myint_0.083deg_P1D-m
+c("1998-01-01", "2024-12-31") |>
+  dataparams(weddell_gyre_coords) |>
+  get_seaice(user, pass)
 
-## does year need to be split across date other than January 1st??
-## what to do about 2021 split over two datasets around July 1st??
-
-# c("1998-01-01", "2020-12-31") |>
-#   dataparams(weddell_gyre_coords) |>
-#   get_seaice(
-#     "cmems_mod_glo_phy_my_0.083deg_P1D-m",
-#     user, pass, "1998_2020_seaice"
-#   )
-# c("2022-01-01", "2024-12-31") |>
-#   dataparams(weddell_gyre_coords) |>
-#   get_seaice(
-#     "cmems_mod_glo_phy_myint_0.083deg_P1D-m",
-#     user, pass, "2020_2024_seaice"
-#   )
 
 
 getdata <- function(datasets = datlst, getdates){

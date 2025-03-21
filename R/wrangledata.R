@@ -77,12 +77,10 @@ extents_and_sums <- function(x, cutoff, spatialweights, metric = c("minext", "ma
   ))
 }
 
-read_ncdata <- function(dataDir, ncvarname){
+read_ncdata <- function(ncFile, ncvarname){
   require(ncdf4)
 
-  nc_file <- list.files(dataDir, pattern = "\\.nc$", full.names = TRUE)
-  nc_data <- nc_open(nc_file)
-
+  nc_data <- nc_open(ncFile)
   x <- ncvar_get(nc_data, ncvarname)
   nc_close(nc_data)
 
