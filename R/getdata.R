@@ -19,10 +19,14 @@ dataparams <- function(getdates, bboxcoords){
 ## https://help.marine.copernicus.eu/en/articles/863825
 ## how-to-download-data-via-the-copernicus-marine-toolbox-in-r
 
-get_seaice <- function(params, datasetID, user, pass, saveRdata){
+get_seaice <- function(params, datasetID, user, pass, saveName){
   require(lubridate)
   require(reticulate)
   require(terra)
+
+  virtualenv_create(envname = "CopernicusMarine")
+  virtualenv_install("CopernicusMarine", packages = c("copernicusmarine"))
+  use_virtualenv("CopernicusMarine", required = TRUE)
 
   cmt <- import("copernicusmarine")
   cmt$login(user, pass)
@@ -65,9 +69,14 @@ get_seaice <- function(params, datasetID, user, pass, saveRdata){
   r <- rast(file.path(saveDir, nm))
   spatialweights <- rast(ext(r), resolution = res(r), crs = crs(r)) |>
     cellSize(unit = "km") |>
+    flip(direction = "vertical") |>
     t() |>
     as.array()
-  tmp <- extents_and_sums(nctmp, cutoff = 0.8, spatialweights, metric = "minext")
+
+  ## will use 15 percent as the cutoff meaning the pixel is ice covered
+  ## https://blogs.egu.eu/divisions/cr/2020/04/10/did-you-know-the-difference-between-sea-ice-area-and-sea-ice-extent/
+  useCutoff <- 0.15
+  tmp <- extents_and_sums(nctmp, cutoff = useCutoff, spatialweights, metric = "minext")
   df <- rbind(df, cbind(year = yrs[1], tmp$df))
   extents[,,1] <- tmp$extent
   sums[,,1] <- tmp$sum
@@ -90,15 +99,24 @@ get_seaice <- function(params, datasetID, user, pass, saveRdata){
       overwrite = TRUE
     )
     nctmp <- read_ncdata(saveDir, "siconc")
-    tmp <- extents_and_sums(nctmp, cutoff = 0.8, spatialweights, metric = "minext")
+    tmp <- extents_and_sums(nctmp, cutoff = useCutoff, spatialweights, metric = "minext")
     df <- rbind(df, cbind(year = yrs[i], tmp$df))
     extents[,,i] <- tmp$extent
     sums[,,i] <- tmp$sum
   }
-  save(
-    list(extents, sums, df),
-    file = file.path(saveDir, saveRdata)
-  )
+
+  ## save data
+  write.csv(df, file.path(saveDir, sprintf("coverage_%s_%s.csv", metric, saveName)))
+
+  extents |>
+    apply(MARGIN = c(1,3), FUN = function(x){rev(x)}) |>
+    rast(ext(r), crs = crs(r)) |>
+    writeRaster(file.path(saveDir, sprintf("%s_%s.csv", metric, saveName)))
+  sums |>
+    apply(MARGIN = c(1,3), FUN = function(x){rev(x)}) |>
+    rast(ext(r), crs = crs(r)) |>
+    writeRaster(file.path(saveDir, sprintf("sums_%s.csv", saveName)))
+
   return(list(
     extents = extents,
     sums = sums,
@@ -117,13 +135,13 @@ get_seaice <- function(params, datasetID, user, pass, saveRdata){
 #   dataparams(weddell_gyre_coords) |>
 #   get_seaice(
 #     "cmems_mod_glo_phy_my_0.083deg_P1D-m",
-#     user, pass, "seaice_1998_2020.Rdata"
+#     user, pass, "1998_2020_seaice"
 #   )
 # c("2022-01-01", "2024-12-31") |>
 #   dataparams(weddell_gyre_coords) |>
 #   get_seaice(
 #     "cmems_mod_glo_phy_myint_0.083deg_P1D-m",
-#     user, pass, "seaice_2020_2024.Rdata"
+#     user, pass, "2020_2024_seaice"
 #   )
 
 
