@@ -44,7 +44,12 @@ get_seaice <- function(params, user, pass){
     index = numeric(),
     coveragearea = numeric()
   )
-  ## start with firstdataset, switch when reach split point
+
+  ## one dataset 1993-2020, another with 2021-2025 interm data
+  ## 1993 to 2021-06-30 in cmems_mod_glo_phy_my_0.083deg_P1D-m
+  ## 2021-07-01 to 2025 in cmems_mod_glo_phy_myint_0.083deg_P1D-m
+
+  ## start with firstdataset, switch when reach split points
   datasetID <- "cmems_mod_glo_phy_my_0.083deg_P1D-m"
   cmt$subset(
     dataset_id = datasetID,
@@ -61,7 +66,7 @@ get_seaice <- function(params, user, pass){
     output_directory = saveDir,
     overwrite = TRUE
   )
-  nctmp <- read_ncdata(saveDir, "siconc")
+  nctmp <- read_ncdata(file.path(saveDir, nm), "siconc")
 
   ## initialize arrays
   dim2 <- dim(nctmp)[1:2]
@@ -134,14 +139,23 @@ get_seaice <- function(params, user, pass){
   saveRDS(extents, file.path(saveDir, "seaice_minext.rds"))
   saveRDS(sums, file.path(saveDir, "seaice_icedays.rds"))
 
-  extents |>
-    apply(MARGIN = c(1,3), FUN = function(x){rev(x)}) |>
-    rast(ext(r), crs = crs(r)) |>
-    writeRaster(file.path(saveDir, "seaice_minext.tif"))
-  sums |>
-    apply(MARGIN = c(1,3), FUN = function(x){rev(x)}) |>
-    rast(ext(r), crs = crs(r)) |>
-    writeRaster(file.path(saveDir, "seaice_icedays.tif"))
+  save_tiff(extents, r, file.path(saveDir, "seaice_minext.tif"))
+  save_tiff(sums, r, file.path(saveDir, "seaice_icedays.tif"))
+
+
+  ## summarize by 3 time periods
+  prd_ext <- array(NA, dim = c(dim2, 3))
+  for(i in 1:3){
+    k <- (9*i-8):(9*i)
+    tmp <- extents_and_sums(extents[,,k], cutoff = 1, spatialweights, metric = "minext")
+    prd_ext[,,i] <- tmp$extent
+  }
+  save_tiff(prd_ext, r, file.path(saveDir, "timeperiod_seaice_minext.tif"))
+
+  prd_icedays <- timeperiod_averages(sums, spatialweights)
+  save_tiff(prd_icedays$averages, r, file.path(saveDir, "timeperiod_seaice_icedays.tif"))
+  save_tiff(prd_icedays$variability, r, file.path(saveDir, "timeperiod_seaice_icedays_var.tif"))
+  write.csv(prd_icedays$table, file.path(saveDir, "seaice_icedays.csv"))
 
   return(list(
     extents = extents,
@@ -149,15 +163,6 @@ get_seaice <- function(params, user, pass){
     df = df
   ))
 }
-
-## one dataset 1993-2020, another with 2021-2025 interm data
-## 1993 to 2021-06-30 in cmems_mod_glo_phy_my_0.083deg_P1D-m
-## 2021-07-01 to 2025 in cmems_mod_glo_phy_myint_0.083deg_P1D-m
-c("1998-01-01", "2024-12-31") |>
-  dataparams(weddell_gyre_coords) |>
-  get_seaice(user, pass)
-
-
 
 getdata <- function(datasets = datlst, getdates){
   require(stringr)

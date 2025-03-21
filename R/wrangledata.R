@@ -87,6 +87,13 @@ read_ncdata <- function(ncFile, ncvarname){
   return(x)
 }
 
+save_tiff <- function(saveArray, r, tifFile){
+  saveArray |>
+    apply(MARGIN = c(1,3), FUN = function(x){rev(x)}) |>
+    rast(ext(r), crs = crs(r)) |>
+    writeRaster(tifFile)
+}
+
 maketiles <- function(tiffs_folder, ){
 
   rast1 <- tiffs_folder |>
