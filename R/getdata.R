@@ -86,8 +86,8 @@ get_seaice <- function(params, datasetID, user, pass, saveName){
     cmt$subset(
       dataset_id = datasetID,
       variables = list("siconc"),
-      start_datetime = paste0(ystart[1], "T00:00:00"),
-      end_datetime = paste0(ystart[1] + years(1) - days(1), "T00:00:00"),
+      start_datetime = paste0(ystart[i], "T00:00:00"),
+      end_datetime = paste0(ystart[i] + years(1) - days(1), "T00:00:00"),
       minimum_longitude = params$min_longitude,
       minimum_latitude = params$min_latitude,
       maximum_longitude = params$max_longitude,
