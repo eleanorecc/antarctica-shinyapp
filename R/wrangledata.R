@@ -1,22 +1,25 @@
-annual_summaries <- function(x, include_years, months, metric = c("mean", "sum")){
+annual_summaries <- function(ncFile, months){
+
+  nc_data <- nc_open(ncFile)
+  x <- ncvar_get(nc_data, "CHL")
+  xtime <- ncvar_get(nc_data, "time")
+  nc_close(nc_data)
+
   dim2 <- dim(x)[1:2]
 
-  y <- array(NA, dim = c(dim2, length(include_years)))
-  if(metric == "mean"){
-    for(i in seq_along(include_years)){
-      k <- which(yrs == include_years[i])
-      k <- k[months]
-      y[,,i] <- rowMeans(x[,,k], na.rm = TRUE, dims = 2)
-      y[is.nan(y)] <- NA
-    }
-  }
-  if(metric == "sum"){
-    for(i in seq_along(include_years)){
-      k <- which(yrs == include_years[i])
-      k <- k[months]
-      y[,,i] <- rowSums(x[,,k], na.rm = TRUE, dims = 2)
-      y[is.nan(y)] <- NA
-    }
+  datayears <- xtime |>
+    as.Date(origin = "1900-01-01") |>
+    format("%Y") |>
+    as.numeric()
+
+  yrs <- unique(datayears)
+
+  y <- array(NA, dim = c(dim2, length(yrs)))
+  for(i in seq_along(yrs)){
+    k <- which(datayears == yrs[i])
+    k <- k[months]
+    y[,,i] <- rowMeans(x[,,k], na.rm = TRUE, dims = 2)
+    y[is.nan(y)] <- NA
   }
   return(y)
 }
