@@ -1,21 +1,32 @@
-annual_summaries <- function(ncFile, months){
+annual_summaries <- function(ncFile, ncvarname, months){
 
   nc_data <- nc_open(ncFile)
-  x <- ncvar_get(nc_data, "CHL")
+  x <- ncvar_get(nc_data, ncvarname)
   xtime <- ncvar_get(nc_data, "time")
   nc_close(nc_data)
 
   dim2 <- dim(x)[1:2]
 
-  datayears <- xtime |>
-    as.Date(origin = "1900-01-01") |>
-    format("%Y") |>
-    as.numeric()
+  ## handle different time definitions
+  if(ncvarname == "CHL"){
+    datayears <- xtime |>
+      ## already using days
+      as.Date(origin = "1900-01-01") |>
+      format("%Y") |>
+      as.numeric()
+  }
+  if(ncvarname == "sos"){
+    ## convert from hours to days
+    datayears <- c(xtime/24) |>
+      as.Date(origin = "1950-01-01") |>
+      format("%Y") |>
+      as.numeric()
+  }
 
   yrs <- unique(datayears)
 
   y <- array(NA, dim = c(dim2, length(yrs)))
-  for(i in seq_along(yrs)){
+  for(i in 1:length(yrs)){
     k <- which(datayears == yrs[i])
     k <- k[months]
     y[,,i] <- rowMeans(x[,,k], na.rm = TRUE, dims = 2)

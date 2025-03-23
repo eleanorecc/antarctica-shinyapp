@@ -213,17 +213,96 @@ get_chla <- function(params, user, pass){
     as.array()
 
   results <- lapply(list(annual = 1:12, summer = 7:9, winter = 1:3), function(m){
-    annual <- annual_summaries(file.path(saveDir, nm), months = m)
+    annual <- annual_summaries(file.path(saveDir, nm), ncvarname = "CHL",  months = m)
     prd <- timeperiod_averages(annual, spatialweights)
 
     save_tiff(prd$averages, r, file.path(saveDir, sprintf("timeperiod_months_%s_%s_chla.tif", m[1], m[length(m)])))
     save_tiff(prd$variability, r, file.path(saveDir, sprintf("timeperiod_months_%s_%s_chla_var.tif", m[1], m[length(m)])))
-    write.csv(prd$table, file.path(saveDir, sprintf("m_%s_%s_chla.csv", m[1], m[length(m)])))
+    write.csv(prd$table, file.path(saveDir,  sprintf("timeperiod_months_%s_%s_chla.csv", m[1], m[length(m)])))
 
     return(prd)
   })
   return(results)
 }
+
+get_salinity <- function(params, user, pass){
+  require(lubridate)
+  require(reticulate)
+  library(ncdf4)
+  require(terra)
+
+  virtualenv_create(envname = "CopernicusMarine")
+  virtualenv_install("CopernicusMarine", packages = c("copernicusmarine"))
+  use_virtualenv("CopernicusMarine", required = TRUE)
+
+  cmt <- import("copernicusmarine")
+  cmt$login(user, pass)
+
+  nm <- "salinity_my.nc"
+  nm2 <- "salinity_nrt.nc"
+  saveDir <- file.path(dirData, "surfaceSalinity")
+
+  ## multi-year dataset 1993 to 2023, then need near-real-time one
+  datasetID <- "cmems_obs-mob_glo_phy-sss_my_multi_P1M"
+  cmt$subset(
+    dataset_id = datasetID,
+    variables = list("sos"),
+    start_datetime = params$start_datetime,
+    end_datetime = "2022-12-31T00:00:00",
+    minimum_longitude = params$min_longitude,
+    minimum_latitude = params$min_latitude,
+    maximum_longitude = params$max_longitude,
+    maximum_latitude = params$max_latitude,
+    minimum_depth = 0,
+    maximum_depth = 0,
+    output_filename = nm,
+    output_directory = saveDir
+  )
+
+  ## for 2024 need the near real time dataset
+  ## also for 2023 as that years MY data ends in november
+  datasetID <- "cmems_obs-mob_glo_phy-sss_nrt_multi_P1M"
+  cmt$subset(
+    dataset_id = datasetID,
+    variables = list("sos"),
+    start_datetime = "2023-01-01T00:00:00",
+    end_datetime = params$end_datetime,
+    minimum_longitude = params$min_longitude,
+    minimum_latitude = params$min_latitude,
+    maximum_longitude = params$max_longitude,
+    maximum_latitude = params$max_latitude,
+    minimum_depth = 0,
+    maximum_depth = 0,
+    output_filename = nm2,
+    output_directory = saveDir
+  )
+
+  r <- rast(file.path(saveDir, nm))
+  spatialweights <- rast(ext(r), resolution = res(r), crs = crs(r)) |>
+    cellSize(unit = "km") |>
+    flip(direction = "vertical") |>
+    t() |>
+    as.array()
+
+  dim2 <- dim(spatialweights)[1:2]
+
+  results <- lapply(list(annual = 1:12, summer = 7:9, winter = 1:3), function(m){
+    annual <- annual_summaries(file.path(saveDir, nm), ncvarname = "sos", months = m)
+    annual2 <- annual_summaries(file.path(saveDir, nm2), ncvarname = "sos", months = m)
+
+    prd <- array(c(annual, annual2), dim = c(dim2, 27)) |>
+      timeperiod_averages(spatialweights)
+
+    save_tiff(prd$averages, r, file.path(saveDir, sprintf("timeperiod_months_%s_%s_salinity.tif", m[1], m[length(m)])))
+    save_tiff(prd$variability, r, file.path(saveDir, sprintf("timeperiod_months_%s_%s_salinity_var.tif", m[1], m[length(m)])))
+    write.csv(prd$table, file.path(saveDir,  sprintf("timeperiod_months_%s_%s_salinity.csv", m[1], m[length(m)])))
+
+    return(prd)
+  })
+
+  return(results)
+}
+
 
 getdata <- function(datasets = datlst, getdates){
   require(stringr)
