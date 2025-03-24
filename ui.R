@@ -1,25 +1,33 @@
 ui <- page_sidebar(
-  tags$head(
-    tags$style(HTML("
-      #map {
-        height: 58vh !important;
-      }
-    "))
-  ),
   ## input elements in sidebar
   sidebar = sidebar(
-    p(
-      "Click the 'draw polyline' button in the top left of the map toolbar
-      to draw a line on the map and view time series for those points,
-      or cross-section of the data shown on the map.
-      Select which type of map to view in the dropdown below",
-      style = "font-size: 12px; color: #606891"
+    ## select which variables to map
+    selectInput(
+      inputId = "map1var",
+      label = "Map (Left)",
+      choices = c(
+        "1", "2"
+      ),
+      selected = "Time Series"
     ),
     selectInput(
-      inputId = "plottype",
-      label = "Plot Type",
-      choices = c("Time Series", "Cross Section"),
+      inputId = "map2var",
+      label = "Map (Right)",
+      choices = c(
+        "1", "2"
+      ),
       selected = "Time Series"
+    ),
+    ## third chart to compare
+    ## either scatter plot or difference map
+    selectInput(
+      inputId = "plot3type",
+      label = "Comparison",
+      choices = c(
+        "Scatter Plot",
+        "Difference Map"
+      ),
+      selected = "Scatter Plot"
     ),
     p(
       "Enter numeric GBIF taxon key (https://www.gbif.org/species) to add
@@ -33,9 +41,15 @@ ui <- page_sidebar(
     )
   ),
 
-  ## output from server function
-  leafletOutput(outputId = "map"),
-
-  ## timeseries or cross section plot
-  plotlyOutput("lineplot", height = "35vh")
+  ## main content area
+  ## maps
+  fluidRow(
+    column(4, leafletOutput(outputId = "map1", height = "60vh")),
+    column(4, leafletOutput(outputId = "map2", height = "60vh"))
+    # column(4, leafletOutput(outputId = "comparison"))
+  )
+  ## time series
+  # fluidRow(
+  #   column(12, plotlyOutput("timeseries"))
+  # )
 )

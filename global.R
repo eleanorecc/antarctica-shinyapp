@@ -14,9 +14,9 @@ library(here)
 library(dplyr)
 library(sf)
 library(shiny)
+library(bslib)
 library(leaflet)
-# library(leafem)
-# library(leaflet.extras)
+library(leaflet.minicharts)
 library(plotly)
 
 ## directories ----
