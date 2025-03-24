@@ -4,7 +4,7 @@ ui <- page_sidebar(
     ## select which variables to map
     selectInput(
       inputId = "map1var",
-      label = "Map (Left)",
+      label = "Left Map",
       choices = c(
         "1", "2"
       ),
@@ -12,41 +12,31 @@ ui <- page_sidebar(
     ),
     selectInput(
       inputId = "map2var",
-      label = "Map (Right)",
+      label = "Right Map",
       choices = c(
         "1", "2"
       ),
       selected = "Time Series"
     ),
-    ## third chart to compare
-    ## either scatter plot or difference map
-    selectInput(
-      inputId = "plot3type",
-      label = "Comparison",
-      choices = c(
-        "Scatter Plot",
-        "Difference Map"
-      ),
-      selected = "Scatter Plot"
+    br(),
+    textInput(
+      inputId = "taxonkey",
+      label = "GBIF Taxon Key",
+      value = ""
     ),
     p(
       "Enter numeric GBIF taxon key (https://www.gbif.org/species) to add
       human and machine observation records from GBIF.",
       style = "font-size: 12px; color: #606891"
-    ),
-    textInput(
-      inputId = "taxonkey",
-      label = "GBIF Taxon Key",
-      value = ""
     )
   ),
 
   ## main content area
   ## maps
   fluidRow(
-    column(4, leafletOutput(outputId = "map1", height = "60vh")),
-    column(4, leafletOutput(outputId = "map2", height = "60vh"))
-    # column(4, leafletOutput(outputId = "comparison"))
+    column(4, leafletOutput(outputId = "map1", height = "58vh")),
+    column(4, leafletOutput(outputId = "map2", height = "58vh"))
+    # column(4, uiOutput(outputId = "comparison"))
   )
   ## time series
   # fluidRow(

@@ -11,11 +11,19 @@ server <- function(input, output, session) {
   epsg_3031 <- leafletCRS(
     crsClass = "L.Proj.CRS",
     code = "EPSG:3031",
-    proj4def = "+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs",
+    proj4def = "+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs",
     resolutions = resolutions,
     origin = c(-extent, extent),
     bounds = list(c(-extent, -extent), c(extent, extent))
   )
+  ## polar crs used for Copernicus marine tiles...
+  # epsg_32761 <- leafletCRS(
+  #   crsClass = "L.Proj.CRS",
+  #   code = "EPSG:32761",
+  #   proj4def = "+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs",
+  #   ...
+  # )
+
   map_options <- leafletOptions(
     ## instead of -90,0 south pole,
     ## center the Weddell sea
@@ -39,43 +47,26 @@ server <- function(input, output, session) {
   ## https://stackoverflow.com/questions/59174298/using-addresourcepath-for-rendering-local-leaflet-tiles
   # addResourcePath("mytiles", data$`Polarview Ice Concentration`$tiles_filepath)
 
-  ## render the leaflet maps
-  ## have two synced maps side-by-side
-  ## https://cmtso.github.io/posts/app-leaflet-compare
-  # output$maps_side_by_side <- renderCombineWidgets({
 
-
-
+  ## two synced leaflet maps side-by-side
   output$map1 <- renderLeaflet({
     # input <- list()
     # input$taxonkey <- 212
     speciesOccurance <- paste(
-        "https://api.gbif.org/v2/map/occurrence/density/{z}/{x}/{y}@1x.png?srs=EPSG%3A3031",
-        paste0("taxonKey=", input$taxonkey),
-        paste0("basisOfRecord=", c("HUMAN_OBSERVATION", "MACHINE_OBSERVATION"), collapse = "&"),
-        "style=purpleYellow.point",
-        sep = "&"
-      )
+      "https://api.gbif.org/v2/map/occurrence/density/{z}/{x}/{y}@1x.png?srs=EPSG%3A3031",
+      paste0("taxonKey=", input$taxonkey),
+      paste0("basisOfRecord=", c("HUMAN_OBSERVATION", "MACHINE_OBSERVATION"), collapse = "&"),
+      "style=purpleYellow.point",
+      sep = "&"
+    )
 
-      leaflet(options = map_options) |>
-        addTiles(
-          urlTemplate = "https://tile.gbif.org/3031/omt/{z}/{x}/{y}@1x.png?style=gbif-light",
-          attribution = "OpenStreetMap | GBIF",
-          layerId = "antartica_tiles",
-          options = gbif_tile_options
-        ) |>
-
-      # addCmsWMTSTiles(
-      #   product = "SST_GLO_SST_L4_NRT_OBSERVATIONS_010_001",
-      #   layer = "analysed_sst",
-      #   variable = "Sea surface temperature (SST)",
-      #   tilematrixset = "EPSG:3031",
-      #   options = WMSTileOptions(
-      #     format = "image/png",
-      #     transparent = TRUE
-      #   )
-      # ) |>
-      # attribution = cms_cite_product("GLOBAL_ANALYSISFORECAST_PHY_001_024")
+    leaflet(options = map_options) |>
+      addTiles(
+        urlTemplate = "https://tile.gbif.org/3031/omt/{z}/{x}/{y}@1x.png?style=gbif-light",
+        attribution = "OpenStreetMap | GBIF",
+        layerId = "antartica_tiles",
+        options = gbif_tile_options
+      ) |>
 
       ## TODO sort issue with misalignment of tiles...
       # addTiles(
@@ -92,61 +83,47 @@ server <- function(input, output, session) {
         urlTemplate = speciesOccurance,
         options = gbif_tile_options
       ) |>
+      addPolygons(data = wobec, color = "red", fillOpacity = 0, weight = 1) |>
+      addPolygons(data = weddell_gyre, color = "yellow", fillOpacity = 0, weight = 1) |>
       syncWith("maps")
-      # addDrawToolbar(
-      #   targetGroup = "draw",
-      #   singleFeature = TRUE,
-      #   polygonOptions = FALSE,
-      #   markerOptions = FALSE,
-      #   rectangleOptions = FALSE,
-      #   circleOptions = FALSE,
-      #   circleMarkerOptions = FALSE,
-      #   editOptions = editToolbarOptions(
-      #     edit = FALSE,
-      #     remove = TRUE,
-      #     selectedPathOptions = selectedPathOptions()
-      #   )
-      # ) |>
-      # addMeasurePathToolbar(
-      #   options = measurePathOptions(
-      #     showOnHover = FALSE,
-      #     minPixelDistance = 30,
-      #     showDistances = TRUE,
-      #     showArea = FALSE
-      #   )
-      # ) |>
-      # addLayersControl(overlayGroups = c(names(data))) |>
-      # hideGroup(names(data))
+      # addLayersControl(overlayGroups = c(names(allrasters))) |>
+      # hideGroup(names(allrasters))
   })
 
-   output$map2 <- renderLeaflet({
-     leaflet(options = map_options) |>
+  output$map2 <- renderLeaflet({
+    leaflet(options = map_options) |>
       addTiles(
         urlTemplate = "https://tile.gbif.org/3031/omt/{z}/{x}/{y}@1x.png?style=gbif-light",
         attribution = "OpenStreetMap | GBIF",
         layerId = "antartica_tiles",
         options = gbif_tile_options
       ) |>
+      addPolygons(data = wobec, color = "red", fillOpacity = 0, weight = 1) |>
+      addPolygons(data = weddell_gyre, color = "yellow", fillOpacity = 0, weight = 1) |>
       syncWith("maps")
   })
 
-  ## alternative method of syncing the maps...
-  # observe({ session$sendCustomMessage(type = "syncMaps", message = NULL) })
-
-  ## update when user uploads shapefile
-  # observe({
-  #   uploaded_data <- shpdata()
-  #   if(!is.null(uploaded_data)){
-  #     leafletProxy("map") |>
-  #       clearGroup("uploaded_data") %>%
-  #       addPolygons(
-  #         data = uploaded_data,
-  #         group = "uploaded_data"
-  #       )
+  ## comparison either in map of difference between two layers,
+  ## or a scatter plot of the two layers' values
+  # output$scatterplot <- renderPlotly({
+  #
+  # })
+  #
+  # output$mapdifference <- renderLeaflet({
+  #
+  # })
+  #
+  # output$comparison <- renderUI({
+  #   condition <- input$select1 == input$select2
+  #   if(condition){
+  #     plotlyOutput("scatterplot")
+  #   } else {
+  #     leafletOutput("mapdifference")
   #   }
   # })
 
-  ## time series or cross section ----
+
+  ## time series plots ----
 
   ## start with an empty data frame
   # plotdata <- reactiveVal(list(

@@ -12,6 +12,7 @@
 ## packages ----
 library(here)
 library(dplyr)
+library(tidyr)
 library(sf)
 library(shiny)
 library(bslib)
@@ -36,22 +37,35 @@ if(length(list.files(dirData)) == 0){
 ## boundaries of weddell gyre
 ## https://doi.org/10.15784/601652
 ## https://eos.org/editors-vox/science-in-a-frozen-ocean
-weddell_gyre_coords <- data.frame(
-  lat = c(-60, -50, -80, -80, -60),
+weddell_gyre_corners <- data.frame(
+  lat = c(-60, -60, -80, -80, -60),
   lon = c(-60, 40, 40, -60, -60)
+)
+weddell_gyre_coords <- data.frame(
+  lat = c(
+    rep(max(weddell_gyre_corners$lat), 100),
+    rep(min(weddell_gyre_corners$lat), 100),
+    max(weddell_gyre_corners$lat)
+  ),
+  lon = c(
+    seq(min(weddell_gyre_corners$lon), max(weddell_gyre_corners$lon), length.out = 100),
+    seq(max(weddell_gyre_corners$lon), min(weddell_gyre_corners$lon), length.out = 100),
+    min(weddell_gyre_corners$lon)
+  )
 )
 weddell_gyre <- weddell_gyre_coords |>
   st_as_sf(coords = c("lon", "lat")) |>
   st_combine() |>
   st_cast("POLYGON") |>
-  st_set_crs(st_crs(4326)) |>
-  st_transform(st_crs(3031))
+  st_set_crs(st_crs(4326))
+
+
 
 
 ## ccamlr statistical areas, subareas, divisions
 ## https://github.com/ccamlr/data/tree/main/geographical_data/asd
 asd <- st_read(file.path(dirData, "statisticalAreasCCAMLR")) |>
-  st_transform(st_crs(3031))
+  st_transform(st_crs(4326))
 
 
 ## https://add.scar.org/
@@ -68,7 +82,7 @@ seamask <- st_read(file.path(dirData, "add_seamask_high_res_v7_10"))
 ## shapefile from Katharina Teschke at awi
 ## add shapefile of study area on top
 wobec <- st_read(file.path(dirData, "studyAreaWOBEC")) |>
-  st_transform(st_crs(3031))
+  st_transform(st_crs(4326))
 
 
 ## will extract time series for 2 areas
@@ -104,6 +118,70 @@ maud_rise_center <- data.frame(lat = -65.46003868, lon = 2.95221053) |>
 ## for the shiny app
 gbif_tile_size <- 512
 extent <- 12367396.2185
+
+# allrasters <- list(
+#   `Sea Ice Minimum Extent` = list(
+#     rast_filepath = file.path(dirData, "sea_ice_extent"),
+#     tiles_filepath = file.path(dirData, "sea_ice_extent", "tiles"),
+#     layernames = c("1990s", "2000s", "2010s", "2020-2025"),
+#     ylab = "Sea Ice Extent (million km^2)"
+#   ),
+#   `Average Number of Ice-Coverage Days` = list(
+#     rast_filepath = file.path(dirData, "sea_ice_concentration"),
+#     tiles_filepath = file.path(dirData, "sea_ice_concentration", "tiles"),
+#     layernames = c("1990s", "2000s", "2010s", "2020-2025"),
+#     ylab = "Sea Ice Concentration (%)"
+#   ),
+#   `` = list(),
+#   "primary_production" = list(
+#     rast_filepath = file.path(dirData, "primary_production"),
+#     tiles_filepath = file.path(dirData, "primary_production", "tiles"),
+#     layernames = c("1990s", "2000s", "2010s", "2020-2025"),
+#     ylab = "Primary Production (mg C m^-2 d^-1)"
+#   ),
+#   "salinity" = list(
+#     rast_filepath = file.path(dirData, "salinity"),
+#     tiles_filepath = file.path(dirData, "salinity", "tiles"),
+#     layernames = c("1990s", "2000s", "2010s", "2020-2025"),
+#     ylab = "Salinity (PSU)"
+#   )
+# )
+
+# tsdata <- bind_rows(
+#   read.csv(file.path(dirData, "seaiceDays", "seaice_icedays.csv")) |>
+#     mutate(
+#       yaxislabel = "Number of Days with Ice-Cover > 15%, Area Average",
+#       plot_with = "iceDays"
+#     ) |>
+#     select(plot_with, year, yvariable = yrwgtmean, yaxislabel),
+#   read.csv(file.path(dirData, "seaiceMinExtent", "seaice_coverage_minext.csv")) |>
+#     mutate(coveragearea = coveragearea/1e6) |>
+#     pivot_longer(cols = c(day_of_year, coveragearea)) |>
+#     mutate(
+#       yaxislabel = ifelse(
+#         name == "coveragearea",
+#         "Area of Minimum Ice Extent (million km^2)",
+#         "Day of the Year with Minimum Ice Extent"
+#       ),
+#       plot_with = "minIceExtent"
+#     ) |>
+#     select(plot_with, year, yvariable = value, yaxislabel),
+#   read.csv(file.path(dirData, "chlorophyllA", "timeperiod_chla.csv")) |>
+#     mutate(
+#       yaxislabel = "Chlorophyll-a (mg m^-3)",
+#       plot_with = paste0("chla", months)
+#     ) |>
+#     select(plot_with, year, yvariable = yrwgtmean, yaxislabel),
+#   read.csv(file.path(dirData, "surfaceSalinity", "timeperiod_salinity.csv")) |>
+#     mutate(
+#       yaxislabel = "Salinity (PSU)",
+#       plot_with = "annualSalinity"
+#     ) |>
+#     select(plot_with, year, yvariable = yrwgtmean, yaxislabel)
+# )
+# write.csv(tsdata, file.path(dirData, "tsdata.csv"), row.names = FALSE)
+tsdata <- read.csv(file.path(dirData, "tsdata.csv"))
+
 # data <- list(
 #   `Polarview Ice Concentration` = list(
 #     rast_filepath = file.path(dirData, "www.polarview.aq"),
