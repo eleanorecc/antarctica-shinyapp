@@ -165,7 +165,7 @@ maketiles <- function(r_start, saveDir){
     na.rm = TRUE
   )
   data.frame(breaks) |>
-    cbind(cols1) |>
+    cbind(cols2) |>
     write.csv(
       file.path(saveDir[1], "diffspalette.csv"),
       row.names = FALSE
@@ -191,20 +191,20 @@ maketiles <- function(r_start, saveDir){
     )
 
   ## loop over time periods and difference, making tiles
-  tilefolder <- c("19982006","20072015","20162024")
-  tilefolder <- c("2007diff","2016diff")
+  tilefolder1 <- rep(c("19982006","20072015","20162024"),3)
+  tilefolder2 <- rep(c("2007diff","2016diff"),3)
   for(s in 1:length(saveDir)){
     idx1 <- list(1:3,4:6,7:9)[[s]]
     idx2 <- list(1:2,3:4,5:6)[[s]]
     for(i in idx1){
       r <- r_int[[i]]
-      coltab(r) <- valcols
-      gdal2tiles(r, dirData, file.path(saveDir[s], tilefolder[[i]]))
+      coltab(r) <- cols1
+      gdal2tiles(r, dirData, file.path(saveDir[s], tilefolder1[[i]]))
     }
     for(i in idx2){
       r <- r_diffs_int[[i]]
-      coltab(r) <- diffcols
-      gdal2tiles(r, dirData, file.path(saveDir[s], tilefolder[[i]]))
+      coltab(r) <- cols2
+      gdal2tiles(r, dirData, file.path(saveDir[s], tilefolder2[[i]]))
     }
   }
 }

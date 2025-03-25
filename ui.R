@@ -30,9 +30,8 @@ ui <- page_sidebar(
   ## main content area
   ## maps
   fluidRow(
-    column(4, leafletOutput(outputId = "map1", height = "58vh")),
-    column(4, leafletOutput(outputId = "map2", height = "58vh"))
-    # column(4, uiOutput(outputId = "comparison"))
+    column(6, leafletOutput(outputId = "map1", height = "58vh")),
+    column(6, leafletOutput(outputId = "map2", height = "58vh"))
   )
   ## time series
   # fluidRow(

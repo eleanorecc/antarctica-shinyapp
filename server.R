@@ -2,52 +2,6 @@ server <- function(input, output, session) {
 
   ## map ----
 
-  allrasters <- list(
-    `Chlorophyll A` = list(
-      `1998-2006` = "chlorophyllA_19982006",
-      `2007-2015` = "chlorophyllA_20072015",
-      `2016-2024` = "chlorophyllA_20162024",
-      `2007-2015 vs 1998-2006` = "chlorophyllA_2007diff",
-      `2016-2024 vs 1998-2006` = "chlorophyllA_2016diff"
-    ),
-    `Chlorophyll A Summer` = list(
-      `1998-2006` = "chlorophyllA_Summer_19982006",
-      `2007-2015` = "chlorophyllA_Summer_20072015",
-      `2016-2024` = "chlorophyllA_Summer_20162024",
-      `2007-2015 vs 1998-2006` = "chlorophyllA_Summer_2007diff",
-      `2016-2024 vs 1998-2006` = "chlorophyllA_Summer_2016diff"
-    ),
-    `Chlorophyll A Winter` = list(
-      `1998-2006` = "chlorophyllA_Winter_19982006",
-      `2007-2015` = "chlorophyllA_Winter_20072015",
-      `2016-2024` = "chlorophyllA_Winter_20162024",
-      `2007-2015 vs 1998-2006` = "chlorophyllA_Winter_2007diff",
-      `2016-2024 vs 1998-2006` = "chlorophyllA_Winter_2016diff"
-    ),
-    `Sea Ice Days` = list(
-      `1998-2006` = "seaiceDays_19982006",
-      `2007-2015` = "seaiceDays_20072015",
-      `2016-2024` = "seaiceDays_20162024",
-      `2007-2015 vs 1998-2006` = "seaiceDays_2007diff",
-      `2016-2024 vs 1998-2006` = "seaiceDays_2016diff"
-    ),
-    `Sea Ice Min Extent` = list(
-      `1998-2006` = "seaiceMinExtent_19982006",
-      `2007-2015` = "seaiceMinExtent_20072015",
-      `2016-2024` = "seaiceMinExtent_20162024",
-      `2007-2015 vs 1998-2006` = "seaiceMinExtent_2007diff",
-      `2016-2024 vs 1998-2006` = "seaiceMinExtent_2016diff"
-    ),
-    `Surface Salinity` = list(
-      `1998-2006` = "surfaceSalinity_19982006",
-      `2007-2015` = "surfaceSalinity_20072015",
-      `2016-2024` = "surfaceSalinity_20162024",
-      `2007-2015 vs 1998-2006` = "surfaceSalinity_2007diff",
-      `2016-2024 vs 1998-2006` = "surfaceSalinity_2016diff"
-    )
-  )
-
-
   ## for polar crs need to custom define leaflet options
   ## https://thomasswilliams.github.io/development/r/2022/06/18/leaflet-and-r.html
   ## https://tile.gbif.org/ui/3031/EPSG3031-leaflet.js
@@ -176,7 +130,6 @@ server <- function(input, output, session) {
 
   ## two synced leaflet maps side-by-side
   output$map1 <- renderLeaflet({
-    p1 <- read.csv(paste0("/", input$tilesLeft, "palette.csv"))
     basemap |>
       addTiles(
         urlTemplate = paste0("/", input$tilesLeft, "/{z}/{x}/{-y}.png"),
@@ -189,10 +142,6 @@ server <- function(input, output, session) {
           pane = "customtiles"
         )
       ) |>
-      addLegendNumeric(
-        pal = colorNumeric(palette = p1$cols, domain = range(p1$breaks)),
-        values = p1$breaks
-      ) |>
       addTiles(
         urlTemplate = speciesOccurance(),
         options = gbif_tile_options
@@ -200,7 +149,6 @@ server <- function(input, output, session) {
       syncWith("maps")
   })
   output$map2 <- renderLeaflet({
-    p2 <- read.csv(paste0("/", input$tilesRight, "palette.csv"))
     basemap |>
       addTiles(
         urlTemplate = paste0("/", input$tilesRight, "/{z}/{x}/{-y}.png"),
@@ -213,35 +161,43 @@ server <- function(input, output, session) {
           pane = "customtiles"
         )
       ) |>
-      addLegendNumeric(
-        pal = colorNumeric(palette = p2$cols, domain = range(p2$breaks)),
-        values = p2$breaks
-      ) |>
       addTiles(
         urlTemplate = speciesOccurance(),
         options = gbif_tile_options
       ) |>
       syncWith("maps")
   })
-
-  ## comparison either in map of difference between two layers,
-  ## or a scatter plot of the two layers' values
-  # output$scatterplot <- renderPlotly({
-  #
-  # })
-  #
-  # output$mapdifference <- renderLeaflet({
-  #
-  # })
-  #
-  # output$comparison <- renderUI({
-  #   condition <- input$select1 == input$select2
-  #   if(condition){
-  #     plotlyOutput("scatterplot")
-  #   } else {
-  #     leafletOutput("mapdifference")
-  #   }
-  # })
+  observeEvent(input$tilesLeft, {
+    p1 <- read.csv(file.path(
+      dirData,
+      first(unlist(str_split(input$tilesLeft, "_"))),
+      ifelse(str_detect(input$tilesLeft, "diff"), "diffspalette.csv", "palette.csv")
+    ))
+    leafletProxy("map1") |>
+      clearControls() |>
+      addLegend(
+        position = "bottomright",
+        title = str_replace(input$tilesLeft, "_", "<br>"),
+        pal = colorNumeric(palette = p1$col, domain = p1$breaks),
+        values = p1$breaks
+      )
+  })
+  observeEvent(input$tilesRight, {
+    v2 <- input$tilesRight
+    p2 <- read.csv(file.path(
+      dirData,
+      first(unlist(str_split(v2, "_"))),
+      ifelse(str_detect(v2, "diff"),"diffspalette.csv","palette.csv")
+    ))
+    leafletProxy("map2") |>
+      clearControls() |>
+      addLegend(
+        position = "bottomright",
+        title = str_replace(v2, "_", "<br>"),
+        pal = colorNumeric(palette = p2$col, domain = p2$breaks),
+        values = p2$breaks
+      )
+  })
 
 
   ## time series plots ----
