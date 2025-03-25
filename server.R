@@ -38,6 +38,9 @@ server <- function(input, output, session) {
     updateWhenIdle = TRUE,
     pane = "background"
   )
+  spp_options <- gbif_tile_options
+  spp_options$pane <- "spp"
+
   tile_options <- tileOptions(
     tileSize = 256,
     noWrap = TRUE,
@@ -50,6 +53,7 @@ server <- function(input, output, session) {
     addMapPane("background", zIndex = 410) |>
     addMapPane("customtiles", zIndex = 420)  |>
     addMapPane("overlays", zIndex = 430)  |>
+    addMapPane("spp", zIndex = 440)  |>
     addTiles(
       urlTemplate = "https://tile.gbif.org/3031/omt/{z}/{x}/{y}@2x.png?style=gbif-geyser",
       attribution = "OpenStreetMap | GBIF",
@@ -129,9 +133,19 @@ server <- function(input, output, session) {
   )})
 
   ## two synced leaflet maps side-by-side
-  output$map1 <- renderLeaflet({
-    basemap |>
+  output$map1 <- renderLeaflet({ syncWith(basemap, "maps") })
+  output$map2 <- renderLeaflet({ syncWith(basemap, "maps") })
+
+  observeEvent(input$tilesLeft, {
+    p1 <- read.csv(file.path(
+      dirData,
+      first(unlist(str_split(input$tilesLeft, "_"))),
+      ifelse(str_detect(input$tilesLeft, "diff"), "diffspalette.csv", "palette.csv")
+    ))
+    leafletProxy("map1") |>
+      clearGroup("map1tiles") |>
       addTiles(
+        group = "map1tiles",
         urlTemplate = paste0("/", input$tilesLeft, "/{z}/{x}/{-y}.png"),
         options = tileOptions(
           tileSize = 256,
@@ -142,15 +156,25 @@ server <- function(input, output, session) {
           pane = "customtiles"
         )
       ) |>
-      addTiles(
-        urlTemplate = speciesOccurance(),
-        options = gbif_tile_options
-      ) |>
-      syncWith("maps")
+      clearControls() |>
+      addLegend(
+        position = "bottomright",
+        title = str_replace(input$tilesLeft, "_", "<br>"),
+        pal = colorNumeric(palette = p1$col, domain = p1$breaks),
+        values = p1$breaks,
+        opacity = 1
+      )
   })
-  output$map2 <- renderLeaflet({
-    basemap |>
+  observeEvent(input$tilesRight, {
+    p2 <- read.csv(file.path(
+      dirData,
+      first(unlist(str_split(input$tilesRight, "_"))),
+      ifelse(str_detect(input$tilesRight, "diff"),"diffspalette.csv","palette.csv")
+    ))
+    leafletProxy("map2") |>
+      clearGroup("map2tiles") |>
       addTiles(
+        group = "map2tiles",
         urlTemplate = paste0("/", input$tilesRight, "/{z}/{x}/{-y}.png"),
         options = tileOptions(
           tileSize = 256,
@@ -161,41 +185,13 @@ server <- function(input, output, session) {
           pane = "customtiles"
         )
       ) |>
-      addTiles(
-        urlTemplate = speciesOccurance(),
-        options = gbif_tile_options
-      ) |>
-      syncWith("maps")
-  })
-  observeEvent(input$tilesLeft, {
-    p1 <- read.csv(file.path(
-      dirData,
-      first(unlist(str_split(input$tilesLeft, "_"))),
-      ifelse(str_detect(input$tilesLeft, "diff"), "diffspalette.csv", "palette.csv")
-    ))
-    leafletProxy("map1") |>
       clearControls() |>
       addLegend(
         position = "bottomright",
-        title = str_replace(input$tilesLeft, "_", "<br>"),
-        pal = colorNumeric(palette = p1$col, domain = p1$breaks),
-        values = p1$breaks
-      )
-  })
-  observeEvent(input$tilesRight, {
-    v2 <- input$tilesRight
-    p2 <- read.csv(file.path(
-      dirData,
-      first(unlist(str_split(v2, "_"))),
-      ifelse(str_detect(v2, "diff"),"diffspalette.csv","palette.csv")
-    ))
-    leafletProxy("map2") |>
-      clearControls() |>
-      addLegend(
-        position = "bottomright",
-        title = str_replace(v2, "_", "<br>"),
+        title = str_replace(input$tilesRight, "_", "<br>"),
         pal = colorNumeric(palette = p2$col, domain = p2$breaks),
-        values = p2$breaks
+        values = p2$breaks,
+        opacity = 1
       )
   })
 

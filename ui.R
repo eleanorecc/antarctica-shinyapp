@@ -13,17 +13,6 @@ ui <- page_sidebar(
       inputId = "tilesRight",
       label = "Right Map",
       choices = allrasters
-    ),
-    br(),
-    textInput(
-      inputId = "taxonkey",
-      label = "GBIF Taxon Key",
-      value = ""
-    ),
-    p(
-      "Enter numeric GBIF taxon key (https://www.gbif.org/species) to add
-      human and machine observation records from GBIF.",
-      style = "font-size: 12px; color: #606891"
     )
   ),
 
