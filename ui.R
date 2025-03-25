@@ -7,13 +7,12 @@ ui <- page_sidebar(
       inputId = "tilesLeft",
       label = "Left Map",
       choices = allrasters,
-      selected = "seaiceDays_2007diff"
+      selected = NULL
     ),
     selectInput(
       inputId = "tilesRight",
       label = "Right Map",
-      choices = allrasters,
-      selected = "seaiceDays_2007diff"
+      choices = allrasters
     ),
     br(),
     textInput(

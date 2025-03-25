@@ -123,17 +123,16 @@ gdal2tiles <- function(r, dirData, saveFile){
   system(paste(
     "gdal2tiles.py -p raster -z 2-4 -x -tmscompatible",
     file.path(dirData, "delete.vrt"),
-    file.path(saveFile)
+    saveFile
   ))
 }
 
-maketiles <- function(tiffs_file, saveDir){
+maketiles <- function(r_start, saveDir){
   require(terra)
 
   ## addRasterImage does not handle sterographic projections
   ## need to make into tiles, so can use addTiles to put on leaflet map
 
-  r_start <- rast(tiffs_file)
   r_start <- project(r_start, "EPSG:3031")
 
   ## need to match shiny leaflet map extent
@@ -141,42 +140,71 @@ maketiles <- function(tiffs_file, saveDir){
   template <- rast(ext(c(-extent,extent,-extent,extent)), nrow=dims[1], ncol=dims[2], crs=crs(r_start))
   r_resample <- resample(r_start, template)
 
-
+  ## in case of two seasons/annual chlorophyll a
+  ## want to have same scale across all
+  if(nlyr(r_resample) == 9){
+    r_diffs <- c(
+      r_resample[[2]] - r_resample[[1]],
+      r_resample[[3]] - r_resample[[1]],
+      r_resample[[5]] - r_resample[[4]],
+      r_resample[[6]] - r_resample[[4]],
+      r_resample[[8]] - r_resample[[7]],
+      r_resample[[9]] - r_resample[[7]]
+    )
+    warning("make sure rasters are properly ordered annual, summer, winter")
+  }
   ## differences from baseline
-  r_diffs <- c(
-    r_resample[[2]] - r_resample[[1]],
-    r_resample[[3]] - r_resample[[1]]
-  )
-  mn <- min(global(r_diffs, min, na.rm = TRUE))
-  mx <- max(global(r_diffs, max, na.rm = TRUE)) + 1
-  r_diffs <- as.int(round(255*(r_diffs-mn)/(mx-mn)), datatype = "INT1U")
-  diffcols <- data.frame(
+  r_diffs_int <- as.int(stretch(r_diffs, minq = 0.02, maxq = 0.98, minv = 0, maxv = 255), datatype = "INT1U")
+  cols1 <- data.frame(
     value = 0:255,
     col = hcl.colors(256, "plasma")
   )
+  breaks <- quantile(
+    values(r_diffs),
+    probs = seq(0,1,length.out=256),
+    na.rm = TRUE
+  )
+  data.frame(breaks) |>
+    cbind(cols1) |>
+    write.csv(
+      file.path(saveDir[1], "diffspalette.csv"),
+      row.names = FALSE
+    )
 
-
-  ## re-scaling for INT1U and defining color table
-  mn <- min(global(r_resample, min, na.rm = TRUE))
-  mx <- max(global(r_resample, max, na.rm = TRUE)) + 1
-  r_int <- as.int(round(255*(r_resample-mn)/(mx-mn)), datatype = "INT1U")
-  valcols <- data.frame(
+  ## re-scale for INT1U and define color table
+  ## use stretch instead of simple rescaling..
+  r_int <- as.int(stretch(r_resample, minq = 0.02, maxq = 0.98, minv = 0, maxv = 255), datatype = "INT1U")
+  cols2 <- data.frame(
     value = 0:255,
     col = hcl.colors(256, "viridis")
   )
-
+  breaks <- quantile(
+    values(r_resample),
+    probs = seq(0,1,length.out=256),
+    na.rm = TRUE
+  )
+  data.frame(breaks) |>
+    cbind(cols1) |>
+    write.csv(
+      file.path(saveDir[1], "palette.csv"),
+      row.names = FALSE
+    )
 
   ## loop over time periods and difference, making tiles
-  tilefolder <- c("1998_2006","2007_2015","2016_2024")
-  for(i in 1:3){
-    r <- r_int[[i]]
-    coltab(r) <- valcols
-    gdal2tiles(r, dirData, file.path(saveDir, tilefolder[[i]]))
-  }
-  tilefolder <- c("diff_2007","diff_2016")
-  for(i in 1:2){
-    r <- r_diffs[[i]]
-    coltab(r) <- diffcols
-    gdal2tiles(r, dirData, file.path(saveDir, tilefolder[[i]]))
+  tilefolder <- c("19982006","20072015","20162024")
+  tilefolder <- c("2007diff","2016diff")
+  for(s in 1:length(saveDir)){
+    idx1 <- list(1:3,4:6,7:9)[[s]]
+    idx2 <- list(1:2,3:4,5:6)[[s]]
+    for(i in idx1){
+      r <- r_int[[i]]
+      coltab(r) <- valcols
+      gdal2tiles(r, dirData, file.path(saveDir[s], tilefolder[[i]]))
+    }
+    for(i in idx2){
+      r <- r_diffs_int[[i]]
+      coltab(r) <- diffcols
+      gdal2tiles(r, dirData, file.path(saveDir[s], tilefolder[[i]]))
+    }
   }
 }

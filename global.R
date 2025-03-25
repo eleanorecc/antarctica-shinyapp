@@ -111,52 +111,17 @@ maud_rise_center <- data.frame(lat = -65.46003868, lon = 2.95221053) |>
   st_set_crs(st_crs(4326))
 
 
+## for map
+## and processing spatial data
+zooms <- 0:6
 extent <- 12367396.2185
+resolutions <- 2*extent/256/2^zooms
 
-allrasters <- list(
-  `Chlorophyll A` = list(
-    `1998-2006` = "chlorophyllA_19982006",
-    `2007-2015` = "chlorophyllA_20072015",
-    `2016-2024` = "chlorophyllA_20162024",
-    `2007-2015 vs 1998-2006` = "chlorophyllA_2007diff",
-    `2016-2024 vs 1998-2006` = "chlorophyllA_2016diff"
-  ),
-  `Chlorophyll A Summer` = list(
-    `1998-2006` = "chlorophyllA_Summer_19982006",
-    `2007-2015` = "chlorophyllA_Summer_20072015",
-    `2016-2024` = "chlorophyllA_Summer_20162024",
-    `2007-2015 vs 1998-2006` = "chlorophyllA_Summer_2007diff",
-    `2016-2024 vs 1998-2006` = "chlorophyllA_Summer_2016diff"
-  ),
-  `Chlorophyll A Winter` = list(
-    `1998-2006` = "chlorophyllA_Winter_19982006",
-    `2007-2015` = "chlorophyllA_Winter_20072015",
-    `2016-2024` = "chlorophyllA_Winter_20162024",
-    `2007-2015 vs 1998-2006` = "chlorophyllA_Winter_2007diff",
-    `2016-2024 vs 1998-2006` = "chlorophyllA_Winter_2016diff"
-  ),
-  `Sea Ice Days` = list(
-    `1998-2006` = "seaiceDays_19982006",
-    `2007-2015` = "seaiceDays_20072015",
-    `2016-2024` = "seaiceDays_20162024",
-    `2007-2015 vs 1998-2006` = "seaiceDays_2007diff",
-    `2016-2024 vs 1998-2006` = "seaiceDays_2016diff"
-  ),
-  `Sea Ice Min Extent` = list(
-    `1998-2006` = "seaiceMinExtent_19982006",
-    `2007-2015` = "seaiceMinExtent_20072015",
-    `2016-2024` = "seaiceMinExtent_20162024",
-    `2007-2015 vs 1998-2006` = "seaiceMinExtent_2007diff",
-    `2016-2024 vs 1998-2006` = "seaiceMinExtent_2016diff"
-  ),
-  `Surface Salinity` = list(
-    `1998-2006` = "surfaceSalinity_19982006",
-    `2007-2015` = "surfaceSalinity_20072015",
-    `2016-2024` = "surfaceSalinity_20162024",
-    `2007-2015 vs 1998-2006` = "surfaceSalinity_2007diff",
-    `2016-2024 vs 1998-2006` = "surfaceSalinity_2016diff"
-  )
-)
+# tiffs <- list.files(file.path(getwd(),"data"), recursive = TRUE, full.names = TRUE, pattern = ".tif")
+# saveDir <- dirname(tiffs)
+# saveDir[2:3] <- paste0(saveDir[2:3], c("/Summer", "/Winter"))
+# mapply(function(x,y){maketiles(x,y)}, tiffs, saveDir)
+
 
 # tsdata <- bind_rows(
 #   read.csv(file.path(dirData, "seaiceDays", "seaice_icedays.csv")) |>
@@ -193,11 +158,3 @@ allrasters <- list(
 # write.csv(tsdata, file.path(dirData, "tsdata.csv"), row.names = FALSE)
 tsdata <- read.csv(file.path(dirData, "tsdata.csv"))
 
-# data <- list(
-#   `Polarview Ice Concentration` = list(
-#     rast_filepath = file.path(dirData, "www.polarview.aq"),
-#     tiles_filepath = file.path(dirData, "www.polarview.aq", "tiles"),
-#     layernames = c("2023-09-01", "2023-10-01", "2023-11-01", "2023-12-01"),
-#     ylab = "Ice Concentration (%)"
-#   )
-# )
