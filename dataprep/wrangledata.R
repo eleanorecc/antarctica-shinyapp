@@ -108,47 +108,67 @@ save_tiff <- function(saveArray, r, tifFile){
     writeRaster(tifFile)
 }
 
-maketiles <- function(tiffs_folder, ){
+gdal2tiles <- function(r, dirData, saveFile){
+  require(terra)
+  writeRaster(
+    r, file.path(dirData, "delete.tif"),
+    datatype = "INT1U",
+    overwrite = TRUE
+  )
+  system(paste(
+    "gdal_translate -of vrt -expand rgba",
+    file.path(dirData, "delete.tif"),
+    file.path(dirData, "delete.vrt")
+  ))
+  system(paste(
+    "gdal2tiles.py -p raster -z 2-5 -s EPSG:3031 --x",
+    file.path(dirData, "delete.vrt"),
+    file.path(saveFile)
+  ))
+}
 
-  rast1 <- tiffs_folder |>
-    list.files("v5.4.tif", full.names = TRUE) |>
-    rast()
-
-  cols <- coltab(rast1)
-  rast1 <- project(rast1, "EPSG:3031")
-
-  ## need to match shiny leaflet map extent
-  dims <- floor(2*extent/res(rast1))
-  template <- rast(ext(c(-extent,extent,-extent,extent)), nrow=dims[1], ncol=dims[2], crs=crs(rast1))
-
-  rast2 <- resample(rast1, template)
-  rast2 <- as.int(rast2, datatype="INT1U")
-  coltab(rast2) <- cols
-
+maketiles <- function(tiffs_file, saveDir){
+  require(terra)
 
   ## addRasterImage does not handle sterographic projections
   ## need to make into tiles, so can use addTiles to put on leaflet map
 
-  ## for now just save top layer to test tile in shiny map
-  ## TODO figure out how best to make all layers available... lots of tiles...
-  i <- nlyr(rast2)
-  writeRaster(
-    rast2[[i]],
-    file.path(dirData, "delete.tif"),
-    datatype="INT1U",
-    overwrite = TRUE
-  )
-  ## for some reason for me the tiler r package gives warning: no module named 'osgeo'
-  ## so will call gdal2tiles.py directly https://gdal.org/en/latest/programs/gdal2tiles.html
-  system(paste(
-    "gdal_translate -of vrt -expand rgba",
-    file.path(dirData, "delete.tif"),
-    file.path(tiffs_folder, "tiles.vrt")
-  ))
-  system(paste(
-    "gdal2tiles.py -p raster -z 2-5 -s EPSG:3031 -x",
-    file.path(tiffs_folder, "tiles.vrt"),
-    file.path(tiffs_folder, "tiles")
-  ))
-}
+  r_start <- rast(tiffs_file)
+  r_start <- project(r_start, "EPSG:3031")
 
+  ## need to match shiny leaflet map extent
+  dims <- rep(gbif_tile_size*2^5,2)
+  template <- rast(ext(c(-extent,extent,-extent,extent)), nrow=dims[1], ncol=dims[2], crs=crs(r_start))
+  r_resample <- resample(r_start, template)
+
+
+  ## differences from baseline
+  r_diffs <- c(
+    r_resample[[2]] - r_resample[[1]],
+    r_resample[[3]] - r_resample[[1]]
+  )
+  mn <- min(global(r_diffs, min, na.rm = TRUE))
+  mx <- max(global(r_diffs, max, na.rm = TRUE)) + 1
+  cols <- data.frame(
+    value = 0:255,
+    col = hcl.colors(256, "plasma")
+  )
+  r_diffs <- as.int(round(255*(r_diffs-mn)/(mx-mn)), datatype = "INT1U")
+  coltab(r_diffs) <- cols
+
+  ## rescale data to assign color table
+  mn <- min(global(r_resample, min, na.rm = TRUE))
+  mx <- max(global(r_resample, max, na.rm = TRUE)) + 1
+  cols <- data.frame(
+    value = 0:255,
+    col = hcl.colors(256, "viridis")
+  )
+  r_int <- as.int(round(255*(r_resample-mn)/(mx-mn)), datatype = "INT1U")
+  coltab(r_int) <- cols
+
+  ## loop over time periods and difference, making tiles
+  tilefolder <- c("1998_2006","2007_2015","2016_2024","diff_2007","diff_2016"))
+  lapply(list(), function(){
+    gdal2tiles(x, dirData, file.path(dirData, saveDir, tilefolder[[i]]))
+  })
+}

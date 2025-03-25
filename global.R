@@ -17,6 +17,7 @@ library(sf)
 library(shiny)
 library(bslib)
 library(leaflet)
+library(leaflet.extras)
 library(leaflet.minicharts)
 library(plotly)
 
@@ -119,33 +120,44 @@ maud_rise_center <- data.frame(lat = -65.46003868, lon = 2.95221053) |>
 gbif_tile_size <- 512
 extent <- 12367396.2185
 
-# allrasters <- list(
-#   `Sea Ice Minimum Extent` = list(
-#     rast_filepath = file.path(dirData, "sea_ice_extent"),
-#     tiles_filepath = file.path(dirData, "sea_ice_extent", "tiles"),
-#     layernames = c("1990s", "2000s", "2010s", "2020-2025"),
-#     ylab = "Sea Ice Extent (million km^2)"
-#   ),
-#   `Average Number of Ice-Coverage Days` = list(
-#     rast_filepath = file.path(dirData, "sea_ice_concentration"),
-#     tiles_filepath = file.path(dirData, "sea_ice_concentration", "tiles"),
-#     layernames = c("1990s", "2000s", "2010s", "2020-2025"),
-#     ylab = "Sea Ice Concentration (%)"
-#   ),
-#   `` = list(),
-#   "primary_production" = list(
-#     rast_filepath = file.path(dirData, "primary_production"),
-#     tiles_filepath = file.path(dirData, "primary_production", "tiles"),
-#     layernames = c("1990s", "2000s", "2010s", "2020-2025"),
-#     ylab = "Primary Production (mg C m^-2 d^-1)"
-#   ),
-#   "salinity" = list(
-#     rast_filepath = file.path(dirData, "salinity"),
-#     tiles_filepath = file.path(dirData, "salinity", "tiles"),
-#     layernames = c("1990s", "2000s", "2010s", "2020-2025"),
-#     ylab = "Salinity (PSU)"
-#   )
-# )
+allrasters <- list(
+  iceDays = list(
+    rast_filepath = file.path(dirData, "seaiceDays", "timeperiod_seaice_icedays.tif"),
+    tiles_1998_2006 = file.path(dirData, "seaiceDays", "1998_2006"),
+    tiles = file.path(dirData, "seaiceDays", "tiles_2007_2015"),
+    tiles = file.path(dirData, "seaiceDays", "tiles_2016_2024")
+  ),
+  minIceExtent = list(
+    rast_filepath = file.path(dirData, "seaiceMinExtent", "timeperiod_seaice_minext.tif"),
+    tiles_1998 = file.path(dirData, "seaiceMinExtent", "tiles_1998_2006"),
+    tiles_2007 = file.path(dirData, "seaiceMinExtent", "tiles_2007_2015"),
+    tiles_2016 = file.path(dirData, "seaiceMinExtent", "tiles_2016_2024")
+  ),
+  chlaAll = list(
+    rast_filepath = file.path(dirData, "chlorophyllA", "timeperiod_all_months_chla.tif"),
+    tiles_1998 = file.path(dirData, "chlorophyllA", "tiles_1998_2006"),
+    tiles_2007 = file.path(dirData, "chlorophyllA", "tiles_2007_2015"),
+    tiles_2016 = file.path(dirData, "chlorophyllA", "tiles_2016_2024")
+  ),
+  chlaWinter = list(
+    rast_filepath = file.path(dirData, "chlorophyllA", "timeperiod_winter_months_chla.tif"),
+    tiles_1998 = file.path(dirData, "chlorophyllA", "tiles_1998_2006_winter"),
+    tiles_2007 = file.path(dirData, "chlorophyllA", "tiles_2007_2015_winter"),
+    tiles_2016 = file.path(dirData, "chlorophyllA", "tiles_2016_2024_winter")
+  ),
+  chlaSummer = list(
+    rast_filepath = file.path(dirData, "chlorophyllA", "timeperiod_summer_months_chla.tif"),
+    tiles_1998 = file.path(dirData, "chlorophyllA", "tiles_1998_2006_summer"),
+    tiles_2007 = file.path(dirData, "chlorophyllA", "tiles_2007_2015_summer"),
+    tiles_2016 = file.path(dirData, "chlorophyllA", "tiles_2016_2024_summer")
+  ),
+  annualSalinity = list(
+    rast_filepath = file.path(dirData, "surfaceSalinity", "timeperiod_all_months_salinity.tif"),
+    tiles_1998 = file.path(dirData, "surfaceSalinity", "tiles_1998_2006"),
+    tiles_2007 = file.path(dirData, "surfaceSalinity", "tiles_2007_2015"),
+    tiles_2016 = file.path(dirData, "surfaceSalinity", "tiles_2016_2024")
+  )
+)
 
 # tsdata <- bind_rows(
 #   read.csv(file.path(dirData, "seaiceDays", "seaice_icedays.csv")) |>

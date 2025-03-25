@@ -45,7 +45,7 @@ server <- function(input, output, session) {
 
   ## add tiles folders as resource paths
   ## https://stackoverflow.com/questions/59174298/using-addresourcepath-for-rendering-local-leaflet-tiles
-  # addResourcePath("mytiles", data$`Polarview Ice Concentration`$tiles_filepath)
+  addResourcePath("mytiles", allrasters$iceDays$tiles_1998_2006)
 
 
   ## two synced leaflet maps side-by-side
@@ -69,19 +69,34 @@ server <- function(input, output, session) {
       ) |>
 
       ## TODO sort issue with misalignment of tiles...
-      # addTiles(
-      #   urlTemplate = "mytiles/{z}/{x}/{y}.png",
-      #   group = "Polarview Ice Concentration",
-      #   options = tileOptions(
-      #     tileSize = gbif_tile_size,
-      #     noWrap = TRUE,
-      #     opacity = 0.2,
-      #     continuousWorld = TRUE
-      #   )
-      # ) |>
+      addTiles(
+        urlTemplate = "mytiles/{z}/{x}/{-y}.png",
+        group = "seaiceDays",
+        options = tileOptions(
+          tileSize = gbif_tile_size,
+          noWrap = TRUE,
+          opacity = 0.6,
+          tms = TRUE,
+          continuousWorld = TRUE
+        )
+      ) |>
       addTiles(
         urlTemplate = speciesOccurance,
         options = gbif_tile_options
+      ) |>
+      addDrawToolbar(
+        targetGroup = "draw",
+        singleFeature = TRUE,
+        polygonOptions = FALSE,
+        markerOptions = FALSE,
+        rectangleOptions = FALSE,
+        circleOptions = FALSE,
+        circleMarkerOptions = FALSE,
+        editOptions = editToolbarOptions(
+          edit = FALSE,
+          remove = TRUE,
+          selectedPathOptions = selectedPathOptions()
+        )
       ) |>
       addPolygons(data = wobec, color = "red", fillOpacity = 0, weight = 1) |>
       addPolygons(data = weddell_gyre, color = "yellow", fillOpacity = 0, weight = 1) |>
