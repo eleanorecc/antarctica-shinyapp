@@ -1,22 +1,19 @@
 ui <- page_sidebar(
   ## input elements in sidebar
   sidebar = sidebar(
+    width = 280,
     ## select which variables to map
     selectInput(
-      inputId = "map1var",
+      inputId = "tilesLeft",
       label = "Left Map",
-      choices = c(
-        "1", "2"
-      ),
-      selected = "Time Series"
+      choices = allrasters,
+      selected = "seaiceDays_2007diff"
     ),
     selectInput(
-      inputId = "map2var",
+      inputId = "tilesRight",
       label = "Right Map",
-      choices = c(
-        "1", "2"
-      ),
-      selected = "Time Series"
+      choices = allrasters,
+      selected = "seaiceDays_2007diff"
     ),
     br(),
     textInput(

@@ -13,6 +13,7 @@
 library(here)
 library(dplyr)
 library(tidyr)
+library(stringr)
 library(sf)
 library(shiny)
 library(bslib)
@@ -39,7 +40,7 @@ if(length(list.files(dirData)) == 0){
 ## https://doi.org/10.15784/601652
 ## https://eos.org/editors-vox/science-in-a-frozen-ocean
 weddell_gyre_corners <- data.frame(
-  lat = c(-60, -60, -80, -80, -60),
+  lat = c(-50, -50, -80, -80, -50),
   lon = c(-60, 40, 40, -60, -60)
 )
 weddell_gyre_coords <- data.frame(
@@ -61,41 +62,36 @@ weddell_gyre <- weddell_gyre_coords |>
   st_set_crs(st_crs(4326))
 
 
-
+## add wobecs study area on top
+wobec <- st_read(file.path(dirData, "studyAreaWOBEC")) |>
+  st_transform(st_crs(4326))
 
 ## ccamlr statistical areas, subareas, divisions
 ## https://github.com/ccamlr/data/tree/main/geographical_data/asd
-asd <- st_read(file.path(dirData, "statisticalAreasCCAMLR")) |>
-  st_transform(st_crs(4326))
+asd <- st_read(file.path(dirData, "statisticalAreasCCAMLR"))
 
+
+## other datsets...
 
 ## https://add.scar.org/
 
 ## high resolution polygons for coastline
 ## https://data.bas.ac.uk/items/4ecd795d-e038-412f-b430-251b33fc880e/
-coast <- st_read(file.path(dirData, "add_coastline_high_res_polygon_v7_10"))
 
 ## high resolution polygons for seamask, CC BY 4.0 license
 ## https://data.bas.ac.uk/items/9288fd09-681b-4377-84b2-6ab9b9c6c05d/
-seamask <- st_read(file.path(dirData, "add_seamask_high_res_v7_10"))
 
 
-## shapefile from Katharina Teschke at awi
-## add shapefile of study area on top
-wobec <- st_read(file.path(dirData, "studyAreaWOBEC")) |>
-  st_transform(st_crs(4326))
 
-
-## will extract time series for 2 areas
+## also extract time series for 2 areas
 ## (1) kap norvega
 ## (2) maud rise sea mound
 
 ## https://www.marineregions.org/gazetteer.php?p=details&id=22139
 ## https://latitude.to/articles-by-country/aq/antarctica/259278/cape-norvegia
-kap_norvega <- data.frame(x = -71.333332, y = -12.2999988) |>
-  st_as_sf(coords = c("x", "y")) |>
-  st_set_crs(st_crs(4326)) |>
-  st_transform(st_crs(3031))
+kap_norvegia <- data.frame(lat = -71.333332, lon = -12.2999988) |>
+  st_as_sf(coords = c("lon", "lat")) |>
+  st_set_crs(st_crs(4326))
 
 
 ## https://www.marineregions.org/gazetteer.php?p=details&id=6990
@@ -112,50 +108,53 @@ maud_rise <- maud_rise_coords |>
 
 maud_rise_center <- data.frame(lat = -65.46003868, lon = 2.95221053) |>
   st_as_sf(coords = c("lon", "lat")) |>
-  st_set_crs(st_crs(4326)) |>
-  st_transform(st_crs(3031))
+  st_set_crs(st_crs(4326))
 
 
-## for the shiny app
-gbif_tile_size <- 512
 extent <- 12367396.2185
 
 allrasters <- list(
-  iceDays = list(
-    rast_filepath = file.path(dirData, "seaiceDays", "timeperiod_seaice_icedays.tif"),
-    tiles_1998_2006 = file.path(dirData, "seaiceDays", "1998_2006"),
-    tiles = file.path(dirData, "seaiceDays", "tiles_2007_2015"),
-    tiles = file.path(dirData, "seaiceDays", "tiles_2016_2024")
+  `Chlorophyll A` = list(
+    `1998-2006` = "chlorophyllA_19982006",
+    `2007-2015` = "chlorophyllA_20072015",
+    `2016-2024` = "chlorophyllA_20162024",
+    `2007-2015 vs 1998-2006` = "chlorophyllA_2007diff",
+    `2016-2024 vs 1998-2006` = "chlorophyllA_2016diff"
   ),
-  minIceExtent = list(
-    rast_filepath = file.path(dirData, "seaiceMinExtent", "timeperiod_seaice_minext.tif"),
-    tiles_1998 = file.path(dirData, "seaiceMinExtent", "tiles_1998_2006"),
-    tiles_2007 = file.path(dirData, "seaiceMinExtent", "tiles_2007_2015"),
-    tiles_2016 = file.path(dirData, "seaiceMinExtent", "tiles_2016_2024")
+  `Chlorophyll A Summer` = list(
+    `1998-2006` = "chlorophyllA_Summer_19982006",
+    `2007-2015` = "chlorophyllA_Summer_20072015",
+    `2016-2024` = "chlorophyllA_Summer_20162024",
+    `2007-2015 vs 1998-2006` = "chlorophyllA_Summer_2007diff",
+    `2016-2024 vs 1998-2006` = "chlorophyllA_Summer_2016diff"
   ),
-  chlaAll = list(
-    rast_filepath = file.path(dirData, "chlorophyllA", "timeperiod_all_months_chla.tif"),
-    tiles_1998 = file.path(dirData, "chlorophyllA", "tiles_1998_2006"),
-    tiles_2007 = file.path(dirData, "chlorophyllA", "tiles_2007_2015"),
-    tiles_2016 = file.path(dirData, "chlorophyllA", "tiles_2016_2024")
+  `Chlorophyll A Winter` = list(
+    `1998-2006` = "chlorophyllA_Winter_19982006",
+    `2007-2015` = "chlorophyllA_Winter_20072015",
+    `2016-2024` = "chlorophyllA_Winter_20162024",
+    `2007-2015 vs 1998-2006` = "chlorophyllA_Winter_2007diff",
+    `2016-2024 vs 1998-2006` = "chlorophyllA_Winter_2016diff"
   ),
-  chlaWinter = list(
-    rast_filepath = file.path(dirData, "chlorophyllA", "timeperiod_winter_months_chla.tif"),
-    tiles_1998 = file.path(dirData, "chlorophyllA", "tiles_1998_2006_winter"),
-    tiles_2007 = file.path(dirData, "chlorophyllA", "tiles_2007_2015_winter"),
-    tiles_2016 = file.path(dirData, "chlorophyllA", "tiles_2016_2024_winter")
+  `Sea Ice Days` = list(
+    `1998-2006` = "seaiceDays_19982006",
+    `2007-2015` = "seaiceDays_20072015",
+    `2016-2024` = "seaiceDays_20162024",
+    `2007-2015 vs 1998-2006` = "seaiceDays_2007diff",
+    `2016-2024 vs 1998-2006` = "seaiceDays_2016diff"
   ),
-  chlaSummer = list(
-    rast_filepath = file.path(dirData, "chlorophyllA", "timeperiod_summer_months_chla.tif"),
-    tiles_1998 = file.path(dirData, "chlorophyllA", "tiles_1998_2006_summer"),
-    tiles_2007 = file.path(dirData, "chlorophyllA", "tiles_2007_2015_summer"),
-    tiles_2016 = file.path(dirData, "chlorophyllA", "tiles_2016_2024_summer")
+  `Sea Ice Min Extent` = list(
+    `1998-2006` = "seaiceMinExtent_19982006",
+    `2007-2015` = "seaiceMinExtent_20072015",
+    `2016-2024` = "seaiceMinExtent_20162024",
+    `2007-2015 vs 1998-2006` = "seaiceMinExtent_2007diff",
+    `2016-2024 vs 1998-2006` = "seaiceMinExtent_2016diff"
   ),
-  annualSalinity = list(
-    rast_filepath = file.path(dirData, "surfaceSalinity", "timeperiod_all_months_salinity.tif"),
-    tiles_1998 = file.path(dirData, "surfaceSalinity", "tiles_1998_2006"),
-    tiles_2007 = file.path(dirData, "surfaceSalinity", "tiles_2007_2015"),
-    tiles_2016 = file.path(dirData, "surfaceSalinity", "tiles_2016_2024")
+  `Surface Salinity` = list(
+    `1998-2006` = "surfaceSalinity_19982006",
+    `2007-2015` = "surfaceSalinity_20072015",
+    `2016-2024` = "surfaceSalinity_20162024",
+    `2007-2015 vs 1998-2006` = "surfaceSalinity_2007diff",
+    `2016-2024 vs 1998-2006` = "surfaceSalinity_2016diff"
   )
 )
 

@@ -121,7 +121,7 @@ gdal2tiles <- function(r, dirData, saveFile){
     file.path(dirData, "delete.vrt")
   ))
   system(paste(
-    "gdal2tiles.py -p raster -z 2-5 -s EPSG:3031 --x",
+    "gdal2tiles.py -p raster -z 2-4 -x -tmscompatible",
     file.path(dirData, "delete.vrt"),
     file.path(saveFile)
   ))
@@ -137,7 +137,7 @@ maketiles <- function(tiffs_file, saveDir){
   r_start <- project(r_start, "EPSG:3031")
 
   ## need to match shiny leaflet map extent
-  dims <- rep(gbif_tile_size*2^5,2)
+  dims <- rep(256*2^5,2)
   template <- rast(ext(c(-extent,extent,-extent,extent)), nrow=dims[1], ncol=dims[2], crs=crs(r_start))
   r_resample <- resample(r_start, template)
 
@@ -149,26 +149,34 @@ maketiles <- function(tiffs_file, saveDir){
   )
   mn <- min(global(r_diffs, min, na.rm = TRUE))
   mx <- max(global(r_diffs, max, na.rm = TRUE)) + 1
-  cols <- data.frame(
+  r_diffs <- as.int(round(255*(r_diffs-mn)/(mx-mn)), datatype = "INT1U")
+  diffcols <- data.frame(
     value = 0:255,
     col = hcl.colors(256, "plasma")
   )
-  r_diffs <- as.int(round(255*(r_diffs-mn)/(mx-mn)), datatype = "INT1U")
-  coltab(r_diffs) <- cols
 
-  ## rescale data to assign color table
+
+  ## re-scaling for INT1U and defining color table
   mn <- min(global(r_resample, min, na.rm = TRUE))
   mx <- max(global(r_resample, max, na.rm = TRUE)) + 1
-  cols <- data.frame(
+  r_int <- as.int(round(255*(r_resample-mn)/(mx-mn)), datatype = "INT1U")
+  valcols <- data.frame(
     value = 0:255,
     col = hcl.colors(256, "viridis")
   )
-  r_int <- as.int(round(255*(r_resample-mn)/(mx-mn)), datatype = "INT1U")
-  coltab(r_int) <- cols
+
 
   ## loop over time periods and difference, making tiles
-  tilefolder <- c("1998_2006","2007_2015","2016_2024","diff_2007","diff_2016"))
-  lapply(list(), function(){
-    gdal2tiles(x, dirData, file.path(dirData, saveDir, tilefolder[[i]]))
-  })
+  tilefolder <- c("1998_2006","2007_2015","2016_2024")
+  for(i in 1:3){
+    r <- r_int[[i]]
+    coltab(r) <- valcols
+    gdal2tiles(r, dirData, file.path(saveDir, tilefolder[[i]]))
+  }
+  tilefolder <- c("diff_2007","diff_2016")
+  for(i in 1:2){
+    r <- r_diffs[[i]]
+    coltab(r) <- diffcols
+    gdal2tiles(r, dirData, file.path(saveDir, tilefolder[[i]]))
+  }
 }

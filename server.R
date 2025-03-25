@@ -5,8 +5,9 @@ server <- function(input, output, session) {
   ## for polar crs need to custom define leaflet options
   ## https://thomasswilliams.github.io/development/r/2022/06/18/leaflet-and-r.html
   ## https://tile.gbif.org/ui/3031/EPSG3031-leaflet.js
-  zooms <- 0:5
-  resolutions <- extent / gbif_tile_size / 2^(zooms-1)
+  ## use 256 tile size resolutions (double) to accommodate generated tiles
+  zooms <- 0:6
+  resolutions <- 2*extent/256/2^zooms
 
   epsg_3031 <- leafletCRS(
     crsClass = "L.Proj.CRS",
@@ -16,40 +17,68 @@ server <- function(input, output, session) {
     origin = c(-extent, extent),
     bounds = list(c(-extent, -extent), c(extent, extent))
   )
-  ## polar crs used for Copernicus marine tiles...
-  # epsg_32761 <- leafletCRS(
-  #   crsClass = "L.Proj.CRS",
-  #   code = "EPSG:32761",
-  #   proj4def = "+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs",
-  #   ...
-  # )
 
   map_options <- leafletOptions(
     ## instead of -90,0 south pole,
     ## center the Weddell sea
     center = c(-75, -45),
     zoom = 3,
-    minZoom = 2,
-    maxZoom = 5,
+    minZoom = 3,
+    maxZoom = 4,
     crs = epsg_3031,
     worldCopyJump = FALSE,
     preferCanvas = TRUE
   )
   gbif_tile_options <- tileOptions(
-    tileSize = gbif_tile_size,
+    ## shift zoom levels with offset
+    ## to match 256px gdal tile grid
+    tileSize = 512,
+    zoomOffset = -1,
     noWrap = TRUE,
     continuousWorld = TRUE,
     updateWhenZooming = FALSE,
     updateWhenIdle = TRUE
   )
+  tile_options <- tileOptions(
+    tileSize = 256,
+    noWrap = TRUE,
+    opacity = 0.8,
+    tms = TRUE,
+    continuousWorld = TRUE
+  )
 
   ## add tiles folders as resource paths
   ## https://stackoverflow.com/questions/59174298/using-addresourcepath-for-rendering-local-leaflet-tiles
-  addResourcePath("mytiles", allrasters$iceDays$tiles_1998_2006)
+  # resource_prefixes <- c("seaiceDays","seaiceMinExtent","chlorophyllA","chlorophyllA_Winter","chlorophyllA_Summer","surfaceSalinity") |>
+  #   paste0(rep(c("_19982006","_20072015","_20162024","_2007diff","_2016diff"), 6)) |>
+  #   sort()
+  resource_prefixes <- "seaiceDays_2007diff"
+  for(prefix in resource_prefixes){
+    tilefolder <- file.path(dirData, str_replace_all(prefix, "_", "/"))
+    addResourcePath(prefix, tilefolder)
+  }
+
+  # annualSalinity = list(
+  #   rast_filepath = file.path(dirData, "surfaceSalinity", "timeperiod_all_months_salinity.tif"),
+  #   tiles_1998 = file.path(dirData, "surfaceSalinity", "tiles_1998_2006"),
+  #   tiles_2007 = file.path(dirData, "surfaceSalinity", "tiles_2007_2015"),
+  #   tiles_2016 = file.path(dirData, "surfaceSalinity", "tiles_2016_2024")
+  # )
+  #
+  # addResourcePath("dataset1", "path/to/dataset1/tiles")
+  # addResourcePath("dataset2", "path/to/dataset2/tiles")
+  # addResourcePath("dataset3", "path/to/dataset3/tiles")
+  #
+  # addResourcePath("dataset1", "path/to/dataset1/tiles")
+  # addResourcePath("dataset2", "path/to/dataset2/tiles")
+  # addResourcePath("dataset3", "path/to/dataset3/tiles")
+  #
 
 
   ## two synced leaflet maps side-by-side
   output$map1 <- renderLeaflet({
+    tilesLeft <- input$tilesLeft
+
     # input <- list()
     # input$taxonkey <- 212
     speciesOccurance <- paste(
@@ -62,20 +91,18 @@ server <- function(input, output, session) {
 
     leaflet(options = map_options) |>
       addTiles(
-        urlTemplate = "https://tile.gbif.org/3031/omt/{z}/{x}/{y}@1x.png?style=gbif-light",
+        urlTemplate = "https://tile.gbif.org/3031/omt/{z}/{x}/{y}@2x.png?style=gbif-geyser-en",
         attribution = "OpenStreetMap | GBIF",
         layerId = "antartica_tiles",
         options = gbif_tile_options
       ) |>
-
-      ## TODO sort issue with misalignment of tiles...
       addTiles(
-        urlTemplate = "mytiles/{z}/{x}/{-y}.png",
+        urlTemplate = paste0("/", tilesLeft, "/{z}/{x}/{-y}.png"),
         group = "seaiceDays",
         options = tileOptions(
-          tileSize = gbif_tile_size,
+          tileSize = 256,
           noWrap = TRUE,
-          opacity = 0.6,
+          opacity = 0.8,
           tms = TRUE,
           continuousWorld = TRUE
         )
@@ -98,23 +125,110 @@ server <- function(input, output, session) {
           selectedPathOptions = selectedPathOptions()
         )
       ) |>
-      addPolygons(data = wobec, color = "red", fillOpacity = 0, weight = 1) |>
-      addPolygons(data = weddell_gyre, color = "yellow", fillOpacity = 0, weight = 1) |>
+      addLayersControl(
+        overlayGroups = c("Statistical Areas", "Study Area", "Points of Interest"),
+        position = "bottomleft"
+      ) |>
+      addPolygons(
+        data = asd,
+        group = "Statistical Areas",
+        fillOpacity = 0, weight = 1
+      ) |>
+      addPolygons(
+        data = wobec,
+        group = "Study Area",
+        popup = "Study Area",
+        color = "red", fillOpacity = 0, weight = 2
+      ) |>
+      addCircles(
+        data = maud_rise_center,
+        group = "Points of Interest",
+        popup = "Maud Rise",
+        fill = FALSE, weight = 12
+      ) |>
+      addCircles(
+        data = kap_norvegia,
+        group = "Points of Interest",
+        popup = "Kap Norvegia",
+        fill = FALSE, weight = 12
+      ) |>
       syncWith("maps")
-      # addLayersControl(overlayGroups = c(names(allrasters))) |>
-      # hideGroup(names(allrasters))
   })
 
   output$map2 <- renderLeaflet({
+    tilesRight <- input$tilesRight
+
+    speciesOccurance <- paste(
+      "https://api.gbif.org/v2/map/occurrence/density/{z}/{x}/{y}@1x.png?srs=EPSG%3A3031",
+      paste0("taxonKey=", input$taxonkey),
+      paste0("basisOfRecord=", c("HUMAN_OBSERVATION", "MACHINE_OBSERVATION"), collapse = "&"),
+      "style=purpleYellow.point",
+      sep = "&"
+    )
+
     leaflet(options = map_options) |>
       addTiles(
-        urlTemplate = "https://tile.gbif.org/3031/omt/{z}/{x}/{y}@1x.png?style=gbif-light",
+        urlTemplate = "https://tile.gbif.org/3031/omt/{z}/{x}/{y}@2x.png?style=gbif-geyser-en",
         attribution = "OpenStreetMap | GBIF",
         layerId = "antartica_tiles",
         options = gbif_tile_options
       ) |>
-      addPolygons(data = wobec, color = "red", fillOpacity = 0, weight = 1) |>
-      addPolygons(data = weddell_gyre, color = "yellow", fillOpacity = 0, weight = 1) |>
+      addTiles(
+        urlTemplate = paste0("/", tilesRight, "/{z}/{x}/{-y}.png"),
+        group = "seaiceDays",
+        options = tileOptions(
+          tileSize = 256,
+          noWrap = TRUE,
+          opacity = 0.8,
+          tms = TRUE,
+          continuousWorld = TRUE
+        )
+      ) |>
+      addTiles(
+        urlTemplate = speciesOccurance,
+        options = gbif_tile_options
+      ) |>
+      addDrawToolbar(
+        targetGroup = "draw",
+        singleFeature = TRUE,
+        polygonOptions = FALSE,
+        markerOptions = FALSE,
+        rectangleOptions = FALSE,
+        circleOptions = FALSE,
+        circleMarkerOptions = FALSE,
+        editOptions = editToolbarOptions(
+          edit = FALSE,
+          remove = TRUE,
+          selectedPathOptions = selectedPathOptions()
+        )
+      ) |>
+      addLayersControl(
+        overlayGroups = c("Statistical Areas", "Study Area", "Points of Interest"),
+        position = "bottomleft"
+      ) |>
+      addPolygons(
+        data = asd,
+        group = "Statistical Areas",
+        fillOpacity = 0, weight = 1
+      ) |>
+      addPolygons(
+        data = wobec,
+        group = "Study Area",
+        popup = "Study Area",
+        color = "red", fillOpacity = 0, weight = 2
+      ) |>
+      addCircles(
+        data = maud_rise_center,
+        group = "Points of Interest",
+        popup = "Maud Rise",
+        fill = FALSE, weight = 12
+      ) |>
+      addCircles(
+        data = kap_norvegia,
+        group = "Points of Interest",
+        popup = "Kap Norvegia",
+        fill = FALSE, weight = 12
+      ) |>
       syncWith("maps")
   })
 
