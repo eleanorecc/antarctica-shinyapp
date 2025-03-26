@@ -21,9 +21,9 @@ ui <- page_sidebar(
   fluidRow(
     column(6, leafletOutput(outputId = "map1", height = "58vh")),
     column(6, leafletOutput(outputId = "map2", height = "58vh"))
-  )
+  ),
   ## time series
-  # fluidRow(
-  #   column(12, plotlyOutput("timeseries"))
-  # )
+  fluidRow(
+    column(12, plotOutput("timeseries", height = "36vh"))
+  )
 )

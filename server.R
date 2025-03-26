@@ -197,43 +197,23 @@ server <- function(input, output, session) {
 
 
   ## time series plots ----
+  output$timeseries <- renderPlot({
+    plotvars <- c(input$tilesLeft, input$tilesRight) |>
+      str_split("_[0-9]{4}") |>
+      lapply(function(x){first(unlist(x))}) |>
+      unlist()
 
-  ## start with an empty data frame
-  # plotdata <- reactiveVal(list(
-  #   values = data.frame(),
-  #   plotymin = 0,
-  #   ylab = ""
-  # ))
-  # ## wrangle data for plotting based on layer selected and line drawn
-  # observeEvent(list(input$map_groups, input$map_draw_new_feature), {
-  #   feature <- input$map_draw_new_feature
-  #   plotlayer <- intersect(input$map_groups, names(data))
-  #   if(!is.null(feature) & length(plotlayer) > 0){
-  #     newdata <- wrangle_data(
-  #       coords = feature$geometry$coordinates,
-  #       layer =  data[[first(plotlayer)]]
-  #     )
-  #     plotdata(newdata)
-  #   }
-  # })
-  # ## render plot
-  # output$elevation_plot <- renderHighchart({
-  #   if(input$plottype == "Time Series"){
-  #     time_series_plot(plotdata())
-  #   } else if(input$plottype == "Cross Section"){
-  #     cross_section_plot(plotdata())
-  #   }
-  # })
-  #
-  # ## define CRS for  using Copernicus Marine Service tiles with EPSG 32761
-  # leafletCRS(
-  #   crsClass = "L.Proj.CRS",
-  #   code = "EPSG:32761",
-  #   proj4def = "+proj=stere +lat_0=-90 +lat_ts=-71 +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
-  # )
-  #
+    df <- filter(tsdata, plot_with %in% plotvars)
+    yTitle <- paste0(unique(df$yaxislabel), "\n")
 
-
-
-
+    ggplot(df) +
+      geom_point(aes(x = year, y = yvariable, color = plot_with), size = 2) +
+      geom_line(aes(x = year, y = yvariable, color = plot_with), linewidth = 0.4) +
+      labs(x = "Year", y = yTitle, color = NULL) +
+      theme(
+        legend.text = element_text(size = 12),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14)
+      )
+  })
 }

@@ -20,7 +20,7 @@ library(bslib)
 library(leaflet)
 library(leaflet.extras)
 library(leaflet.minicharts)
-library(plotly)
+library(ggplot2)
 
 ## directories ----
 dirData <- here("data")
@@ -188,9 +188,10 @@ allrasters <- list(
 #     ) |>
 #     select(plot_with, year, yvariable = value, yaxislabel),
 #   read.csv(file.path(dirData, "chlorophyllA", "timeperiod_chla.csv")) |>
+#     mutate(months = ifelse(months == "All", "", paste0("_", months))) |>
 #     mutate(
 #       yaxislabel = "Chlorophyll-a (mg m^-3)",
-#       plot_with = paste0("chla", months)
+#       plot_with = paste0("chlorophyllA", months)
 #     ) |>
 #     select(plot_with, year, yvariable = yrwgtmean, yaxislabel),
 #   read.csv(file.path(dirData, "surfaceSalinity", "timeperiod_salinity.csv")) |>
