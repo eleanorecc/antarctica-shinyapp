@@ -8,12 +8,17 @@ annual_summaries <- function(ncFile, ncvarname, months){
   dim2 <- dim(x)[1:2]
 
   ## handle different time definitions
+  ## handle different time definitions
+  # if(ncvarname == "CHL"){
+  #   datayears <- xtime |>
+  #     ## already using days
+  #     as.Date(origin = "1900-01-01") |>
+  #     format("%Y") |>
+  #     as.numeric()
+  # }
   if(ncvarname == "CHL"){
-    datayears <- xtime |>
-      ## already using days
-      as.Date(origin = "1900-01-01") |>
-      format("%Y") |>
-      as.numeric()
+    origin <- as.POSIXct("1970-01-01", tz = "UTC")
+    datayears <- format(as.POSIXct(xtime, origin = origin, tz = "UTC"), "%Y")
   }
   if(ncvarname == "sos"){
     ## convert from hours to days
@@ -138,7 +143,8 @@ maketiles <- function(r_start, saveDir){
   ## need to match shiny leaflet map extent
   dims <- rep(256*2^5,2)
   template <- rast(ext(c(-extent,extent,-extent,extent)), nrow=dims[1], ncol=dims[2], crs=crs(r_start))
-  r_resample <- resample(r_start, template)
+  # r_resample <- resample(r_start, template)
+  r_resample <- r_start
 
   ## in case of two seasons/annual chlorophyll a
   ## want to have same scale across all
