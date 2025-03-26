@@ -23,7 +23,7 @@ library(leaflet.minicharts)
 library(ggplot2)
 
 ## directories ----
-dirData <- here("data")
+dirData <- here("www")
 if(length(list.files(dirData)) == 0){
   message(
     "dirData is not found-- if on a remote server,

@@ -6,13 +6,42 @@ ui <- page_sidebar(
     selectInput(
       inputId = "tilesLeft",
       label = "Left Map",
-      choices = allrasters,
-      selected = NULL
+      choices = allrasters
     ),
     selectInput(
       inputId = "tilesRight",
       label = "Right Map",
       choices = allrasters
+    ),
+    br(),
+    HTML(paste0(
+      "<p style='font-size:18px; margin-bottom:-20px;'>Chlorophyll A Data:</p>",
+      "<p style='font-size:12px; color:#606891'>",
+      "Chlorophyll A averages calculated from Copernicus Marine Dataset:<br>",
+      "<a href = 'https://data.marine.copernicus.eu/product/OCEANCOLOUR_GLO_BGC_L4_MY_009_104/services'>",
+      "cmems_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M",
+      "</a></p>"
+    )),
+    HTML(paste0(
+      "<p style='font-size:18px; margin-bottom:-20px'>Sea Ice Data:</p>",
+      "<p style='font-size:12px; color:#606891'>",
+      "Sea Ice averages and minimums calculated (taking >%15 covered area as 'ice covered') from Copernicus Marine Dataset:<br>",
+      "<a href = 'https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/services'>",
+      "cmems_mod_glo_phy_my_0.083deg_P1D-m",
+      "</a></p>"
+    )),
+    HTML(paste0(
+      "<p style='font-size:18px; margin-bottom:-20px;'>Salinity Data:</p>",
+      "<p style='font-size:12px; color:#606891'>",
+      "Salinity averages calculated from Copernicus Marine Dataset:<br>",
+      "<a href = 'https://data.marine.copernicus.eu/product/MULTIOBS_GLO_PHY_S_SURFACE_MYNRT_015_013/services'>",
+      "cmems_obs-mob_glo_phy-sss_my_multi_P1M",
+      "</a></p>"
+    )),
+    textInput(
+      inputId = "taxonkey",
+      label = "GBIF Taxon",
+      value = ""
     )
   ),
 

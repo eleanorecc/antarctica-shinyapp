@@ -108,22 +108,6 @@ server <- function(input, output, session) {
       options = pathOptions(pane = "overlays")
     )
 
-  ## add tiles folders as resource paths
-  ## https://stackoverflow.com/questions/59174298/using-addresourcepath-for-rendering-local-leaflet-tiles
-  # resource_prefixes <- c("seaiceDays","seaiceMinExtent","chlorophyllA","chlorophyllA_Winter","chlorophyllA_Summer","surfaceSalinity") |>
-  #   paste0(rep(c("_19982006","_20072015","_20162024","_2007diff","_2016diff"), 6)) |>
-  #   sort()
-  resource_prefixes <- c("chlorophyllA", "chlorophyllA_Summer", "chlorophyllA_Winter") |>
-    paste0(rep(c("_19982006","_20072015","_20162024", "_2007diff", "_2016diff"), 3)) |>
-    sort()
-  for(prefix in resource_prefixes){
-    tilefolder <- file.path(dirData, str_replace_all(prefix, "_", "/"))
-    addResourcePath(prefix, tilefolder)
-  }
-
-
-  # input <- list()
-  # input$taxonkey <- 212
   speciesOccurance <- reactive({paste(
     "https://api.gbif.org/v2/map/occurrence/density/{z}/{x}/{y}@1x.png?srs=EPSG%3A3031",
     paste0("taxonKey=", input$taxonkey),
@@ -146,7 +130,10 @@ server <- function(input, output, session) {
       clearGroup("map1tiles") |>
       addTiles(
         group = "map1tiles",
-        urlTemplate = paste0("/", input$tilesLeft, "/{z}/{x}/{-y}.png"),
+        urlTemplate = sprintf(
+          "%s/{z}/{x}/{-y}.png",
+          str_replace_all(input$tilesLeft, "_", "/")
+        ),
         options = tileOptions(
           tileSize = 256,
           noWrap = TRUE,
@@ -165,6 +152,17 @@ server <- function(input, output, session) {
         opacity = 1
       )
   })
+  observeEvent(input$taxonkey, {
+    leafletProxy("map1") |>
+      clearGroup("spp") |>
+      clearGroup("map1tiles") |>
+      clearControls() |>
+      addTiles(
+        group = "spp",
+        urlTemplate = speciesOccurance(),
+        options = spp_options
+      )
+  })
   observeEvent(input$tilesRight, {
     p2 <- read.csv(file.path(
       dirData,
@@ -175,7 +173,10 @@ server <- function(input, output, session) {
       clearGroup("map2tiles") |>
       addTiles(
         group = "map2tiles",
-        urlTemplate = paste0("/", input$tilesRight, "/{z}/{x}/{-y}.png"),
+        urlTemplate = sprintf(
+          "%s/{z}/{x}/{-y}.png",
+          str_replace_all(input$tilesRight, "_", "/")
+        ),
         options = tileOptions(
           tileSize = 256,
           noWrap = TRUE,
