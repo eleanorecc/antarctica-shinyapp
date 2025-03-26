@@ -108,13 +108,23 @@ server <- function(input, output, session) {
       options = pathOptions(pane = "overlays")
     )
 
-  speciesOccurance <- reactive({paste(
-    "https://api.gbif.org/v2/map/occurrence/density/{z}/{x}/{y}@1x.png?srs=EPSG%3A3031",
-    paste0("taxonKey=", input$taxonkey),
-    paste0("basisOfRecord=", c("HUMAN_OBSERVATION", "MACHINE_OBSERVATION"), collapse = "&"),
-    "style=purpleYellow.point",
-    sep = "&"
-  )})
+  speciesOccurance <- reactive({
+    taxa <- paste0("https://api.gbif.org/v1/species/match?name=", URLencode(input$taxonkey)) |>
+      request() |>
+      req_perform() |>
+      resp_body_json()
+    key <- taxa$usageKey
+
+    if(!is.null(key)){
+      paste(
+        "https://api.gbif.org/v2/map/occurrence/density/{z}/{x}/{y}@1x.png?srs=EPSG%3A3031",
+        paste0("taxonKey=", key),
+        paste0("basisOfRecord=", c("HUMAN_OBSERVATION", "MACHINE_OBSERVATION"), collapse = "&"),
+        "style=purpleYellow.point",
+        sep = "&"
+      )
+    }
+  })
 
   ## two synced leaflet maps side-by-side
   output$map1 <- renderLeaflet({ syncWith(basemap, "maps") })
@@ -148,6 +158,9 @@ server <- function(input, output, session) {
         position = "bottomright",
         title = str_replace(input$tilesLeft, "_", "<br>"),
         pal = colorNumeric(palette = p1$col, domain = p1$breaks),
+        labFormat = labelFormat(
+          transform = function(x) sort(x)
+        ),
         values = p1$breaks,
         opacity = 1
       )

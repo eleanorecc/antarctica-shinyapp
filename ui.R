@@ -1,7 +1,7 @@
 ui <- page_sidebar(
   ## input elements in sidebar
   sidebar = sidebar(
-    width = 280,
+    width = 295,
     ## select which variables to map
     selectInput(
       inputId = "tilesLeft",
