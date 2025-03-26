@@ -63,14 +63,16 @@ weddell_gyre <- weddell_gyre_coords |>
   st_cast("POLYGON") |>
   st_set_crs(st_crs(4326))
 
-
-## add wobecs study area on top
-wobec <- st_read(file.path(dirData, "studyAreaWOBEC")) |>
-  st_transform(st_crs(4326))
-
 ## ccamlr statistical areas, subareas, divisions
 ## https://github.com/ccamlr/data/tree/main/geographical_data/asd
 asd <- st_read(file.path(dirData, "statisticalAreasCCAMLR"))
+
+## add wobecs study area on top
+# st_write(st_intersection(
+#   st_set_agr(st_transform(studyAreaWOBECbox, st_crs(4326)), "constant"),
+#   st_geometry(filter(asd, GAR_Name == "Subarea 48.6"))
+# ), file.path(dirData, "studyAreaWOBEC/WOBEC_StudyArea.shp"))
+wobec <- st_read(file.path(dirData, "studyAreaWOBEC"))
 
 
 ## other datsets...

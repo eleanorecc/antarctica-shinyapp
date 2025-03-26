@@ -15,6 +15,17 @@ ui <- page_sidebar(
     ),
     br(),
     HTML(paste0(
+      "<p style='font-size:12px; color:#606891; margin-bottom:-20px;'>",
+      "Search GBIF using scientific name",
+      "</p>"
+    )),
+    textInput(
+      inputId = "taxonkey",
+      label = NULL,
+      value = ""
+    ),
+    br(),
+    HTML(paste0(
       "<p style='font-size:18px; margin-bottom:-20px;'>Chlorophyll A Data:</p>",
       "<p style='font-size:12px; color:#606891'>",
       "Chlorophyll A averages calculated from Copernicus Marine Dataset:<br>",
@@ -37,12 +48,7 @@ ui <- page_sidebar(
       "<a href = 'https://data.marine.copernicus.eu/product/MULTIOBS_GLO_PHY_S_SURFACE_MYNRT_015_013/services'>",
       "cmems_obs-mob_glo_phy-sss_my_multi_P1M",
       "</a></p>"
-    )),
-    textInput(
-      inputId = "taxonkey",
-      label = "GBIF Taxon",
-      value = ""
-    )
+    ))
   ),
 
   ## main content area
