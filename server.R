@@ -108,23 +108,6 @@ server <- function(input, output, session) {
       options = pathOptions(pane = "overlays")
     )
 
-  speciesOccurance <- reactive({
-    taxa <- paste0("https://api.gbif.org/v1/species/match?name=", URLencode(input$taxonkey)) |>
-      request() |>
-      req_perform() |>
-      resp_body_json()
-    key <- taxa$usageKey
-
-    if(!is.null(key)){
-      paste(
-        "https://api.gbif.org/v2/map/occurrence/density/{z}/{x}/{y}@1x.png?srs=EPSG%3A3031",
-        paste0("taxonKey=", key),
-        paste0("basisOfRecord=", c("HUMAN_OBSERVATION", "MACHINE_OBSERVATION"), collapse = "&"),
-        "style=purpleYellow.point",
-        sep = "&"
-      )
-    }
-  })
 
   ## two synced leaflet maps side-by-side
   output$map1 <- renderLeaflet({ syncWith(basemap, "maps") })
@@ -137,6 +120,7 @@ server <- function(input, output, session) {
       ifelse(str_detect(input$tilesLeft, "diff"), "diffspalette.csv", "palette.csv")
     ))
     leafletProxy("map1") |>
+      clearGroup("spp") |>
       clearGroup("map1tiles") |>
       addTiles(
         group = "map1tiles",
@@ -166,15 +150,35 @@ server <- function(input, output, session) {
       )
   })
   observeEvent(input$taxonkey, {
-    leafletProxy("map1") |>
-      clearGroup("spp") |>
-      clearGroup("map1tiles") |>
-      clearControls() |>
-      addTiles(
-        group = "spp",
-        urlTemplate = speciesOccurance(),
-        options = spp_options
+    taxon_delayed <- debounce(reactive(input$taxonkey), 1000)
+    res <- paste0("https://api.gbif.org/v1/species/match?name=", URLencode(taxon_delayed())) |>
+      request() |>
+      req_headers(user_agent = "DataSummaryWOBEC/1.0") |>
+      req_perform()
+    if(resp_status(res) < 400){
+      taxa <- resp_body_json(res)
+      key <- taxa$usageKey
+    } else {
+      key <- NULL
+    }
+    if(!is.null(key)){
+      speciesOccurance <- paste(
+        "https://api.gbif.org/v2/map/occurrence/density/{z}/{x}/{y}@1x.png?srs=EPSG%3A3031",
+        paste0("taxonKey=", key),
+        paste0("basisOfRecord=", c("HUMAN_OBSERVATION", "MACHINE_OBSERVATION"), collapse = "&"),
+        "style=purpleYellow.point",
+        sep = "&"
       )
+      leafletProxy("map1") |>
+        clearGroup("spp") |>
+        clearGroup("map1tiles") |>
+        clearControls() |>
+        addTiles(
+          group = "spp",
+          urlTemplate = speciesOccurance,
+          options = spp_options
+        )
+    }
   })
   observeEvent(input$tilesRight, {
     p2 <- read.csv(file.path(
@@ -218,15 +222,16 @@ server <- function(input, output, session) {
       unlist()
 
     df <- filter(tsdata, plot_with %in% plotvars)
-    yTitle <- paste0(unique(df$yaxislabel), "\n")
+    # yTitle <- paste0(unique(df$yaxislabel), "\n")
 
     ggplot(df) +
       geom_point(aes(x = year, y = yvariable, color = plot_with), size = 2) +
       geom_line(aes(x = year, y = yvariable, color = plot_with), linewidth = 0.4) +
-      labs(x = "Year", y = yTitle, color = NULL) +
+      facet_wrap(~yaxislabel, ncol = 1, scales = "free") +
+      labs(x = "Year", y = NULL, color = NULL) +
       theme(
         legend.text = element_text(size = 12),
-        axis.title = element_text(size = 16),
+        strip.text = element_text(size = 16),
         axis.text = element_text(size = 14)
       )
   })

@@ -121,90 +121,94 @@ zooms <- 0:6
 extent <- 12367396.2185
 resolutions <- 2*extent/256/2^zooms
 
-# tiffs <- list.files(dirData, recursive = TRUE, full.names = TRUE, pattern = ".tif")
-# saveDir <- dirname(tiffs)
-# saveDir[2:3] <- paste0(saveDir[2:3], c("/Summer", "/Winter"))
-# mapply(function(x,y){maketiles(x,y)}, tiffs, saveDir)
-
 allrasters <- list(
   `Chlorophyll A` = list(
     `1998-2006` = "chlorophyllA_19982006",
     `2007-2015` = "chlorophyllA_20072015",
     `2016-2024` = "chlorophyllA_20162024",
-    `2007-2015 minus 1998-2006` = "chlorophyllA_2007diff",
-    `2016-2024 minus 1998-2006` = "chlorophyllA_2016diff"
+    `2007-2015 minus 1998-2006` = "chlorophyllA_20072015diff",
+    `2016-2024 minus 1998-2006` = "chlorophyllA_20162024diff"
   ),
   `Chlorophyll A Summer` = list(
     `1998-2006` = "chlorophyllA_Summer_19982006",
     `2007-2015` = "chlorophyllA_Summer_20072015",
     `2016-2024` = "chlorophyllA_Summer_20162024",
-    `2007-2015 minus 1998-2006` = "chlorophyllA_Summer_2007diff",
-    `2016-2024 minus 1998-2006` = "chlorophyllA_Summer_2016diff"
+    `2007-2015 minus 1998-2006` = "chlorophyllA_Summer_20072015diff",
+    `2016-2024 minus 1998-2006` = "chlorophyllA_Summer_20162024diff"
   ),
   `Chlorophyll A Winter` = list(
     `1998-2006` = "chlorophyllA_Winter_19982006",
     `2007-2015` = "chlorophyllA_Winter_20072015",
     `2016-2024` = "chlorophyllA_Winter_20162024",
-    `2007-2015 minus 1998-2006` = "chlorophyllA_Winter_2007diff",
-    `2016-2024 minus 1998-2006` = "chlorophyllA_Winter_2016diff"
+    `2007-2015 minus 1998-2006` = "chlorophyllA_Winter_20072015diff",
+    `2016-2024 minus 1998-2006` = "chlorophyllA_Winter_20162024diff"
   ),
   `Sea Ice Days` = list(
     `1998-2006` = "seaiceDays_19982006",
     `2007-2015` = "seaiceDays_20072015",
     `2016-2024` = "seaiceDays_20162024",
-    `2007-2015 minus 1998-2006` = "seaiceDays_2007diff",
-    `2016-2024 minus 1998-2006` = "seaiceDays_2016diff"
+    `2007-2015 minus 1998-2006` = "seaiceDays_20072015diff",
+    `2016-2024 minus 1998-2006` = "seaiceDays_20162024diff"
   ),
   `Sea Ice Min Extent` = list(
     `1998-2006` = "seaiceMinExtent_19982006",
     `2007-2015` = "seaiceMinExtent_20072015",
-    `2016-2024` = "seaiceMinExtent_20162024",
-    `2007-2015 minus 1998-2006` = "seaiceMinExtent_2007diff",
-    `2016-2024 minus 1998-2006` = "seaiceMinExtent_2016diff"
+    `2016-2024` = "seaiceMinExtent_20162024"
   ),
   `Surface Salinity` = list(
     `1998-2006` = "surfaceSalinity_19982006",
     `2007-2015` = "surfaceSalinity_20072015",
     `2016-2024` = "surfaceSalinity_20162024",
-    `2007-2015 minus 1998-2006` = "surfaceSalinity_2007diff",
-    `2016-2024 minus 1998-2006` = "surfaceSalinity_2016diff"
+    `2007-2015 minus 1998-2006` = "surfaceSalinity_20072015diff",
+    `2016-2024 minus 1998-2006` = "surfaceSalinity_20162024diff"
+  ),
+  `Surface Salinity Summer` = list(
+    `1998-2006` = "surfaceSalinity_Summer_19982006",
+    `2007-2015` = "surfaceSalinity_Summer_20072015",
+    `2016-2024` = "surfaceSalinity_Summer_20162024",
+    `2007-2015 minus 1998-2006` = "surfaceSalinity_Summer_20072015diff",
+    `2016-2024 minus 1998-2006` = "surfaceSalinity_Summer_20162024diff"
   )
 )
 
 
-# tsdata <- bind_rows(
-#   read.csv(file.path(dirData, "seaiceDays", "seaice_icedays.csv")) |>
-#     mutate(
-#       yaxislabel = "Number of Days with Ice-Cover > 15%, Area Average",
-#       plot_with = "iceDays"
-#     ) |>
-#     select(plot_with, year, yvariable = yrwgtmean, yaxislabel),
-#   read.csv(file.path(dirData, "seaiceMinExtent", "seaice_coverage_minext.csv")) |>
-#     mutate(coveragearea = coveragearea/1e6) |>
-#     pivot_longer(cols = c(day_of_year, coveragearea)) |>
-#     mutate(
-#       yaxislabel = ifelse(
-#         name == "coveragearea",
-#         "Area of Minimum Ice Extent (million km^2)",
-#         "Day of the Year with Minimum Ice Extent"
-#       ),
-#       plot_with = "minIceExtent"
-#     ) |>
-#     select(plot_with, year, yvariable = value, yaxislabel),
-#   read.csv(file.path(dirData, "chlorophyllA", "timeperiod_chla.csv")) |>
-#     mutate(months = ifelse(months == "All", "", paste0("_", months))) |>
-#     mutate(
-#       yaxislabel = "Chlorophyll-a (mg m^-3)",
-#       plot_with = paste0("chlorophyllA", months)
-#     ) |>
-#     select(plot_with, year, yvariable = yrwgtmean, yaxislabel),
-#   read.csv(file.path(dirData, "surfaceSalinity", "timeperiod_salinity.csv")) |>
-#     mutate(
-#       yaxislabel = "Salinity (PSU)",
-#       plot_with = "annualSalinity"
-#     ) |>
-#     select(plot_with, year, yvariable = yrwgtmean, yaxislabel)
-# )
-# write.csv(tsdata, file.path(dirData, "tsdata.csv"), row.names = FALSE)
+# chla <- bind_rows(
+#   read.csv(file.path(dirData, "chlorophyllA", "timeperiod_all_months_chla.csv")) |>
+#     mutate(plot_with = "chlorophyllA") |>
+#     cbind(year = 1998:2024),
+#   read.csv(file.path(dirData, "chlorophyllA", "timeperiod_summer_months_chla.csv")) |>
+#     mutate(plot_with = "chlorophyllA_Summer") |>
+#     cbind(year = 1998:2024),
+#   read.csv(file.path(dirData, "chlorophyllA", "timeperiod_winter_months_chla.csv")) |>
+#     mutate(plot_with = "chlorophyllA_Winter") |>
+#     cbind(year = 1998:2024)) |>
+#   mutate(yaxislabel = "Chlorophyll-a (mg m^-3)")
+#
+# salinity <- bind_rows(
+#   read.csv(file.path(dirData, "surfaceSalinity", "timeperiod_all_months_salinity.csv")) |>
+#     mutate(plot_with = "surfaceSalinity") |>
+#     cbind(year = 1998:2024),
+#   read.csv(file.path(dirData, "surfaceSalinity", "timeperiod_summer_months_salinity.csv")) |>
+#     mutate(plot_with = "surfaceSalinity_Summer") |>
+#     cbind(year = 1998:2024)) |>
+#   mutate(yaxislabel = "Salinity (PSU)")
+#
+# icedays <- read.csv(file.path(dirData, "seaiceDays", "seaice_icedays.csv")) |>
+#   mutate(plot_with = "seaiceDays") |>
+#   mutate(yaxislabel = "Number of Days with Ice-Cover > 15%, Area Average") |>
+#   cbind(year = 1998:2024)
+# iceext <- read.csv(file.path(dirData, "seaiceMinExtent", "seaice_coverage_minext.csv")) |>
+#   mutate(coveragearea = coveragearea/1e6) |>
+#   pivot_longer(cols = c(index, coveragearea), values_to = "yrwgtmean") |>
+#   mutate(plot_with = "seaiceMinExtent") |>
+#   mutate(yaxislabel = ifelse(
+#     name == "coveragearea",
+#     "Area of Minimum Ice Extent (million km^2)",
+#     "Day of the Year with Minimum Ice Extent"
+#   ))
+# bind_rows(chla, salinity, icedays, iceext) |>
+#   select(plot_with, year, yvariable = yrwgtmean, yaxislabel) |>
+#   write.csv(file.path(dirData, "tsdata.csv"), row.names = FALSE)
+
 tsdata <- read.csv(file.path(dirData, "tsdata.csv"))
 

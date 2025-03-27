@@ -29,8 +29,8 @@ ui <- page_sidebar(
       "<p style='font-size:18px; margin-bottom:-20px;'>Chlorophyll A Data:</p>",
       "<p style='font-size:12px; color:#606891'>",
       "Chlorophyll A averages calculated from Copernicus Marine Dataset:<br>",
-      "<a href = 'https://data.marine.copernicus.eu/product/OCEANCOLOUR_GLO_BGC_L4_MY_009_104/services'>",
-      "cmems_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M",
+      "<a href = 'https://data.marine.copernicus.eu/product/OCEANCOLOUR_GLO_BGC_L4_MY_009_108/services'>",
+      "c3s_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M",
       "</a></p>"
     )),
     HTML(paste0(
