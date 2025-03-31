@@ -8,7 +8,6 @@ annual_summaries <- function(ncFile, ncvarname, months){
   dim2 <- dim(x)[1:2]
 
   ## handle different time definitions
-  ## handle different time definitions
   # if(ncvarname == "CHL"){
   #   datayears <- xtime |>
   #     ## already using days

@@ -162,9 +162,9 @@ get_seaice <- function(params, user, pass){
   save_tiff(prd_ext, r, file.path(saveDir, "timeperiod_seaice_minext.tif"))
 
   prd_icedays <- timeperiod_averages(sums, spatialweights)
-  save_tiff(prd_icedays$averages, r, file.path(saveDir, "timeperiod_seaice_icedays.tif"))
-  save_tiff(prd_icedays$variability, r, file.path(saveDir, "timeperiod_seaice_icedays_var.tif"))
-  write.csv(prd_icedays$table, file.path(saveDir, "seaice_icedays.csv"))
+  save_tiff(prd_icedays$averages, r, file.path(dirname(saveDir), "seaiceDays", "timeperiod_seaice_icedays.tif"))
+  save_tiff(prd_icedays$variability, r, file.path(dirname(saveDir), "seaiceDays", "timeperiod_seaice_icedays_var.tif"))
+  write.csv(prd_icedays$table, file.path(dirname(saveDir), "seaiceDays", "seaice_icedays.csv"))
 
   return(list(
     extents = extents,
@@ -322,6 +322,6 @@ get_salinity <- function(params, user, pass){
 
 ## use functions to get all the data...
 # params <- dataparams(c("1998-01-01","2024-12-31"), weddell_gyre_corners)
-result_seaice <- get_seaice(params, user, pass)
+# result_seaice <- get_seaice(params, user, pass)
 # result_chla get_chla(params, user, pass)
 # result_salinity <- get_salinity(params, user, pass)
