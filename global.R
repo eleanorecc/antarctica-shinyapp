@@ -72,10 +72,10 @@ asd <- st_read(file.path(dirData, "statisticalAreasCCAMLR"))
 #   st_set_agr(st_transform(studyAreaWOBECbox, st_crs(4326)), "constant"),
 #   st_geometry(filter(asd, GAR_Name == "Subarea 48.6"))
 # ), file.path(dirData, "studyAreaWOBEC/WOBEC_StudyArea.shp"))
-wobec <- st_read(file.path(dirData, "studyAreaWOBEC"))
+wobec <- st_transform(st_read(file.path(dirData, "studyAreaWOBEC")), st_crs(4326))
 
 
-## other datsets...
+## other datasets...
 
 ## https://add.scar.org/
 

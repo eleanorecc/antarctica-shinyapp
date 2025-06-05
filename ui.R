@@ -13,7 +13,6 @@ ui <- page_sidebar(
       label = "Right Map",
       choices = allrasters
     ),
-    br(),
     HTML(paste0(
       "<p style='font-size:12px; color:#606891; margin-bottom:-20px;'>",
       "Search GBIF using scientific name",
@@ -23,6 +22,15 @@ ui <- page_sidebar(
       inputId = "taxonkey",
       label = NULL,
       value = ""
+    ),
+    p(
+      "Upload a zipped shapefile (.zip) to view as an overlay on the map.",
+      style = "font-size: 12px; color: #606891"
+    ),
+    fileInput(
+      "shapefile",
+      "Upload Shapefile",
+      accept = c(".zip")
     ),
     br(),
     HTML(paste0(

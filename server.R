@@ -49,30 +49,31 @@ server <- function(input, output, session) {
     continuousWorld = TRUE
   )
 
-  basemap <- leaflet(options = map_options) |>
-    addMapPane("background", zIndex = 410) |>
-    addMapPane("customtiles", zIndex = 420)  |>
-    addMapPane("overlays", zIndex = 430)  |>
-    addMapPane("spp", zIndex = 440)  |>
-    addTiles(
-      urlTemplate = "https://tile.gbif.org/3031/omt/{z}/{x}/{y}@2x.png?style=gbif-geyser",
-      attribution = "OpenStreetMap | GBIF",
-      options = gbif_tile_options
-    ) |>
-    addDrawToolbar(
-      targetGroup = "draw",
-      singleFeature = TRUE,
-      polygonOptions = FALSE,
-      markerOptions = FALSE,
-      rectangleOptions = FALSE,
-      circleOptions = FALSE,
-      circleMarkerOptions = FALSE,
-      editOptions = editToolbarOptions(
-        edit = FALSE,
-        remove = TRUE,
-        selectedPathOptions = selectedPathOptions()
-      )
-    ) |>
+    basemap <- leaflet(options = map_options) |>
+      addMapPane("background", zIndex = 410) |>
+      addMapPane("customtiles", zIndex = 420)  |>
+      addMapPane("overlays", zIndex = 430)  |>
+      addMapPane("spp", zIndex = 440)  |>
+      addMapPane("owndata", zIndex = 450) |>
+      addTiles(
+        urlTemplate = "https://tile.gbif.org/3031/omt/{z}/{x}/{y}@2x.png?style=gbif-geyser",
+        attribution = "OpenStreetMap | GBIF",
+        options = gbif_tile_options
+      ) |>
+      addDrawToolbar(
+        targetGroup = "draw",
+        singleFeature = TRUE,
+        polygonOptions = FALSE,
+        markerOptions = FALSE,
+        rectangleOptions = FALSE,
+        circleOptions = FALSE,
+        circleMarkerOptions = FALSE,
+        editOptions = editToolbarOptions(
+          edit = FALSE,
+          remove = TRUE,
+          selectedPathOptions = selectedPathOptions()
+        )
+      ) |>
     addLayersControl(
       overlayGroups = c("Statistical Areas", "Study Area", "Points of Interest"),
       position = "bottomleft"
@@ -212,6 +213,54 @@ server <- function(input, output, session) {
         opacity = 1
       )
   })
+
+  ## handling user-uploaded data ----
+  shpdata <- reactive({
+    ## req ensures this code only runs when a file is uploaded
+    req(input$shapefile)
+
+    ## unzip the uploaded shapefile
+    dirtmp <- tempdir()
+    unzip(input$shapefile$datapath, exdir = dirtmp)
+    tmpfile <- list.files(dirtmp, pattern = "\\.shp$", full.names = TRUE, recursive = TRUE)
+    tmpfile <- tmpfile[[1]]
+    if(length(tmpfile) == 1){
+      shpfile <- st_read(tmpfile) |>
+        rmapshaper::ms_simplify(keep = 0.01) |>
+        st_geometry()
+      ## vector geometries need to be in latlon for leaflet
+      if(st_crs(shpfile) != st_crs("EPSG:4326")){
+        shpfile <- st_transform(shpfile, st_crs("EPSG:4326"))
+      }
+    } else {
+      ## TODO check the shp has at least 30% overlap with map latitudes?
+      shpfile <- NULL
+    }
+    return(shpfile)
+  })
+
+  ## increase upload limit to 30MB (from default of 5) in options
+  options(shiny.maxRequestSize = 30*1024^2)
+
+  ## update when user uploads shapefile
+  observe({
+    message("SHPDATA EXISTS; ADD TO MAP...")
+    uploaded_data <- shpdata()
+    if(is.null(uploaded_data)){message("NULL  SHP DATA  FOR MAPPING...")}
+    if(!is.null(uploaded_data)){
+      leafletProxy("map1") |>
+        clearGroup("uploaded_data") |>
+        addPolygons(
+          data = uploaded_data,
+          group = "uploaded_data",
+          col = "black",
+          weight = 1.5,
+          fillOpacity = 0,
+          options = list(pane = "owndata")
+        )
+    }
+  })
+
 
 
   ## time series plots ----
