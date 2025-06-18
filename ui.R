@@ -1,72 +1,56 @@
-ui <- page_sidebar(
-  ## input elements in sidebar
-  sidebar = sidebar(
-    width = 295,
-    ## select which variables to map
-    selectInput(
-      inputId = "tilesLeft",
-      label = "Left Map",
-      choices = allrasters
-    ),
-    selectInput(
-      inputId = "tilesRight",
-      label = "Right Map",
-      choices = allrasters
-    ),
-    HTML(paste0(
-      "<p style='font-size:12px; color:#606891; margin-bottom:-20px;'>",
-      "Search GBIF using scientific name",
-      "</p>"
-    )),
-    textInput(
-      inputId = "taxonkey",
-      label = NULL,
-      value = ""
-    ),
-    p(
-      "Upload a zipped shapefile (.zip) to view as an overlay on the map.",
-      style = "font-size: 12px; color: #606891"
-    ),
-    fileInput(
-      "shapefile",
-      "Upload Shapefile",
-      accept = c(".zip")
-    ),
-    br(),
-    HTML(paste0(
-      "<p style='font-size:18px; margin-bottom:-20px;'>Chlorophyll A Data:</p>",
-      "<p style='font-size:12px; color:#606891'>",
-      "Chlorophyll A averages calculated from Copernicus Marine Dataset:<br>",
-      "<a href = 'https://data.marine.copernicus.eu/product/OCEANCOLOUR_GLO_BGC_L4_MY_009_108/services'>",
-      "c3s_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M",
-      "</a></p>"
-    )),
-    HTML(paste0(
-      "<p style='font-size:18px; margin-bottom:-20px'>Sea Ice Data:</p>",
-      "<p style='font-size:12px; color:#606891'>",
-      "Sea Ice averages and minimums calculated (taking >%15 covered area as 'ice covered') from Copernicus Marine Dataset:<br>",
-      "<a href = 'https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/services'>",
-      "cmems_mod_glo_phy_my_0.083deg_P1D-m",
-      "</a></p>"
-    )),
-    HTML(paste0(
-      "<p style='font-size:18px; margin-bottom:-20px;'>Salinity Data:</p>",
-      "<p style='font-size:12px; color:#606891'>",
-      "Salinity averages calculated from Copernicus Marine Dataset:<br>",
-      "<a href = 'https://data.marine.copernicus.eu/product/MULTIOBS_GLO_PHY_S_SURFACE_MYNRT_015_013/services'>",
-      "cmems_obs-mob_glo_phy-sss_my_multi_P1M",
-      "</a></p>"
-    ))
+htmlTemplate(
+  filename = here("index.html"),
+
+  ## header ----
+
+
+  ## stakeholders of the Weddell Sea ----
+
+
+  ## summary data ----
+  leftmap_input = selectInput(
+    inputId = "tilesLeft",
+    label = NULL,
+    choices = allrasters
+  ),
+  rightmap_input = selectInput(
+    inputId = "tilesRight",
+    label = NULL,
+    choices = allrasters
+  ),
+  taxonkey_input = textInput(
+    inputId = "taxonKey",
+    label = NULL,
+    value = ""
+  ),
+  distant_input = selectizeInput(
+    inputId = "distAnt",
+    label = "SCAR DistAnt",
+    choices = distrasters,
+    selected = NULL,
+    options = list(
+      placeholder = 'Select...',
+      onInitialize = I('function() { this.setValue(""); }')
+    )
+  ),
+  shapefile_input = fileInput(
+    "shapefile",
+    "Upload Shapefile",
+    accept = c(".zip")
   ),
 
   ## main content area
-  ## maps
-  fluidRow(
-    column(6, leafletOutput(outputId = "map1", height = "58vh")),
-    column(6, leafletOutput(outputId = "map2", height = "58vh"))
-  ),
-  ## time series
-  fluidRow(
-    column(12, plotOutput("timeseries", height = "36vh"))
-  )
+  # timeseries_ui = plotOutput("timeseries", height = "36vh"),
+  map1ui = leafletOutput(outputId = "map1", height = 480),
+  map2ui = leafletOutput(outputId = "map2", height = 480)
+
+  ## system graphic ----
+
+
+  ## resources ----
+
+
+
+  ## footer ----
+
 )

@@ -67,6 +67,9 @@ weddell_gyre <- weddell_gyre_coords |>
 ## https://github.com/ccamlr/data/tree/main/geographical_data/asd
 asd <- st_read(file.path(dirData, "statisticalAreasCCAMLR"))
 
+## https://github.com/ccamlr/data/tree/main/geographical_data/ssmu
+ssmu <- st_read(file.path(dirData, "mgmtAreasCCAMLR"))
+
 ## add wobecs study area on top
 # st_write(st_intersection(
 #   st_set_agr(st_transform(studyAreaWOBECbox, st_crs(4326)), "constant"),
@@ -120,6 +123,7 @@ maud_rise_center <- data.frame(lat = -65.46003868, lon = 2.95221053) |>
 zooms <- 0:6
 extent <- 12367396.2185
 resolutions <- 2*extent/256/2^zooms
+dims <- rep(256*2^5, 2)
 
 allrasters <- list(
   `Chlorophyll A` = list(
@@ -211,4 +215,58 @@ allrasters <- list(
 #   write.csv(file.path(dirData, "tsdata.csv"), row.names = FALSE)
 
 tsdata <- read.csv(file.path(dirData, "tsdata.csv"))
+
+
+rast2tile <- function(url, lyrnum, saveDir){
+  require(terra)
+  require(dplyr)
+
+  ## download the raster
+  tmptif <- file.path(saveDir, "rast0.tif")
+  download.file(url, destfile = tmptif)
+
+  ## project to sterographic south after cropping
+  r <- project(rast(tmptif, lyrs = lyrnum), "EPSG:4326") |>
+    crop(ext(c(-180, 180, -90, -50))) |>
+    project("EPSG:3031")
+
+  ## resample to match leaflet map tiles/extent
+  x <- 12367396.2185
+  template <- rast(ext(c(-x,x,-x,x)), nrow = 8192, ncol = 8192, crs = crs("EPSG:3031"))
+  rresamp <- resample(r, template)
+
+  pal <- data.frame(value = 0:255, col = hcl.colors(256, "viridis"))
+  values(rresamp) |>
+    quantile(probs = seq(0, 1, length.out = 256), na.rm = TRUE) |>
+    data.frame() |>
+    cbind(pal) |>
+    write.csv(
+      file.path(saveDir, "palette.csv"),
+      row.names = FALSE
+    )
+
+  rint <- rresamp |>
+    stretch(minq = 0.02, maxq = 0.98, minv = 0, maxv = 255) |>
+    as.int(datatype = "INT1U")
+  coltab(rint) <- pal
+
+  writeRaster(
+    rint, file.path(saveDir, "rint.tif"),
+    datatype = "INT1U",
+    overwrite = TRUE
+  )
+  system(paste(
+    "gdal_translate -of vrt -expand rgba",
+    file.path(saveDir, "rint.tif"),
+    file.path(saveDir, "rint.vrt")
+  ))
+  system(paste(
+    "gdal2tiles.py -p raster -z 2-4 -x -tmscompatible",
+    file.path(saveDir, "rint.vrt"),
+    saveDir
+  ))
+}
+
+distcsv <-  read.csv(file.path(dirData, "distAnt.csv"))
+distrasters <- as.list(pull(distcsv, name))
 

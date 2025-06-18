@@ -1,0 +1,286 @@
+<!doctype html>
+<html class="no-js" lang="en" xml:lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="Eleanore">
+    <meta name="description" content="">
+    <meta name="keywords" content="HTML,CSS,XML,JavaScript">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Title -->
+    <title>WOBEC Dashboard</title>
+    <!-- Shiny added header -->
+    {{ headContent() }}
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Place favicon.ico in the root directory -->
+    <!-- <link rel="wobec-icon" href="images/WOBEC-icon.png"> -->
+    <!-- <link rel="shortcut icon" type="image/ico" href="images/WOBEC.ico" /> -->
+
+    <!-- Bootstrap CSS and JS -->
+    <!-- https://getbootstrap.com/docs/5.3/getting-started/download/ -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+
+</head>
+
+<body data-spy="scroll" data-target="#primary-menu">
+    <!--Mainmenu-area-->
+    <div class="mainmenu-area" data-spy="affix" data-offset-top="100">
+        <div class="container">
+          <div class="col-sm-12 side-menu">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#primary-menu" aria-controls="primary-menu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+                <!--Logo-->
+                <div class="header-img-container">
+                    <!--<img class="header-logo" src="images/WOBEC_logo_fullsize_new.png" alt="WOBEC Logo">-->
+                    <img class="header-logo" src="images/WOBEC-simpleLogo-Blue-Small.png" alt="WOBEC Logo" style="width:15vw; padding-bottom:10px;">
+                </div>
+                <div class="collapse navbar-collapse" id="primary-menu">
+                    <ul class="navbar-nav ms-auto">
+                      <li class="nav-item active"><a class="nav-link" href="#welcome">Welcome</a></li>
+                      <li class="nav-item"><a class="nav-link" href="#wobec">WOBEC</a></li>
+                      <li class="nav-item"><a class="nav-link" href="#data">Explore Data</a></li>
+                      <li class="nav-item"><a class="nav-link" href="#overview">Overview</a></li>
+                      <li class="nav-item"><a class="nav-link" href="#more">Learn More</a></li>
+                    </ul>
+                </div>
+            </button>
+          </div>
+        </div>
+    </div>
+    <!--Mainmenu-area/-->
+
+    <!--Header-area with image-->
+    <header class="header-area overlay full-height relative v-center" id="welcome">
+        <div class="absolute hero-image", style="height:120%;"></div>
+        <div class="container">
+            <div class="row v-center">
+                <div class="header-text col-sm-12">
+                    <h2 style="text-align:left;">WOBEC</h2>
+                    <h3 style="text-align:left;">Summary Data for Stakeholder Workshops</h3>
+                </div>
+            </div>
+            <div class="box left-box">
+                <p class="intro-text">
+                    The Weddell Sea is a uniquely biodiverse and pristine area of the Southern Ocean surrounding Antarctica. To better protect this region which is crucial for climate regulation and food provision and home to many rare and vulnerable species, the Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR) are working to establish a Weddell Sea Marine Protected Area (WSMPA).
+                </p>
+            </div>
+            <div class="box left-box" style="width:78vw">
+                <p class="intro-text">
+                    Realizing that no systematic ecosystem monitoring exists in the Eastern Weddell Sea, scientists from 11 institutes across 8 countries have joined forces together with stakeholders from economy, conservation and society to design and initiate a long-term ecosystem observatory – the Weddell Sea Observatory of Biodiversity and Ecosystem Change (WOBEC) – with the aim to support global biodiversity goals, establish a baseline for measuring changes, and strengthen the WSMPA process.
+                </p>
+            </div>
+            <div class="box left-box" style="width:81vw">
+                <p class="intro-text">
+                    The purpose of this digital application is to provide easy access to summary datasets on already existing biogeochemical and physical oceanographic variables, prior species observations and model output data, for use in stakeholder workshops as a basis for exploration and discussion.
+                </p>
+            </div>
+            <br>
+            <i class="fa-solid fa-arrow-down-long"></i>
+        </div>
+    </header>
+    <!--Header-area with image/-->
+
+
+    <!--Intro section
+    <section class="white-bg" id="wobec">
+      <div class="container">
+          <div class="row">
+            <div class="header-text col-xs-12">
+                <h3 style="text-size:14px;margin-top:25px;">
+                  Co-Producing an Ecosystem Observation system for the Weddell Sea
+                </h3>
+            </div>
+            <div class="row">
+              <div id="imgsCarousel" class="carousel slide" data-bs-ride="carousel">
+                  <div class="carousel-inner">
+                    <div class="carousel-item active">
+                      <div class="row">
+                        <div class="col"><img src="images/Schaafsma_PS89_DSCF1090 (2).JPG" class="img-fluid" alt="..."></div>
+                        <div class="col"><img src="images/270A8799.JPG" class="img-fluid" alt="..."></div>
+                        <div class="col"><img src="images/Ice algae1.JPG" class="img-fluid" alt="..."></div>
+                      </div>
+                    </div>
+                    <div class="carousel-item">
+                      <div class="row">
+                        <div class="col"><img src="images/Schaafsma_PS89_DSCF1090 (2).JPG" class="img-fluid" alt="..."></div>
+                        <div class="col"><img src="270A8799.JPG" class="img-fluid" alt="..."></div>
+                        <div class="col"><img src="Ice algae1.JPG" class="img-fluid" alt="..."></div>
+                      </div>
+                    </div>
+                  </div>
+                  <button class="carousel-control-prev" type="button" data-bs-target="#imgsCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                  </button>
+                  <button class="carousel-control-next" type="button" data-bs-target="#imgsCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                  </button>
+                </div>
+            </div>
+          </div>
+      </div>
+    </section>
+    Intro section/-->
+
+
+    <!--Data summary / Maps section-->
+    <section class="overlay full-height relative" id="data">
+      <div class="container">
+          <div class="hidden-header">
+            <h4>
+                Oceanographic & Biogeochemical Variables
+                <br>Species Occurrence Records & Model Outputs
+            </h4>
+          </div>
+      </div>
+      <div class="container">
+            <div class="map-inputbox">
+                <p style="font-size:12px; color:#606891;">Search GBIF using scientific name</p>
+                {{ taxonkey_input }}
+                <br>
+                {{ distant_input }}
+                <p style="font-size:12px; color:#606891;">Add a layer from SCAR DistAnt Ecological Model Output Repository <br>(note: this is slow...)</p>
+                <br>
+                {{ shapefile_input }}
+                <p style="font-size:12px; color:#606891;">Upload a zipped shapefile (.zip) to view as an overlay on the map.</p>
+            </div>
+            <div id="map1ui" style="height:65vh">
+              {{ map1ui }}
+              {{ leftmap_input }}
+            </div>
+            <div id="map2ui" style="height:65vh">
+              {{ map2ui }}
+              {{ rightmap_input }}
+          </div>
+      </div>
+    </section>
+    <!--Intro section/-->
+
+
+    <!--About the data-->
+    <section class="grey-bg" id="system">
+      <div class="container">
+          <div class="row">
+            <div class="box data-infobox">
+                <p style="font-size:16px;color:#98c01e;">Chlorophyll A Data:</p>
+                <p class="intro-text">
+                    Chlorophyll A averages calculated from Copernicus Marine Dataset:
+                    <a href="https://data.marine.copernicus.eu/product/OCEANCOLOUR_GLO_BGC_L4_MY_009_108/services" target="_blank" style="color:#205d9e">
+                        <br>c3s_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M
+                    </a>
+                </p>
+              </div>
+              <div class="box data-infobox">
+                <p style="font-size:16px;color:#98c01e;">Sea Ice Data:</p>
+                <p class="intro-text">
+                    Sea Ice averages and minimums calculated (taking >%15 covered area as 'ice covered') from Copernicus Marine Dataset:
+                    <a href="https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/service" target="_blank" style="color:#205d9e">
+                        <br>cmems_mod_glo_phy_my_0.083deg_P1D-m
+                    </a>
+                </p>
+              </div>
+              <div class="box data-infobox">
+                <p style="font-size:16px;color:#98c01e;">Salinity Data:</p>
+                <p class="intro-text">
+                    Salinity averages calculated from Copernicus Marine Dataset:
+                    <a href="https://data.marine.copernicus.eu/product/MULTIOBS_GLO_PHY_S_SURFACE_MYNRT_015_013/services" target="_blank" style="color:#205d9e">
+                        <br>cmems_obs-mob_glo_phy-sss_my_multi_P1M
+                    </a>
+                </p>
+              </div>
+          </div>
+      </div>
+    </section>
+    <!--About the data/-->
+
+
+    <!--System Overview-->
+    <section class="overlay white-bg">
+      <div class="container">
+        <div class="row">
+          <div class="box">
+            <p>... space here for system network and flowerplot...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="overlay blue-bg" id="system">
+      <div class="container" style="padding-top:200px;padding-bottom:20px;">
+        <h4 style="color:white;">
+            Weddell Sea Social-Ecological system
+            <br>Monitoring key Variables
+        </h4>
+      </div>
+    </section>
+    <!--System Overview/-->
+
+
+
+    <!--References-->
+    <section class="header-area overlay full-height relative v-center" id="more">
+      <div class="absolute hero-image"></div>
+      <div class="container">
+        <div class="box left-box">
+          <p class="intro-text">
+              Data from Copernicus Marine Service -
+              <a href="https://data.marine.copernicus.eu/products" target="_blank" style="color:#205d9e">https://data.marine.copernicus.eu/products</a>
+          </p>
+        </div>
+        <div class="box left-box">
+          <p class="intro-text">
+              GBIF species occurrence records -
+              <a href="https://www.gbif.org/en" target="_blank" style="color:#205d9e">https://www.gbif.org/en</a>
+          </p>
+        </div>
+        <div class="box left-box">
+          <p class="intro-text">
+              Species and ecological modeling outputs accessed via SCAR distAnt respository -
+              <a href="https://source.coop/repositories/scar/distant" target="_blank" style="color:#205d9e">https://source.coop/repositories/scar/distant</a>
+          </p>
+        </div>
+        <div class="box left-box">
+          <p class="intro-text">
+              Want to learn more? Visit the official WOBEC website for updates, upcoming activities, and project results -
+              <a href="https://wobec.aq" target="_blank" style="color:#205d9e">https://wobec.aq</a>
+          </p>
+        </div>
+        <div class="box left-box">
+            <p class="intro-text">
+                Data management plan version 1.0 is available at -
+                <a href="https://doi.org/10.5281/zenodo.15040396" target="_blank" style="color:#205d9e">https://doi.org/10.5281/zenodo.15040396</a>
+            </p>
+        </div>
+        <div class="box left-box">
+            <p class="intro-text">
+                Code for prepared summary data layers and this app are available on GitHub -
+                <a href="https://github.com/eleanorecc/antarctica-shinyapp" target="_blank" style="color:#205d9e">https://github.com/eleanorecc/antarctica-shinyapp</a>
+            </p>
+        </div>
+      </div>
+    </section>
+    <!--References/-->
+
+    <footer class="footer-area relative" id="referenser">
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="row" style="padding-bottom:20px;">
+                  <div class="col-xs-12 logo-container">
+                    <p class="footer-info" style="line-height: 16px; min-width: 150px;">
+                        Add<br>Something<br>Here?
+                    </p>
+                    <div class="right-logos pull-right">
+                        <img src="images/WOBEC_logo_fullsize_new.png" alt="WOBEC Logo" class="logo">
+                    </div>
+                  </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

@@ -49,7 +49,7 @@ server <- function(input, output, session) {
     continuousWorld = TRUE
   )
 
-    basemap <- leaflet(options = map_options) |>
+  basemap <- leaflet(options = map_options) |>
       addMapPane("background", zIndex = 410) |>
       addMapPane("customtiles", zIndex = 420)  |>
       addMapPane("overlays", zIndex = 430)  |>
@@ -75,15 +75,22 @@ server <- function(input, output, session) {
         )
       ) |>
     addLayersControl(
-      overlayGroups = c("Statistical Areas", "Study Area", "Points of Interest"),
+      overlayGroups = c("Statistical Areas", "Management Units", "Study Area", "Points of Interest"),
       position = "bottomleft"
     ) |>
     hideGroup("Statistical Areas") |>
+    hideGroup("Management Units") |>
     hideGroup("Study Area") |>
     hideGroup("Points of Interest") |>
     addPolygons(
       data = asd,
       group = "Statistical Areas",
+      fillOpacity = 0, weight = 1,
+      options = pathOptions(pane = "overlays")
+    ) |>
+    addPolygons(
+      data = ssmu,
+      group = "Management Units",
       fillOpacity = 0, weight = 1,
       options = pathOptions(pane = "overlays")
     ) |>
@@ -149,9 +156,9 @@ server <- function(input, output, session) {
         values = p1$breaks,
         opacity = 1
       )
-  })
-  observeEvent(input$taxonkey, {
-    taxon_delayed <- debounce(reactive(input$taxonkey), 1000)
+  }, ignoreNULL = TRUE)
+  observeEvent(input$taxonKey, {
+    taxon_delayed <- debounce(reactive(input$taxonKey), 1000)
     res <- paste0("https://api.gbif.org/v1/species/match?name=", URLencode(taxon_delayed())) |>
       request() |>
       req_headers(user_agent = "DataSummaryWOBEC/1.0") |>
@@ -213,75 +220,118 @@ server <- function(input, output, session) {
         opacity = 1
       )
   })
+  observeEvent(input$distAnt, {
+    info <- filter(distcsv, name == input$distAnt)
+
+    message("GETTING DISTANT TILES")
+
+    tileDir <- file.path(tempdir(), "distAntTiles")
+    dir.create(tileDir, recursive = TRUE, showWarnings = FALSE)
+    rast2tile(info$url, info$lyrnum, tileDir)
+    addResourcePath("distAntTiles", tileDir)
+
+    p1 <- read.csv(file.path(tileDir, "palette.csv"))
+
+    leafletProxy("map2") |>
+      clearGroup("distant") |>
+      clearGroup("map2tiles") |>
+      addTiles(
+        group = "distant",
+        urlTemplate = "/distAntTiles/{z}/{x}/{-y}.png",
+        options = tileOptions(
+          tileSize = 256,
+          noWrap = TRUE,
+          opacity = 0.8,
+          tms = TRUE,
+          continuousWorld = TRUE,
+          pane = "customtiles"
+        )
+      ) |>
+      clearControls() |>
+      addLegend(
+        position = "bottomright",
+        title = "DistAnt<br>Model",
+        pal = colorNumeric(palette = p1$col, domain = p1$breaks),
+        labFormat = labelFormat(
+          transform = function(x) sort(x)
+        ),
+        values = p1$breaks,
+        opacity = 1
+      )
+  })
 
   ## handling user-uploaded data ----
-  shpdata <- reactive({
-    ## req ensures this code only runs when a file is uploaded
-    req(input$shapefile)
-
-    ## unzip the uploaded shapefile
-    dirtmp <- tempdir()
-    unzip(input$shapefile$datapath, exdir = dirtmp)
-    tmpfile <- list.files(dirtmp, pattern = "\\.shp$", full.names = TRUE, recursive = TRUE)
-    tmpfile <- tmpfile[[1]]
-    if(length(tmpfile) == 1){
-      shpfile <- st_read(tmpfile) |>
-        rmapshaper::ms_simplify(keep = 0.01) |>
-        st_geometry()
-      ## vector geometries need to be in latlon for leaflet
-      if(st_crs(shpfile) != st_crs("EPSG:4326")){
-        shpfile <- st_transform(shpfile, st_crs("EPSG:4326"))
-      }
-    } else {
-      ## TODO check the shp has at least 30% overlap with map latitudes?
-      shpfile <- NULL
-    }
-    return(shpfile)
-  })
+  # shpdata <- reactive({
+  #   ## req ensures this code only runs when a file is uploaded
+  #   req(input$shapefile)
+  #
+  #   ## unzip the uploaded shapefile
+  #   dirtmp <- tempdir()
+  #   unzip(input$shapefile$datapath, exdir = dirtmp)
+  #   tmpfile <- list.files(dirtmp, pattern = "\\.shp$", full.names = TRUE, recursive = TRUE)
+  #   tmpfile <- tmpfile[[1]]
+  #   if(length(tmpfile) == 1){
+  #     shpfile <- st_read(tmpfile) |>
+  #       rmapshaper::ms_simplify(keep = 0.01) |>
+  #       st_geometry()
+  #     ## vector geometries need to be in latlon for leaflet
+  #     if(st_crs(shpfile) != st_crs("EPSG:4326")){
+  #       shpfile <- st_transform(shpfile, st_crs("EPSG:4326"))
+  #     }
+  #   } else {
+  #     ## TODO check the shp has at least 30% overlap with map latitudes?
+  #     shpfile <- NULL
+  #   }
+  #   return(shpfile)
+  # })
 
   ## increase upload limit to 30MB (from default of 5) in options
   options(shiny.maxRequestSize = 30*1024^2)
 
   ## update when user uploads shapefile
-  observe({
-    message("SHPDATA EXISTS; ADD TO MAP...")
-    uploaded_data <- shpdata()
-    if(is.null(uploaded_data)){message("NULL  SHP DATA  FOR MAPPING...")}
-    if(!is.null(uploaded_data)){
-      leafletProxy("map1") |>
-        clearGroup("uploaded_data") |>
-        addPolygons(
-          data = uploaded_data,
-          group = "uploaded_data",
-          col = "black",
-          weight = 1.5,
-          fillOpacity = 0,
-          options = list(pane = "owndata")
-        )
-    }
-  })
+  # observe({
+  #   message("SHPDATA EXISTS; ADD TO MAP...")
+  #   uploaded_data <- shpdata()
+  #   if(is.null(uploaded_data)){message("NULL  SHP DATA  FOR MAPPING...")}
+  #   if(!is.null(uploaded_data)){
+  #     leafletProxy("map1") |>
+  #       clearGroup("uploaded_data") |>
+  #       addPolygons(
+  #         data = uploaded_data,
+  #         group = "uploaded_data",
+  #         col = "black",
+  #         weight = 1.5,
+  #         fillOpacity = 0,
+  #         options = list(pane = "owndata")
+  #       )
+  #   }
+  # })
 
 
 
   ## time series plots ----
-  output$timeseries <- renderPlot({
-    plotvars <- c(input$tilesLeft, input$tilesRight) |>
-      str_split("_[0-9]{4}") |>
-      lapply(function(x){first(unlist(x))}) |>
-      unlist()
+  # output$timeseries <- renderPlot({
+  #   plotvars <- c(input$tilesLeft, input$tilesRight) |>
+  #     str_split("_[0-9]{4}") |>
+  #     lapply(function(x){first(unlist(x))}) |>
+  #     unlist()
+  #
+  #   df <- filter(tsdata, plot_with %in% plotvars)
+  #   # yTitle <- paste0(unique(df$yaxislabel), "\n")
+  #
+  #   ggplot(df) +
+  #     geom_point(aes(x = year, y = yvariable, color = plot_with), size = 2) +
+  #     geom_line(aes(x = year, y = yvariable, color = plot_with), linewidth = 0.4) +
+  #     facet_wrap(~yaxislabel, ncol = 1, scales = "free") +
+  #     labs(x = "Year", y = NULL, color = NULL) +
+  #     theme(
+  #       legend.text = element_text(size = 12),
+  #       strip.text = element_text(size = 16),
+  #       axis.text = element_text(size = 14)
+  #     )
+  # })
 
-    df <- filter(tsdata, plot_with %in% plotvars)
-    # yTitle <- paste0(unique(df$yaxislabel), "\n")
-
-    ggplot(df) +
-      geom_point(aes(x = year, y = yvariable, color = plot_with), size = 2) +
-      geom_line(aes(x = year, y = yvariable, color = plot_with), linewidth = 0.4) +
-      facet_wrap(~yaxislabel, ncol = 1, scales = "free") +
-      labs(x = "Year", y = NULL, color = NULL) +
-      theme(
-        legend.text = element_text(size = 12),
-        strip.text = element_text(size = 16),
-        axis.text = element_text(size = 14)
-      )
+  session$onSessionEnded(function() {
+    unlink(tileDir, recursive = TRUE, force = TRUE)
   })
 }
