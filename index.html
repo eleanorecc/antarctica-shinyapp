@@ -128,7 +128,7 @@
 
 
     <!--Data summary / Maps section-->
-    <section class="overlay full-height relative" id="data">
+    <section class="overlay full-height relative" id="data" style="height:140vh;padding-bottom:80px;">
       <div class="container">
           <div class="hidden-header">
             <h4>
@@ -139,29 +139,46 @@
       </div>
       <div class="container">
             <div class="map-inputbox">
-                <p style="font-size:12px; color:#606891;">Search GBIF using scientific name</p>
+                <p style="font-size:16px; color:#cfd2de; padding-top:10px; margin-bottom:0px;">Species Occurences</p>
+                <p style="font-size:12px; color:#606891; padding-top:2px; padding-bottom:0px;">
+                  Search GBIF using scientific name
+                </p>
                 {{ taxonkey_input }}
                 <br>
-                {{ distant_input }}
-                <p style="font-size:12px; color:#606891;">Add a layer from SCAR DistAnt Ecological Model Output Repository <br>(note: this is slow...)</p>
-                <br>
+                <p style="font-size:16px; color:#cfd2de; padding-top:10px; margin-bottom:2px;">Upload Shapefile</p>
+                <p style="font-size:12px; color:#606891; padding-top:2px;">
+                  Upload a zipped shapefile (.zip) to view as an overlay on the map.
+                </p>
                 {{ shapefile_input }}
-                <p style="font-size:12px; color:#606891;">Upload a zipped shapefile (.zip) to view as an overlay on the map.</p>
+                <br>
+                <p style="font-size:16px; color:#cfd2de; padding-top:5px; margin-bottom:10px;">Model Output</p>
+                {{ distant_input }}
+                <p style="font-size:12px; color:#606891; padding-top:8px;">
+                  Add a layer from SCAR DistAnt Ecological Model Output Repository (I may need to find another approach, this is slow...)
+                </p>
             </div>
-            <div id="map1ui" style="height:65vh">
+            <div class="mapbox1" id="map1ui">
               {{ map1ui }}
               {{ leftmap_input }}
+              <div class="map-caption">
+                {{ map1caption }}
+              </div>
             </div>
-            <div id="map2ui" style="height:65vh">
+            <div class="mapbox2" id="map2ui">
               {{ map2ui }}
               {{ rightmap_input }}
+              <div class="map-caption2">
+                {{ map2caption }}
+              </div>
+            </div>
           </div>
+        </div>
       </div>
     </section>
     <!--Intro section/-->
 
 
-    <!--About the data-->
+    <!--About the datas
     <section class="grey-bg" id="system">
       <div class="container">
           <div class="row">
@@ -195,24 +212,28 @@
           </div>
       </div>
     </section>
-    <!--About the data/-->
+    About the data/-->
 
 
-    <!--System Overview-->
+    <!--System Overview
     <section class="overlay white-bg">
       <div class="container">
         <div class="row">
           <div class="box">
-            <p>... space here for system network and flowerplot...</p>
+            <p style="padding-top:100px;">... space here for system network and flowerplot...</p>
           </div>
         </div>
       </div>
-    </section>
+    </section>-->
     <section class="overlay blue-bg" id="system">
       <div class="container" style="padding-top:200px;padding-bottom:20px;">
+        <h3 style="color:white;">
+            Another Section...
+        </h3>
+        <br>
         <h4 style="color:white;">
-            Weddell Sea Social-Ecological system
-            <br>Monitoring key Variables
+            Weddell Sea Social-Ecological System
+            <br>On Monitoring key Variables...
         </h4>
       </div>
     </section>
@@ -221,7 +242,7 @@
 
 
     <!--References-->
-    <section class="header-area overlay full-height relative v-center" id="more">
+    <section class="overlay full-height v-center" id="more">
       <div class="absolute hero-image"></div>
       <div class="container">
         <div class="box left-box">
@@ -267,12 +288,12 @@
     <footer class="footer-area relative" id="referenser">
         <div class="footer-bottom">
             <div class="container">
-                <div class="row" style="padding-bottom:20px;">
+                <div class="row" style="padding-bottom:10px;">
                   <div class="col-xs-12 logo-container">
                     <p class="footer-info" style="line-height: 16px; min-width: 150px;">
                         Add<br>Something<br>Here?
                     </p>
-                    <div class="right-logos pull-right">
+                    <div class="right-logos">
                         <img src="images/WOBEC_logo_fullsize_new.png" alt="WOBEC Logo" class="logo">
                     </div>
                   </div>

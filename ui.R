@@ -18,6 +18,11 @@ htmlTemplate(
     label = NULL,
     choices = allrasters
   ),
+  shapefile_input = fileInput(
+    inputId = "shapefile",
+    label = NULL,
+    accept = c(".zip")
+  ),
   taxonkey_input = textInput(
     inputId = "taxonKey",
     label = NULL,
@@ -25,7 +30,7 @@ htmlTemplate(
   ),
   distant_input = selectizeInput(
     inputId = "distAnt",
-    label = "SCAR DistAnt",
+    label = NULL,
     choices = distrasters,
     selected = NULL,
     options = list(
@@ -33,16 +38,14 @@ htmlTemplate(
       onInitialize = I('function() { this.setValue(""); }')
     )
   ),
-  shapefile_input = fileInput(
-    "shapefile",
-    "Upload Shapefile",
-    accept = c(".zip")
-  ),
 
   ## main content area
   # timeseries_ui = plotOutput("timeseries", height = "36vh"),
-  map1ui = leafletOutput(outputId = "map1", height = 480),
-  map2ui = leafletOutput(outputId = "map2", height = 480)
+  map1ui = leafletOutput(outputId = "map1", height = "100%"),
+  map2ui = leafletOutput(outputId = "map2", height = "100%"),
+
+  map1caption = htmlOutput("map1cap"),
+  map2caption = htmlOutput("map2cap")
 
   ## system graphic ----
 

@@ -1,0 +1,217 @@
+plot_with,year,yvariable,yaxislabel
+chlorophyllA,1998,0.499317334,Chlorophyll-a (mg m^-3)
+chlorophyllA,1999,0.4146737,Chlorophyll-a (mg m^-3)
+chlorophyllA,2000,0.428235922,Chlorophyll-a (mg m^-3)
+chlorophyllA,2001,0.439496741,Chlorophyll-a (mg m^-3)
+chlorophyllA,2002,0.398386506,Chlorophyll-a (mg m^-3)
+chlorophyllA,2003,0.481973692,Chlorophyll-a (mg m^-3)
+chlorophyllA,2004,0.502581885,Chlorophyll-a (mg m^-3)
+chlorophyllA,2005,0.529157079,Chlorophyll-a (mg m^-3)
+chlorophyllA,2006,0.543046195,Chlorophyll-a (mg m^-3)
+chlorophyllA,2007,0.347266272,Chlorophyll-a (mg m^-3)
+chlorophyllA,2008,0.414253209,Chlorophyll-a (mg m^-3)
+chlorophyllA,2009,0.538504936,Chlorophyll-a (mg m^-3)
+chlorophyllA,2010,0.563381962,Chlorophyll-a (mg m^-3)
+chlorophyllA,2011,0.561930486,Chlorophyll-a (mg m^-3)
+chlorophyllA,2012,0.685597238,Chlorophyll-a (mg m^-3)
+chlorophyllA,2013,0.539792343,Chlorophyll-a (mg m^-3)
+chlorophyllA,2014,0.431061494,Chlorophyll-a (mg m^-3)
+chlorophyllA,2015,0.427979506,Chlorophyll-a (mg m^-3)
+chlorophyllA,2016,0.563916394,Chlorophyll-a (mg m^-3)
+chlorophyllA,2017,0.408721894,Chlorophyll-a (mg m^-3)
+chlorophyllA,2018,0.390026461,Chlorophyll-a (mg m^-3)
+chlorophyllA,2019,0.500732023,Chlorophyll-a (mg m^-3)
+chlorophyllA,2020,0.592354225,Chlorophyll-a (mg m^-3)
+chlorophyllA,2021,0.659978481,Chlorophyll-a (mg m^-3)
+chlorophyllA,2022,0.564480702,Chlorophyll-a (mg m^-3)
+chlorophyllA,2023,0.485769603,Chlorophyll-a (mg m^-3)
+chlorophyllA,2024,0.387166311,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,1998,0.527593433,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,1999,0.428600045,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2000,0.45728729,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2001,0.419510822,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2002,0.400277008,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2003,0.508199898,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2004,0.478956764,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2005,0.53241061,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2006,0.573629411,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2007,0.357811672,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2008,0.36362687,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2009,0.507108348,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2010,0.575896982,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2011,0.532890751,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2012,0.697609538,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2013,0.57322122,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2014,0.446547186,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2015,0.417330531,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2016,0.615890551,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2017,0.42206664,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2018,0.394150247,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2019,0.518197602,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2020,0.581033412,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2021,0.671201758,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2022,0.599677845,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2023,0.511779062,Chlorophyll-a (mg m^-3)
+chlorophyllA_Summer,2024,0.440272655,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,1998,0.2148507,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,1999,0.20080025,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2000,0.208824786,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2001,0.178440108,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2002,0.230275937,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2003,0.230471793,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2004,0.222013548,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2005,0.205464651,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2006,0.23603441,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2007,0.229936888,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2008,0.267488663,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2009,0.198213485,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2010,0.197948489,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2011,0.21591567,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2012,0.237889742,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2013,0.225099368,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2014,0.215408612,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2015,0.263063413,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2016,0.228847107,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2017,0.244437113,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2018,0.213675887,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2019,0.216347162,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2020,0.272811359,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2021,0.227001435,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2022,0.234786839,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2023,0.202561476,Chlorophyll-a (mg m^-3)
+chlorophyllA_Winter,2024,0.22139376,Chlorophyll-a (mg m^-3)
+surfaceSalinity,1998,33.97848781,Salinity (PSU)
+surfaceSalinity,1999,33.97862236,Salinity (PSU)
+surfaceSalinity,2000,33.97952804,Salinity (PSU)
+surfaceSalinity,2001,33.97950387,Salinity (PSU)
+surfaceSalinity,2002,33.97895286,Salinity (PSU)
+surfaceSalinity,2003,33.97813802,Salinity (PSU)
+surfaceSalinity,2004,33.97744394,Salinity (PSU)
+surfaceSalinity,2005,33.97929235,Salinity (PSU)
+surfaceSalinity,2006,33.9804084,Salinity (PSU)
+surfaceSalinity,2007,33.98588007,Salinity (PSU)
+surfaceSalinity,2008,33.9897599,Salinity (PSU)
+surfaceSalinity,2009,33.98007957,Salinity (PSU)
+surfaceSalinity,2010,33.97170929,Salinity (PSU)
+surfaceSalinity,2011,33.97266483,Salinity (PSU)
+surfaceSalinity,2012,33.97398742,Salinity (PSU)
+surfaceSalinity,2013,33.96681274,Salinity (PSU)
+surfaceSalinity,2014,33.98018138,Salinity (PSU)
+surfaceSalinity,2015,33.97499939,Salinity (PSU)
+surfaceSalinity,2016,33.98493292,Salinity (PSU)
+surfaceSalinity,2017,33.9722803,Salinity (PSU)
+surfaceSalinity,2018,33.98780367,Salinity (PSU)
+surfaceSalinity,2019,33.9907663,Salinity (PSU)
+surfaceSalinity,2020,33.98264717,Salinity (PSU)
+surfaceSalinity,2021,33.98098923,Salinity (PSU)
+surfaceSalinity,2022,33.99562219,Salinity (PSU)
+surfaceSalinity,2023,33.99526466,Salinity (PSU)
+surfaceSalinity,2024,34.01124271,Salinity (PSU)
+surfaceSalinity_Summer,1998,33.87721361,Salinity (PSU)
+surfaceSalinity_Summer,1999,33.87968488,Salinity (PSU)
+surfaceSalinity_Summer,2000,33.87856787,Salinity (PSU)
+surfaceSalinity_Summer,2001,33.87581638,Salinity (PSU)
+surfaceSalinity_Summer,2002,33.87521744,Salinity (PSU)
+surfaceSalinity_Summer,2003,33.87511274,Salinity (PSU)
+surfaceSalinity_Summer,2004,33.87836621,Salinity (PSU)
+surfaceSalinity_Summer,2005,33.87858742,Salinity (PSU)
+surfaceSalinity_Summer,2006,33.86477278,Salinity (PSU)
+surfaceSalinity_Summer,2007,33.88441659,Salinity (PSU)
+surfaceSalinity_Summer,2008,33.88940518,Salinity (PSU)
+surfaceSalinity_Summer,2009,33.87492329,Salinity (PSU)
+surfaceSalinity_Summer,2010,33.84823299,Salinity (PSU)
+surfaceSalinity_Summer,2011,33.8629277,Salinity (PSU)
+surfaceSalinity_Summer,2012,33.8585328,Salinity (PSU)
+surfaceSalinity_Summer,2013,33.85296356,Salinity (PSU)
+surfaceSalinity_Summer,2014,33.87090536,Salinity (PSU)
+surfaceSalinity_Summer,2015,33.85112135,Salinity (PSU)
+surfaceSalinity_Summer,2016,33.87887682,Salinity (PSU)
+surfaceSalinity_Summer,2017,33.85762286,Salinity (PSU)
+surfaceSalinity_Summer,2018,33.87869696,Salinity (PSU)
+surfaceSalinity_Summer,2019,33.89004195,Salinity (PSU)
+surfaceSalinity_Summer,2020,33.86857739,Salinity (PSU)
+surfaceSalinity_Summer,2021,33.86673967,Salinity (PSU)
+surfaceSalinity_Summer,2022,33.89813921,Salinity (PSU)
+surfaceSalinity_Summer,2023,33.89346003,Salinity (PSU)
+surfaceSalinity_Summer,2024,33.909016,Salinity (PSU)
+seaiceDays,1998,112.7786944,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,1999,105.3141406,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2000,116.264122,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2001,113.1781019,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2002,115.0346673,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2003,127.4978473,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2004,126.0601432,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2005,117.0761269,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2006,115.8795928,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2007,119.4617704,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2008,125.553387,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2009,120.1195661,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2010,120.8502284,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2011,111.8746545,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2012,124.5893716,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2013,121.2530075,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2014,128.6448629,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2015,128.2599814,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2016,114.5336438,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2017,105.6842083,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2018,102.4090028,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2019,107.0413099,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2020,112.0018129,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2021,106.5912317,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2022,99.80938953,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2023,91.0147164,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceDays,2024,99.69073439,"Number of Days with Ice-Cover > 15%, Area Average"
+seaiceMinExtent,1998,63,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,1998,0.791999936,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,1999,67,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,1999,0.757950837,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2000,47,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2000,0.978364924,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2001,52,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2001,1.166169991,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2002,59,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2002,1.111779163,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2003,67,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2003,1.657361566,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2004,57,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2004,1.493000583,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2005,59,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2005,1.067170771,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2006,74,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2006,0.919713011,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2007,47,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2007,1.111549842,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2008,57,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2008,1.583290747,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2009,50,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2009,1.364246522,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2010,53,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2010,1.549726366,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2011,52,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2011,1.198861996,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2012,53,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2012,1.517166738,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2013,51,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2013,1.629535298,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2014,73,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2014,2.100200797,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2015,49,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2015,2.069166272,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2016,57,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2016,1.19279626,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2017,45,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2017,0.914810669,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2018,50,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2018,0.853690448,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2019,52,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2019,0.927855524,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2020,50,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2020,0.861445248,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2021,51,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2021,0.631849019,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2022,49,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2022,0.722289362,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2023,44,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2023,0.756497229,Area of Minimum Ice Extent (million km^2)
+seaiceMinExtent,2024,47,Day of the Year with Minimum Ice Extent
+seaiceMinExtent,2024,0.965756297,Area of Minimum Ice Extent (million km^2)

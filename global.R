@@ -23,6 +23,7 @@ library(leaflet.minicharts)
 library(ggplot2)
 library(httr2)
 library(jsonlite)
+library(curl)
 
 ## directories ----
 dirData <- here("www")
@@ -240,6 +241,7 @@ rast2tile <- function(url, lyrnum, saveDir){
     quantile(probs = seq(0, 1, length.out = 256), na.rm = TRUE) |>
     data.frame() |>
     cbind(pal) |>
+    setNames(c("breaks","value","col")) |>
     write.csv(
       file.path(saveDir, "palette.csv"),
       row.names = FALSE
