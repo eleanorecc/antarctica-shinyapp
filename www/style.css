@@ -159,8 +159,8 @@
 /* LANDING PAGE AKA HEADER */
 
 .hero-image {
-    /* background: linear-gradient(rgba(159, 185, 197, 0.9), rgba(14, 57, 93, 0.4)), url('images/270A8692-DRAFT.JPG') no-repeat scroll center top; */
-    background: linear-gradient(rgba(197, 236, 255, 0.5), rgba(4, 61, 72, 0.6)), url('images/270A8692-Small.JPG') no-repeat scroll center top;
+    background: linear-gradient(rgba(159, 185, 197, 0.9), rgba(14, 57, 93, 0.4)), url('images/270A8692-DRAFT.JPG') no-repeat scroll center top;
+    /* background: linear-gradient(rgba(197, 236, 255, 0.5), rgba(4, 61, 72, 0.6)), url('images/270A8692-Small.JPG') no-repeat scroll center top; */
     background-size: cover;
     background-attachment: fixed;
     z-index: 1;
@@ -332,6 +332,10 @@
   background-color: #fff;
 }
 
+.shiny-input-container {
+  padding-top: 5px;
+}
+
 .item {
   font-size: 13px;
 }
@@ -340,7 +344,12 @@
   font-size: 10px;
 }
 
-/* BACKGROUND COLUMNS */
+.selectize-dropdown-content {
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+/* MAPS */
 
 .map-caption {
   position: fixed;
@@ -411,11 +420,6 @@
     height: 295px;
     z-index: 0;
   }
-}
-
-.selectize-dropdown-content {
-  max-height: 100px;
-  overflow-y: auto;
 }
 
 

@@ -253,53 +253,53 @@ server <- function(input, output, session) {
       )
   })
 
-  distAnt <- reactive({
-    req(input$distAnt)
-    info <- filter(distcsv, name == input$distAnt)
-    r <- curl_fetch_memory(info$url)
-    if(r$status_code == 200){
-      message("Getting distAnt data to make mapping tiles...")
-
-      tileDir <- file.path(dirData, "distAntTiles")
-      dir.create(tileDir, recursive = TRUE, showWarnings = FALSE)
-      rast2tile(info$url, info$lyrnum, tileDir)
-      addResourcePath("distAntTiles", dirData)
-
-      p2 <- read.csv(file.path(tileDir, "palette.csv"))
-    }
-    return(p2)
-  })
-
-  observe({
-    p2 <- distAnt()
-
-    leafletProxy("map2") |>
-      clearGroup("distant") |>
-      clearGroup("map2tiles") |>
-      addTiles(
-        group = "distant",
-        urlTemplate = "distAntTiles/{z}/{x}/{-y}.png",
-        options = tileOptions(
-          tileSize = 256,
-          noWrap = TRUE,
-          opacity = 0.8,
-          tms = TRUE,
-          continuousWorld = TRUE,
-          pane = "customtiles"
-        )
-      ) |>
-      clearControls() |>
-      addLegend(
-        position = "bottomright",
-        title = "DistAnt<br>Model",
-        pal = colorNumeric(palette = p2$col, domain = p2$breaks),
-        # labFormat = labelFormat(
-        #   transform = function(x) sort(x)
-        # ),
-        values = p2$breaks,
-        opacity = 1
-      )
-  })
+  # distAnt <- reactive({
+  #   req(input$distAnt)
+  #   info <- filter(distcsv, name == input$distAnt)
+  #   r <- curl_fetch_memory(info$url)
+  #   if(r$status_code == 200){
+  #     message("Getting distAnt data to make mapping tiles...")
+  #
+  #     tileDir <- file.path(dirData, "distAntTiles")
+  #     dir.create(tileDir, recursive = TRUE, showWarnings = FALSE)
+  #     rast2tile(info$url, info$lyrnum, tileDir)
+  #     addResourcePath("distAntTiles", dirData)
+  #
+  #     p2 <- read.csv(file.path(tileDir, "palette.csv"))
+  #   }
+  #   return(p2)
+  # })
+  #
+  # observe({
+  #   p2 <- distAnt()
+  #
+  #   leafletProxy("map2") |>
+  #     clearGroup("distant") |>
+  #     clearGroup("map2tiles") |>
+  #     addTiles(
+  #       group = "distant",
+  #       urlTemplate = "distAntTiles/{z}/{x}/{-y}.png",
+  #       options = tileOptions(
+  #         tileSize = 256,
+  #         noWrap = TRUE,
+  #         opacity = 0.8,
+  #         tms = TRUE,
+  #         continuousWorld = TRUE,
+  #         pane = "customtiles"
+  #       )
+  #     ) |>
+  #     clearControls() |>
+  #     addLegend(
+  #       position = "bottomright",
+  #       title = "DistAnt<br>Model",
+  #       pal = colorNumeric(palette = p2$col, domain = p2$breaks),
+  #       # labFormat = labelFormat(
+  #       #   transform = function(x) sort(x)
+  #       # ),
+  #       values = p2$breaks,
+  #       opacity = 1
+  #     )
+  # })
 
   ## handling user-uploaded data ----
   shpdata <- reactive({
