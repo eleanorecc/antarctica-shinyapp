@@ -85,13 +85,15 @@ server <- function(input, output, session) {
     addPolygons(
       data = asd,
       group = "Statistical Areas",
+      popup = ~GAR_Name,
       fillOpacity = 0, weight = 1,
       options = pathOptions(pane = "overlays")
     ) |>
     addPolygons(
-      data = ssmu,
+      data = mgmt,
       group = "Management Units",
-      fillOpacity = 0, weight = 1,
+      fillOpacity = 0, weight = 2,
+      color = "white", opacity = 0.5,
       options = pathOptions(pane = "overlays")
     ) |>
     addPolygons(

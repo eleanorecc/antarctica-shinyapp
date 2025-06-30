@@ -69,7 +69,8 @@ weddell_gyre <- weddell_gyre_coords |>
 asd <- st_read(file.path(dirData, "statisticalAreasCCAMLR"))
 
 ## https://github.com/ccamlr/data/tree/main/geographical_data/ssmu
-ssmu <- st_read(file.path(dirData, "mgmtAreasCCAMLR"))
+# ssmu <- st_read(file.path(dirData, "mgmtAreasCCAMLR"))
+mgmt <- st_transform(st_read(file.path(dirData, "mgmtAreasCCAMLR")), "EPSG:4326")
 
 ## add wobecs study area on top
 # st_write(st_intersection(
