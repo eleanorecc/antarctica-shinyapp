@@ -1,6 +1,6 @@
 server <- function(input, output, session) {
 
-  ## map ----
+  ## map layout and options ----
 
   ## for polar crs need to custom define leaflet options
   ## https://thomasswilliams.github.io/development/r/2022/06/18/leaflet-and-r.html
@@ -49,31 +49,32 @@ server <- function(input, output, session) {
     continuousWorld = TRUE
   )
 
+  ## make basemap ----
   basemap <- leaflet(options = map_options) |>
-      addMapPane("background", zIndex = 410) |>
-      addMapPane("customtiles", zIndex = 420)  |>
-      addMapPane("overlays", zIndex = 430)  |>
-      addMapPane("spp", zIndex = 440)  |>
-      addMapPane("owndata", zIndex = 450) |>
-      addTiles(
-        urlTemplate = "https://tile.gbif.org/3031/omt/{z}/{x}/{y}@2x.png?style=gbif-geyser",
-        attribution = "OpenStreetMap | GBIF",
-        options = gbif_tile_options
-      ) |>
-      addDrawToolbar(
-        targetGroup = "draw",
-        singleFeature = TRUE,
-        polygonOptions = FALSE,
-        markerOptions = FALSE,
-        rectangleOptions = FALSE,
-        circleOptions = FALSE,
-        circleMarkerOptions = FALSE,
-        editOptions = editToolbarOptions(
-          edit = FALSE,
-          remove = TRUE,
-          selectedPathOptions = selectedPathOptions()
-        )
-      ) |>
+    addMapPane("background", zIndex = 410) |>
+    addMapPane("customtiles", zIndex = 420)  |>
+    addMapPane("overlays", zIndex = 430)  |>
+    addMapPane("spp", zIndex = 440)  |>
+    addMapPane("owndata", zIndex = 450) |>
+    addTiles(
+      urlTemplate = "https://tile.gbif.org/3031/omt/{z}/{x}/{y}@2x.png?style=gbif-geyser",
+      attribution = "OpenStreetMap | GBIF",
+      options = gbif_tile_options
+    ) |>
+    addDrawToolbar(
+      targetGroup = "draw",
+      singleFeature = TRUE,
+      polygonOptions = FALSE,
+      markerOptions = FALSE,
+      rectangleOptions = FALSE,
+      circleOptions = FALSE,
+      circleMarkerOptions = FALSE,
+      editOptions = editToolbarOptions(
+        edit = FALSE,
+        remove = TRUE,
+        selectedPathOptions = selectedPathOptions()
+      )
+    ) |>
     addLayersControl(
       overlayGroups = c("Statistical Areas", "Management Units", "Study Area", "Points of Interest"),
       position = "bottomleft"
@@ -118,13 +119,13 @@ server <- function(input, output, session) {
       options = pathOptions(pane = "overlays")
     )
 
-
   ## two synced leaflet maps side-by-side
   output$map1 <- renderLeaflet({ syncWith(basemap, "maps") })
   output$map2 <- renderLeaflet({ syncWith(basemap, "maps") })
 
-  chooseCaption <- function(inputTiles){
-    if(str_detect(inputTiles, "chlorophyll")){
+  ## caption based on map layer ----
+  chooseCaption <- function(inputCaption){
+    if(str_detect(inputCaption, "chlorophyll")){
       s <- '<p style="font-size:16px;color:#98c01e;">Chlorophyll A Data:</p>
                   <p class="intro-text">
                       Chlorophyll A averages calculated from Copernicus Marine Dataset:
@@ -132,7 +133,7 @@ server <- function(input, output, session) {
                           <br>c3s_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M
                       </a>
                   </p>'
-    } else if(str_detect(inputTiles, "seaice")){
+    } else if(str_detect(inputCaption, "seaice")){
       s <- '<p style="font-size:16px;color:#98c01e;">Sea Ice Data:</p>
                   <p class="intro-text">
                       Sea Ice averages and minimums calculated (taking >%15 covered area as "ice covered") from Copernicus Marine Dataset:
@@ -154,7 +155,7 @@ server <- function(input, output, session) {
   output$map1cap <- renderUI({HTML(chooseCaption(input$tilesLeft))})
   output$map2cap <- renderUI({HTML(chooseCaption(input$tilesRight))})
 
-
+  ## update left map tiles based on user selection ----
   observeEvent(input$tilesLeft, {
     p1 <- read.csv(file.path(
       dirData,
@@ -191,6 +192,7 @@ server <- function(input, output, session) {
         opacity = 1
       )
   }, ignoreNULL = TRUE)
+  ## add GBIF occurrence tiles ----
   observeEvent(input$taxonKey, {
     taxon_delayed <- debounce(reactive(input$taxonKey), 1000)
     res <- paste0("https://api.gbif.org/v1/species/match?name=", URLencode(taxon_delayed())) |>
@@ -222,6 +224,7 @@ server <- function(input, output, session) {
         )
     }
   })
+  ## update right map tiles based on user selection ----
   observeEvent(input$tilesRight, {
     p2 <- read.csv(file.path(
       dirData,
@@ -255,53 +258,57 @@ server <- function(input, output, session) {
       )
   })
 
-  # distAnt <- reactive({
-  #   req(input$distAnt)
-  #   info <- filter(distcsv, name == input$distAnt)
-  #   r <- curl_fetch_memory(info$url)
-  #   if(r$status_code == 200){
-  #     message("Getting distAnt data to make mapping tiles...")
-  #
-  #     tileDir <- file.path(dirData, "distAntTiles")
-  #     dir.create(tileDir, recursive = TRUE, showWarnings = FALSE)
-  #     rast2tile(info$url, info$lyrnum, tileDir)
-  #     addResourcePath("distAntTiles", dirData)
-  #
-  #     p2 <- read.csv(file.path(tileDir, "palette.csv"))
-  #   }
-  #   return(p2)
-  # })
-  #
-  # observe({
-  #   p2 <- distAnt()
-  #
-  #   leafletProxy("map2") |>
-  #     clearGroup("distant") |>
-  #     clearGroup("map2tiles") |>
-  #     addTiles(
-  #       group = "distant",
-  #       urlTemplate = "distAntTiles/{z}/{x}/{-y}.png",
-  #       options = tileOptions(
-  #         tileSize = 256,
-  #         noWrap = TRUE,
-  #         opacity = 0.8,
-  #         tms = TRUE,
-  #         continuousWorld = TRUE,
-  #         pane = "customtiles"
-  #       )
-  #     ) |>
-  #     clearControls() |>
-  #     addLegend(
-  #       position = "bottomright",
-  #       title = "DistAnt<br>Model",
-  #       pal = colorNumeric(palette = p2$col, domain = p2$breaks),
-  #       # labFormat = labelFormat(
-  #       #   transform = function(x) sort(x)
-  #       # ),
-  #       values = p2$breaks,
-  #       opacity = 1
-  #     )
-  # })
+  distAnt <- reactive({
+    req(input$distAnt)
+
+    info <- filter(distcsv, name == input$distAnt)
+    tileDir <- file.path(dirData, info$dir)
+    r <- curl_fetch_memory(info$url)
+
+    if(r$status_code == 200){
+      if(!file.exists(tileDir)){
+        message("Getting distAnt data to make mapping tiles...")
+        dir.create(tileDir, recursive = TRUE, showWarnings = FALSE)
+        rast2tile(info$url, info$lyrnum, tileDir)
+      }
+      addResourcePath(info$dir, tileDir)
+      p2 <- read.csv(file.path(tileDir, "palette.csv"))
+    }
+    return(list(
+      dir = info$dir,
+      pal = p2
+    ))
+  })
+
+  observe({
+    x <- distAnt()
+
+    leafletProxy("map2") |>
+      clearGroup("map2tiles") |>
+      addTiles(
+        group = "map2tiles",
+        urlTemplate = sprintf("%s/{z}/{x}/{-y}.png", x$dir),
+        options = tileOptions(
+          tileSize = 256,
+          noWrap = TRUE,
+          opacity = 0.8,
+          tms = TRUE,
+          continuousWorld = TRUE,
+          pane = "customtiles"
+        )
+      ) |>
+      clearControls() |>
+      addLegend(
+        position = "bottomright",
+        title = "DistAnt<br>Model",
+        pal = colorNumeric(palette = x$pal$col, domain = x$pal$breaks),
+        labFormat = labelFormat(
+          transform = function(x) sort(x)
+        ),
+        values = x$pal$breaks,
+        opacity = 1
+      )
+  })
 
   ## handling user-uploaded data ----
   shpdata <- reactive({
@@ -314,9 +321,11 @@ server <- function(input, output, session) {
     tmpfile <- list.files(dirtmp, pattern = "\\.shp$", full.names = TRUE, recursive = TRUE)
     tmpfile <- tmpfile[[1]]
     if(length(tmpfile) == 1){
-      shpfile <- st_read(tmpfile) |>
-        rmapshaper::ms_simplify(keep = 0.01) |>
-        st_geometry()
+      shpfile <- st_read(tmpfile)
+      if(object.size(shpfile) > 8e5){
+        shpfile <- rmapshaper::ms_simplify(shpfile, keep = 0.01)
+      }
+      shpfile <- st_geometry(shpfile)
       ## vector geometries need to be in latlon for leaflet
       if(st_crs(shpfile) != st_crs("EPSG:4326")){
         shpfile <- st_transform(shpfile, st_crs("EPSG:4326"))
@@ -339,7 +348,18 @@ server <- function(input, output, session) {
       message("no shapefile for mapping...")
     }
     if(!is.null(uploaded_data)){
+      ## add the uploaded layer to both maps
       leafletProxy("map1") |>
+        clearGroup("uploaded_data") |>
+        addPolygons(
+          data = uploaded_data,
+          group = "uploaded_data",
+          col = "black",
+          weight = 1.5,
+          fillOpacity = 0,
+          options = list(pane = "owndata")
+        )
+      leafletProxy("map2") |>
         clearGroup("uploaded_data") |>
         addPolygons(
           data = uploaded_data,
