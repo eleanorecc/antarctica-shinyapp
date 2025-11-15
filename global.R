@@ -24,6 +24,7 @@ library(ggplot2)
 library(httr2)
 library(jsonlite)
 library(curl)
+library(terra)
 
 ## directories ----
 dirData <- here("www")

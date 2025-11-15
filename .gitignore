@@ -49,4 +49,21 @@ po/*~
 rsconnect/
 
 ## Mac Desktop Services Store files
+**/.DS_Store
 .DS_Store
+
+## Shiny app data tiles and spatial files (generated from dataprep/ scripts)
+www/chlorophyllA/
+www/seaiceDays/
+www/seaiceMinExtent/
+www/surfaceSalinity/
+www/statisticalAreasCCAMLR/
+www/mgmtAreas/
+www/studyAreaWOBEC/
+www/images/
+www/distAnt.csv
+www/tsdata.csv
+
+# Keep only CSS and module files in www/
+!www/style.css
+!www/modules/

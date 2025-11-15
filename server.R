@@ -1,5 +1,11 @@
 server <- function(input, output, session) {
 
+  ## temporary directory to save added data ----
+  # addData <- file.path(tempdir(), paste0("session_", session$token))
+  addData <- tempdir()
+  dir.create(addData, showWarnings = FALSE)
+  # session_addData <- reactiveVal(addData)
+
   ## map layout and options ----
 
   ## for polar crs need to custom define leaflet options
@@ -258,36 +264,112 @@ server <- function(input, output, session) {
       )
   })
 
+  ## update map with distAnt data ----
   distAnt <- reactive({
     req(input$distAnt)
 
     info <- filter(distcsv, name == input$distAnt)
-    tileDir <- file.path(dirData, info$dir)
-    r <- curl_fetch_memory(info$url)
 
-    if(r$status_code == 200){
-      if(!file.exists(tileDir)){
-        message("Getting distAnt data to make mapping tiles...")
-        dir.create(tileDir, recursive = TRUE, showWarnings = FALSE)
-        rast2tile(info$url, info$lyrnum, tileDir)
+    tileDir <- file.path(addData, info$dir)
+    # if(!file.exists(tileDir)){
+      dir.create(tileDir, recursive = TRUE, showWarnings = FALSE)
+
+      r <- curl_fetch_memory(info$url)
+      if(r$status_code == 200){
+        ## download the raster
+        message("Getting data to make map tiles...")
+        tmptif <- file.path(tileDir, "rast0.tif")
+        download.file(info$url, destfile = tmptif)
+
+        ## template matching leaflet map tiles/extent
+        x <- 12367396.2185
+        template <- rast(ext(c(-x,x,-x,x)), nrow = 8192, ncol = 8192, crs = crs("EPSG:3031"))
+
+        ## project to sterographic south after cropping
+        ## then resample to template
+        message("reprojecting and cropping data...")
+        rresamp <- project(rast(tmptif, lyrs = info$lyrnum), "EPSG:4326") |>
+          crop(ext(c(-180, 180, -90, -50))) |>
+          project("EPSG:3031") |>
+          resample(template)
+
+        message("creating color palette...")
+        pal <- data.frame(value = 0:255, col = hcl.colors(256, "viridis"))
+
+        # message("trying to extract values")
+        # v <- values(rresamp)
+        # message("values extracted for palette")
+
+        # q <- quantile(v, probs = seq(0, 1, length.out = 256), na.rm = TRUE)
+        qt <- global(rresamp, quantile, probs = seq(0, 1, length.out = 256), na.rm = TRUE)
+          # mutate(name = as.numeric(substr(name, 2, 7)))
+        message("quantiles extracted for palette")
+
+       data.frame(breaks = unlist(c(qt))) |>
+          # global(rresamp, quantile, probs = seq(0, 1, length.out = 256), na.rm = TRUE) |>
+          # data.frame() |>
+          cbind(pal) |>
+          # setNames(c("breaks","value","col"))
+        # values(rresamp) |>
+        #   quantile(probs = seq(0, 1, length.out = 256), na.rm = TRUE) |>
+        #   data.frame() |>
+        #   cbind(pal) |>
+        #   setNames(c("breaks","value","col")) |>
+          write.csv(
+            file.path(tileDir, "palette.csv"),
+            row.names = FALSE
+          )
+
+
+        message("making int1u raster...")
+        rint <- rresamp |>
+          stretch(minq = 0.02, maxq = 0.98, minv = 0, maxv = 255) |>
+          as.int(datatype = "INT1U")
+        message("assign palette to int1u raster")
+        coltab(rint) <- pal
+
+        message("starting tiles...")
+        writeRaster(
+          rint, file.path(tileDir, "rint.tif"),
+          datatype = "INT1U",
+          overwrite = TRUE
+        )
+
+        message("making .vrt file")
+        system(paste(
+          "gdal_translate -of vrt -expand rgba",
+          file.path(tileDir, "rint.tif"),
+          file.path(tileDir, "rint.vrt")
+        ))
+        message("tile-izing...")
+        system(paste(
+          "gdal2tiles.py -p raster -z 2-4 -x -tmscompatible",
+          file.path(tileDir, "rint.vrt"),
+          tileDir
+        ))
+        message("tiles complete. \n\n")
       }
-      addResourcePath(info$dir, tileDir)
-      p2 <- read.csv(file.path(tileDir, "palette.csv"))
-    }
+    # }
+    pal2 <- read.csv(file.path(tileDir, "palette.csv"))
     return(list(
-      dir = info$dir,
-      pal = p2
+      dir = tileDir,
+      pal = pal2
     ))
   })
 
   observe({
+    message("adding distAnt tiles to map...")
     x <- distAnt()
+
+    message(sprintf("filepath %s exists: %s", x$dir, file.exists(x$dir)))
+    addResourcePath("distAntTiles", x$dir)
 
     leafletProxy("map2") |>
       clearGroup("map2tiles") |>
       addTiles(
         group = "map2tiles",
-        urlTemplate = sprintf("%s/{z}/{x}/{-y}.png", x$dir),
+        urlTemplate = "distAntTiles/{z}/{x}/{-y}.png",
+        # urlTemplate = sprintf("%s/{z}/{x}/{-y}.png", x$dir),
         options = tileOptions(
           tileSize = 256,
           noWrap = TRUE,
@@ -316,9 +398,9 @@ server <- function(input, output, session) {
     req(input$shapefile)
 
     ## unzip the uploaded shapefile
-    dirtmp <- tempdir()
-    unzip(input$shapefile$datapath, exdir = dirtmp)
-    tmpfile <- list.files(dirtmp, pattern = "\\.shp$", full.names = TRUE, recursive = TRUE)
+    shpDir <- file.path(addData, "userShapefile")
+    unzip(input$shapefile$datapath, exdir = shpDir)
+    tmpfile <- list.files(shpDir, pattern = "\\.shp$", full.names = TRUE, recursive = TRUE)
     tmpfile <- tmpfile[[1]]
     if(length(tmpfile) == 1){
       shpfile <- st_read(tmpfile)
@@ -334,6 +416,8 @@ server <- function(input, output, session) {
       ## TODO check the shp has at least 30% overlap with map latitudes?
       shpfile <- NULL
     }
+    unlink(shpDir, recursive = TRUE)
+
     return(shpfile)
   })
 
@@ -397,6 +481,6 @@ server <- function(input, output, session) {
   # })
 
   session$onSessionEnded(function() {
-    unlink(tileDir, recursive = TRUE, force = TRUE)
+    unlink(addData, recursive = TRUE, force = TRUE)
   })
 }

@@ -56,12 +56,11 @@
 
     <!--Header-area with image-->
     <header class="header-area overlay full-height relative v-center" id="welcome">
-        <div class="absolute hero-image", style="height:120%;"></div>
+        <div class="absolute hero-image", style="height:100%;"></div>
         <div class="container">
             <div class="row v-center">
                 <div class="header-text col-sm-12">
-                    <h2 style="text-align:left;">WOBEC</h2>
-                    <h3 style="text-align:left;">Summary Data for Stakeholder Workshops</h3>
+                    <h2 style="text-align:left;">Summary Data for<br>Stakeholder Workshops</h2>
                 </div>
             </div>
             <div class="box left-box">
@@ -139,21 +138,21 @@
       </div>
       <div class="container">
             <div class="map-inputbox">
-                <p style="font-size:16px; color:#cfd2de; padding-top:10px; margin-bottom:0px;">Species Occurences</p>
-                <p style="font-size:12px; color:#606891; padding-top:2px; padding-bottom:0px;">
+                <p class="input-label">Species Occurences</p>
+                <p class="input-description">
                   Search GBIF using scientific name
                 </p>
                 {{ taxonkey_input }}
                 <br>
-                <p style="font-size:16px; color:#cfd2de; padding-top:10px; margin-bottom:2px;">Upload Shapefile</p>
-                <p style="font-size:12px; color:#606891; padding-top:2px;">
+                <p class="input-label">Upload Shapefile</p>
+                <p class="input-description">
                   Upload a zipped shapefile (.zip) to view as an overlay on the map.
                 </p>
                 {{ shapefile_input }}
                 <br>
-                <p style="font-size:16px; color:#cfd2de; padding-top:5px; margin-bottom:10px;">Model Output</p>
+                <p class="input-label">Model Output</p>
                 {{ distant_input }}
-                <p style="font-size:12px; color:#606891; padding-top:8px;">
+                <p class="input-description">
                   Add a layer from SCAR DistAnt Ecological Model Output Repository (Note, this takes some time...)
                 </p>
             </div>
@@ -245,62 +244,62 @@
     <section class="overlay full-height v-center" id="more">
       <div class="absolute hero-image"></div>
       <div class="container">
-        <div class="box left-box">
-          <p class="intro-text">
-              Data from Copernicus Marine Service -
-              <a href="https://data.marine.copernicus.eu/products" target="_blank" style="color:#205d9e">https://data.marine.copernicus.eu/products</a>
-          </p>
-        </div>
-        <div class="box left-box">
-          <p class="intro-text">
-              GBIF species occurrence records -
-              <a href="https://www.gbif.org/en" target="_blank" style="color:#205d9e">https://www.gbif.org/en</a>
-          </p>
-        </div>
-        <div class="box left-box">
-          <p class="intro-text">
-              Species and ecological modeling outputs accessed via SCAR distAnt respository -
-              <a href="https://source.coop/repositories/scar/distant" target="_blank" style="color:#205d9e">https://source.coop/repositories/scar/distant</a>
-          </p>
-        </div>
-        <div class="box left-box">
-          <p class="intro-text">
-              Want to learn more? Visit the official WOBEC website for updates, upcoming activities, and project results -
-              <a href="https://wobec.aq" target="_blank" style="color:#205d9e">https://wobec.aq</a>
-          </p>
-        </div>
-        <div class="box left-box">
-            <p class="intro-text">
-                Data management plan version 1.0 is available at -
-                <a href="https://doi.org/10.5281/zenodo.15040396" target="_blank" style="color:#205d9e">https://doi.org/10.5281/zenodo.15040396</a>
-            </p>
-        </div>
-        <div class="box left-box">
-            <p class="intro-text">
-                Code for prepared summary data layers and this app are available on GitHub -
-                <a href="https://github.com/eleanorecc/antarctica-shinyapp" target="_blank" style="color:#205d9e">https://github.com/eleanorecc/antarctica-shinyapp</a>
-            </p>
+        <div class="references-container">
+          <h3 class="references-title">Resources and Links</h3>
+
+          <div class="references-grid">
+            <div class="reference-category">
+              <h4 class="category-title">Data Sources</h4>
+              <ul class="reference-list">
+                <li>
+                  <strong>Copernicus Marine Service</strong>
+                  <br>Oceanographic and biogeochemical data
+                  <br><a href="https://data.marine.copernicus.eu/products" target="_blank">data.marine.copernicus.eu/products</a>
+                </li>
+                <li>
+                  <strong>GBIF</strong>
+                  <br>Species occurrence records
+                  <br><a href="https://www.gbif.org/en" target="_blank">gbif.org</a>
+                </li>
+                <li>
+                  <strong>SCAR distAnt</strong>
+                  <br>Species and ecological modeling outputs
+                  <br><a href="https://source.coop/repositories/scar/distant" target="_blank">source.coop/repositories/scar/distant</a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="reference-category">
+              <h4 class="category-title">Learn More</h4>
+              <ul class="reference-list">
+                <li>
+                  <strong>WOBEC Official Website</strong>
+                  <br>Updates, activities, and project results
+                  <br><a href="https://wobec.aq" target="_blank">wobec.aq</a>
+                </li>
+                <li>
+                  <strong>Data Management Plan v1.0</strong>
+                  <br>Available via Zenodo
+                  <br><a href="https://doi.org/10.5281/zenodo.15040396" target="_blank">doi.org/10.5281/zenodo.15040396</a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="reference-category">
+              <h4 class="category-title">Code</h4>
+              <ul class="reference-list">
+                <li>
+                  <strong>GitHub Repository</strong>
+                  <br>Source code for data preparation and this application
+                  <br><a href="https://github.com/eleanorecc/antarctica-shinyapp" target="_blank">github.com/eleanorecc/antarctica-shinyapp</a>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </section>
     <!--References/-->
-
-    <footer class="footer-area relative" id="referenser">
-        <div class="footer-bottom">
-            <div class="container">
-                <div class="row" style="padding-bottom:10px;">
-                  <div class="col-xs-12 logo-container">
-                    <p class="footer-info" style="line-height: 16px; min-width: 150px;">
-                        Add<br>Something<br>Here?
-                    </p>
-                    <div class="right-logos">
-                        <img src="images/WOBEC_logo_fullsize_new.png" alt="WOBEC Logo" class="logo">
-                    </div>
-                  </div>
-                </div>
-            </div>
-        </div>
-    </footer>
 
 </body>
 
