@@ -92,14 +92,41 @@ All environmental data are processed to show **9-year period averages** to captu
 
 ### Prerequisites
 
-- **R** (version 4.0 or higher)
+- **R** (version 4.5 or higher)
 - **RStudio** (recommended)
-- Required R packages (see `global.R` for full list):
-  - `shiny`, `leaflet`, `leaflet.extras`, `leaflet.minicharts`
-  - `sf`, `terra` (spatial data handling)
-  - `dplyr`, `tidyr`, `stringr` (data wrangling)
-  - `httr2`, `jsonlite`, `curl` (API access)
-  - `reticulate` (Python interoperability for Copernicus data access)
+- **System dependencies**:
+  - **netCDF library**: Required for processing oceanographic data
+    - macOS: `brew install netcdf`
+    - Ubuntu/Debian: `sudo apt-get install libnetcdf-dev`
+    - Other systems: See [netCDF installation guide](https://www.unidata.ucar.edu/software/netcdf/)
+
+### Package Management
+
+This project uses **renv** for reproducible R package management. All required packages are tracked in `renv.lock`.
+
+**First-time setup:**
+```r
+# 1. Open R in the project directory
+# 2. renv will automatically bootstrap
+# 3. Restore all packages from the lockfile:
+renv::restore()
+```
+
+**Adding new packages:**
+```r
+# Install the package as usual
+install.packages("new_package")
+
+# Update the lockfile
+renv::snapshot()
+```
+
+Key packages used in this project:
+- `shiny`, `leaflet`, `leaflet.extras`, `leaflet.minicharts` (web interface)
+- `sf`, `terra`, `ncdf4` (spatial and netCDF data handling)
+- `dplyr`, `tidyr`, `stringr` (data wrangling)
+- `httr2`, `jsonlite`, `curl` (API access)
+- `reticulate` (Python interoperability for Copernicus data access)
 
 ### Launch the App
 

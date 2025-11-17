@@ -6,6 +6,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Shiny application for exploring Antarctic Weddell Sea oceanographic data (WOBEC project). The app displays dual synchronized maps showing environmental variables (chlorophyll-a, sea ice, salinity) across three time periods (1998-2006, 2007-2015, 2016-2024), with support for GBIF species occurrence overlays and user-uploaded shapefiles.
 
+## Package Management
+
+This project uses **renv** for reproducible R package management. When you first clone the repository:
+
+1. Open R in the project directory
+2. renv will automatically activate (via `.Rprofile`)
+3. Run `renv::restore()` to install all required packages from the lockfile
+4. If you add new packages, run `renv::snapshot()` to update the lockfile
+
+**System Dependencies:**
+- **netCDF library** (required for `ncdf4` package): Install via `brew install netcdf` (macOS) or equivalent package manager
+
 ## Running the Application
 
 ```bash
