@@ -65,17 +65,17 @@
             </div>
             <div class="box left-box">
                 <p class="intro-text">
-                    The Weddell Sea is a uniquely biodiverse and pristine area of the Southern Ocean surrounding Antarctica. To better protect this region which is crucial for climate regulation and food provision and home to many rare and vulnerable species, the Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR) are working to establish a Weddell Sea Marine Protected Area (WSMPA).
+                    The Weddell Sea is a <span class="highlight-green">uniquely biodiverse and pristine</span> area of the Southern Ocean surrounding Antarctica. To better protect this region which is crucial for climate regulation and food provision and home to many rare and vulnerable species, the Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR) are working to establish a <span class="highlight-blue">Weddell Sea Marine Protected Area</span> (WSMPA).
                 </p>
             </div>
             <div class="box left-box" style="width:78vw">
                 <p class="intro-text">
-                    Realizing that no systematic ecosystem monitoring exists in the Eastern Weddell Sea, scientists from 11 institutes across 8 countries have joined forces together with stakeholders from economy, conservation and society to design and initiate a long-term ecosystem observatory – the Weddell Sea Observatory of Biodiversity and Ecosystem Change (WOBEC) – with the aim to support global biodiversity goals, establish a baseline for measuring changes, and strengthen the WSMPA process.
+                    Realizing that <span class="highlight-green">no systematic ecosystem monitoring exists</span> in the Eastern Weddell Sea, scientists from 11 institutes across 8 countries have joined forces together with stakeholders from economy, conservation and society to design and initiate a long-term ecosystem observatory – the <span class="highlight-blue">Weddell Sea Observatory of Biodiversity and Ecosystem Change</span> (WOBEC) – with the aim to support global biodiversity goals, establish a baseline for measuring changes, and strengthen the WSMPA process.
                 </p>
             </div>
             <div class="box left-box" style="width:81vw">
                 <p class="intro-text">
-                    The purpose of this digital application is to provide easy access to summary datasets on already existing biogeochemical and physical oceanographic variables, prior species observations and model output data, for use in stakeholder workshops as a basis for exploration and discussion.
+                    The purpose of this digital application is to provide <span class="highlight-green">easy access to summary datasets</span> on already existing biogeochemical and physical oceanographic variables, prior species observations and model output data, for use in stakeholder workshops as a basis for exploration and discussion.
                 </p>
             </div>
             <br>
@@ -159,15 +159,25 @@
             <div class="mapbox1" id="map1ui">
               {{ map1ui }}
               {{ leftmap_input }}
-              <div class="map-caption">
-                {{ map1caption }}
+              <button class="caption-toggle caption-toggle-1" onclick="toggleCaption('map-caption')">
+                <span class="toggle-icon">i</span>
+              </button>
+              <div class="map-caption" id="map-caption">
+                <div class="caption-content">
+                  {{ map1caption }}
+                </div>
               </div>
             </div>
             <div class="mapbox2" id="map2ui">
               {{ map2ui }}
               {{ rightmap_input }}
-              <div class="map-caption2">
-                {{ map2caption }}
+              <button class="caption-toggle caption-toggle-2" onclick="toggleCaption('map-caption2')">
+                <span class="toggle-icon">i</span>
+              </button>
+              <div class="map-caption2" id="map-caption2">
+                <div class="caption-content">
+                  {{ map2caption }}
+                </div>
               </div>
             </div>
           </div>
@@ -300,6 +310,18 @@
       </div>
     </section>
     <!--References/-->
+
+    <script>
+    function toggleCaption(captionId) {
+      var caption = document.getElementById(captionId);
+
+      if (caption.classList.contains('expanded')) {
+        caption.classList.remove('expanded');
+      } else {
+        caption.classList.add('expanded');
+      }
+    }
+    </script>
 
 </body>
 

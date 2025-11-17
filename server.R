@@ -56,7 +56,7 @@ server <- function(input, output, session) {
   )
 
   ## make basemap ----
-  basemap <- leaflet(options = map_options) |>
+  basemap <- leaflet(options = c(map_options, leafletOptions(zoomControl = FALSE))) |>
     addMapPane("background", zIndex = 410) |>
     addMapPane("customtiles", zIndex = 420)  |>
     addMapPane("overlays", zIndex = 430)  |>
