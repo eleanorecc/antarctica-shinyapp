@@ -1,0 +1,168 @@
+﻿Parameter,ParamName,Category,Habitat,Community,Fisheries_FoodProvision,NaturalProducts_Krill,IconicSpecies_Conservation,SpecialPlaces_Protection,Tourism_Recreation,CleanWater_NutrientCycling,SpeciesDiversity_FoodWeb,HabitatIntegrity,CarbonStorage_Cycling,Goal,ServiceCategory
+eDNA,eDNA_WaterCol_AllBiota,Biological,Water column,All biota,7,8,8,7,5,6,9,8,4,SpeciesDiversity_FoodWeb,Supporting
+eDNA,eDNA_UIW_AllBiota,Biological,UIW,All biota,7,9,8,7,5,6,9,8,4,NaturalProducts_Krill,Provisioning
+eDNA,eDNA_SeaIce_AllBiota,Biological,Sea ice,All biota,6,9,7,7,4,6,9,8,4,NaturalProducts_Krill,Provisioning
+eDNA,eDNA_WaterCol_AllBiota,Biological,Water column,All biota,7,8,8,7,5,6,9,8,4,SpeciesDiversity_FoodWeb,Supporting
+"Invertebrate C,N,SI, biomarkers",Invertebrate_CNSI_biomark_WaterCol_Metazoa,Biological,Water column,Metazoans,8,9,7,6,4,8,9,7,7,NaturalProducts_Krill,Provisioning
+"Invertebrate C,N,SI, biomarkers",Invertebrate_CNSI_biomark_UIW_Metazoa,Biological,UIW,Metazoans,7,9,7,6,4,8,9,7,7,NaturalProducts_Krill,Provisioning
+"Invertebrate C,N,SI, biomarkers",Invertebrate_CNSI_biomark_Seafloor_Metazoa,Biological,Seafloor,Metazoans,7,7,6,7,3,8,8,8,7,CleanWater_NutrientCycling,Supporting
+Net community production,Net_community_Prod_WaterCol,BGC,Water column,,6,8,6,7,4,9,8,8,9,CarbonStorage_Cycling,Regulating
+DMS(P),DMSP_WaterCol,BGC,Water column,,3,5,4,6,3,7,6,7,8,CarbonStorage_Cycling,Regulating
+DMS(P),DMSP_SeaIce,BGC,Sea ice,,3,6,4,6,3,7,6,7,8,CarbonStorage_Cycling,Regulating
+DMS(P),DMSP_UIW,BGC,UIW,,3,6,4,6,3,7,6,7,8,CarbonStorage_Cycling,Regulating
+Dissolved organic carbon,Dissolved_organic_carbon_SeaIce,BGC,Sea ice,,4,7,5,6,3,9,7,7,9,CarbonStorage_Cycling,Regulating
+Dissolved organic carbon,Dissolved_organic_carbon_UIW,BGC,UIW,,4,7,5,6,3,9,7,7,9,CarbonStorage_Cycling,Regulating
+delta18O ,delta18O_SeaIce,BGC,Sea ice,,4,6,5,7,3,8,6,7,7,CleanWater_NutrientCycling,Supporting
+delta18O ,delta18O_UIW,BGC,UIW,,4,6,5,7,3,8,6,7,7,CleanWater_NutrientCycling,Supporting
+delta18O ,delta18O_WaterCol,BGC,Water column,,4,6,5,7,3,8,6,7,7,CleanWater_NutrientCycling,Supporting
+Dissolved inorganic carbon / Total alkalinity,Dissolved_inorganic_carbon,BGC,,,5,7,5,7,3,10,7,7,10,CarbonStorage_Cycling,Regulating
+Reflected Shortwave,Reflected_Shortwave_Atmos,Physical,atmosphere,,3,5,4,6,4,6,5,6,6,CarbonStorage_Cycling,Regulating
+Incoming Shortwave,Incoming_Shortwave_Atmos,Physical,atmosphere,,4,6,5,6,4,7,6,7,6,CleanWater_NutrientCycling,Supporting
+Transmitted Shortwave,Transmitted_Shortwave_WaterCol,Physical,Water column,,5,7,6,6,4,7,7,7,7,NaturalProducts_Krill,Provisioning
+Methane,Methane,BGC,,,2,3,3,5,2,7,5,6,8,CarbonStorage_Cycling,Regulating
+Temperature,Temperature_WaterCol,Physical,Water column,,8,9,8,8,5,8,9,9,6,NaturalProducts_Krill,Provisioning
+Salinity,Salinity_WaterCol,Physical,Water column,,7,9,7,7,5,8,8,8,7,NaturalProducts_Krill,Provisioning
+Salinity,Salinity_WaterCol,Physical,Water column,,7,9,7,7,5,8,8,8,7,NaturalProducts_Krill,Provisioning
+Salinity,Salinity_SeaIce,Physical,Sea ice ,,6,9,7,7,4,8,8,8,6,NaturalProducts_Krill,Provisioning
+Salinity,Salinity_UIW,Physical,UIW,,7,9,7,7,4,8,8,8,7,NaturalProducts_Krill,Provisioning
+Salinity,Salinity_UIW,Physical,UIW,,7,9,7,7,4,8,8,8,7,NaturalProducts_Krill,Provisioning
+Salinity,Salinity_WaterCol,Physical,Water column,,7,9,7,7,5,8,8,8,7,NaturalProducts_Krill,Provisioning
+Temperature,Temperature_WaterCol,Physical,Water column,,8,9,8,8,5,8,9,9,6,NaturalProducts_Krill,Provisioning
+Temperature,Temperature_SeaIce,Physical,Sea ice ,,7,9,8,8,5,8,8,9,6,NaturalProducts_Krill,Provisioning
+Temperature,Temperature_UIW,Physical,UIW,,7,9,8,8,5,8,8,9,6,NaturalProducts_Krill,Provisioning
+Temperature,Temperature_UIW,Physical,UIW,,7,9,8,8,5,8,8,9,6,NaturalProducts_Krill,Provisioning
+Temperature,Temperature_WaterCol,Physical,Water column,,8,9,8,8,5,8,9,9,6,NaturalProducts_Krill,Provisioning
+Turbidity,Turbidity_WaterCol,BGC,Water column,,5,6,5,6,4,7,6,7,5,CleanWater_NutrientCycling,Supporting
+Turbidity,Turbidity_WaterCol,Physical,Water column,,5,6,5,6,4,7,6,7,5,CleanWater_NutrientCycling,Supporting
+Particle absorption,Particle_absorption_WaterCol,BGC,Water column,,5,7,5,6,4,7,7,7,6,NaturalProducts_Krill,Provisioning
+Radiance,Radiance_UIW_Atmos,Physical,UIW/ atmo,,4,6,5,6,5,6,6,6,6,NaturalProducts_Krill,Provisioning
+Irradiance,Irradiance_UIW_Atmos,Physical,UIW/ atmo,,5,7,6,6,5,7,7,7,7,NaturalProducts_Krill,Provisioning
+Radiance,Radiance_UIW_Atmos,physical,UIW/ atmo,,4,6,5,6,5,6,6,6,6,NaturalProducts_Krill,Provisioning
+Irradiance,Irradiance_UIW_Atmos,physical,UIW/ atmo,,5,7,6,6,5,7,7,7,7,NaturalProducts_Krill,Provisioning
+Low irradiance,Low_irradiance_UIW,Physical,UIW,,5,7,6,6,4,7,7,7,6,NaturalProducts_Krill,Provisioning
+Sea floor backscatter,Sea_floor_backscatter_Seafloor,Geological,Seafloor,,6,5,6,8,4,6,7,9,5,HabitatIntegrity,Regulating
+Water current velocities,Water_current_velocities_WaterCol,Physical,Water column,,6,7,6,7,4,8,7,7,7,CleanWater_NutrientCycling,Supporting
+Fluorescence,Fluorescence_UIW,BGC,UIW,,6,8,6,6,4,8,8,7,7,NaturalProducts_Krill,Provisioning
+Snow depth,Snow_depth_Snow,Physical,Snow,,4,7,7,7,5,6,7,8,5,HabitatIntegrity,Regulating
+Snow density,Snow_density_Snow,Physical,Snow,,3,6,6,6,4,5,6,7,5,HabitatIntegrity,Regulating
+Snow temperature,Snow_Temp_Snow,Physical,Snow,,4,6,6,6,4,6,6,7,5,HabitatIntegrity,Regulating
+Sea ice observations,Sea_ice_Obs_SeaIce,Physical,Sea ice,,6,9,8,8,6,7,8,9,6,NaturalProducts_Krill,Provisioning
+Sea ice cover,Sea_ice_cover_SeaIce,Physical,Sea ice,,7,9,9,8,6,7,9,9,7,IconicSpecies_Conservation,Cultural
+Sea ice thickness,Sea_ice_thickness_SeaIce,Physical,Sea ice,,6,9,8,8,6,7,8,9,6,NaturalProducts_Krill,Provisioning
+Under-ice images,Under_ice_images_UIW,Physical,UIW,,6,8,7,7,6,6,8,8,5,NaturalProducts_Krill,Provisioning
+Sea ice growth,Sea_ice_growth_SeaIce,Physical,Sea ice,,6,9,8,8,5,7,8,9,6,NaturalProducts_Krill,Provisioning
+Ice-coring site properities – Freeboard,Ice_coring_site_SeaIce,Physical,Sea ice,,5,8,7,7,4,6,7,8,5,NaturalProducts_Krill,Provisioning
+Ice-coring site properities – Core length,Ice_coring_site_SeaIce,Physical,Sea ice,,5,8,7,7,4,6,7,8,5,NaturalProducts_Krill,Provisioning
+Ice-coring site properities – Sea ice thickness,Ice_coring_site_SeaIce,Physical,Sea ice,,6,9,8,8,5,7,8,9,6,NaturalProducts_Krill,Provisioning
+Under-ice stereo images,Under_ice_stereo_images_UIW,Biological,UIW,,6,8,7,7,6,6,8,8,5,NaturalProducts_Krill,Provisioning
+Epifauna abundance,Epifauna_Abund_Seafloor,Biological,Seafloor,,6,6,6,8,4,7,8,9,6,HabitatIntegrity,Regulating
+Epifauna biodiversity,Epifauna_bioDiv_Seafloor,Biological,Seafloor,,6,6,7,8,5,7,9,9,6,SpeciesDiversity_FoodWeb,Supporting
+Mesozooplankton diversity,Mesozooplankton_Div_WaterCol_Metazoa,Biological,Water column,Metazoans,7,8,7,7,4,8,9,8,6,SpeciesDiversity_FoodWeb,Supporting
+Mesozooplankton distribution,Mesozooplankton_Dist_WaterCol_Metazoa,Biological,Water column,Metazoans,7,8,7,7,4,7,9,8,6,SpeciesDiversity_FoodWeb,Supporting
+Macrofauna diversity,Macrofauna_Div_UIW_Macrofauna,Biological,UIW,Macrofauna,6,7,7,7,5,7,9,8,5,SpeciesDiversity_FoodWeb,Supporting
+Macrofauna abundance,Macrofauna_Abund_UIW_Macrofauna,Biological,UIW,Macrofauna,6,7,7,7,5,7,8,8,5,SpeciesDiversity_FoodWeb,Supporting
+Macrofauna diversity,Macrofauna_Div_WaterCol_Macrofauna,Biological,Water column,Macrofauna,6,7,7,7,4,7,9,8,5,SpeciesDiversity_FoodWeb,Supporting
+Macrofauna abundance,Macrofauna_Abund_WaterCol_Macrofauna,Biological,Water column,Macrofauna,6,7,7,7,4,7,8,8,5,SpeciesDiversity_FoodWeb,Supporting
+Macrofauna biomass,Macrofauna_Biomass_WaterCol_Macrofauna,Biological,Water column,Macrofauna,7,8,7,7,4,7,8,8,6,NaturalProducts_Krill,Provisioning
+Benthic macrofauna diversity,Benthic_macrofauna_Div_Seafloor_Macrofauna,BGC,Seafloor,Macrofauna,6,6,6,8,4,8,9,9,7,SpeciesDiversity_FoodWeb,Supporting
+Mesofauna diversity,Mesofauna_Div_UIW_Mesofauna,Biological,UIW,Mesofauna,5,7,6,7,4,7,8,8,5,SpeciesDiversity_FoodWeb,Supporting
+Mesofauna diversity,Mesofauna_Div_WaterCol_Mesofauna,Biological,Water column,Mesofauna,5,7,6,7,4,7,8,8,5,SpeciesDiversity_FoodWeb,Supporting
+Mesofauna abundance,Mesofauna_Abund_UIW_Mesofauna,Biological,UIW,Mesofauna,5,7,6,7,4,7,8,8,5,SpeciesDiversity_FoodWeb,Supporting
+Mesofauna abundance,Mesofauna_Abund_WaterCol_Mesofauna,Biological,Water column,Mesofauna,5,7,6,7,4,7,8,8,5,SpeciesDiversity_FoodWeb,Supporting
+Predator abundance – Leopard seal,Predator_Abund_Leopard,Biological,,,6,7,10,9,9,5,9,8,4,IconicSpecies_Conservation,Cultural
+Predator abundance – Weddell seal,Predator_Abund_Weddell,Biological,,,6,7,10,9,9,5,9,8,4,IconicSpecies_Conservation,Cultural
+Predator abundance – Crabeater seal,Predator_Abund_Crabeater,Biological,,,6,8,10,9,9,6,9,8,4,IconicSpecies_Conservation,Cultural
+Predator abundance – Elephant seal,Predator_Abund_Elephant,Biological,,,6,7,10,9,9,5,9,8,4,IconicSpecies_Conservation,Cultural
+Predator abundance – Minke whale,Predator_Abund_Minke,Biological,,,7,8,10,9,9,6,9,8,5,IconicSpecies_Conservation,Cultural
+Predator abundance – Blue whale,Predator_Abund_Blue_whale,Biological,,,6,7,10,9,9,6,9,8,5,IconicSpecies_Conservation,Cultural
+Predator abundance – Fin whale,Predator_Abund_Fin_whale,Biological,,,6,7,10,9,9,6,9,8,5,IconicSpecies_Conservation,Cultural
+Predator abundance – Humpback whale,Predator_Abund_Humpback,Biological,,,7,8,10,9,9,6,9,8,5,IconicSpecies_Conservation,Cultural
+Predator abundance – Sperm whale,Predator_Abund_Sperm,Biological,,,7,7,10,9,9,6,9,8,5,IconicSpecies_Conservation,Cultural
+Predator abundance – Orca,Predator_Abund_Orca,Biological,,,7,7,10,9,9,6,9,8,5,IconicSpecies_Conservation,Cultural
+Predator diversity,Predator_Div,Biological,,,7,8,10,9,9,6,9,9,5,IconicSpecies_Conservation,Cultural
+Macrofauna biomass,Macrofauna_Biomass_WaterCol_Macrofauna,Biological,Water column,Macrofauna,7,8,7,7,4,7,8,8,6,NaturalProducts_Krill,Provisioning
+Under shelf biodiversity,Under_shelf_bioDiv_UnderShelf_Macrofauna,Biological,Under shelf,Macrofauna,5,6,7,9,4,7,8,9,6,HabitatIntegrity,Regulating
+Under shelf biodiversity,Under_shelf_bioDiv_UnderShelf_Macrofauna,Biological,Under shelf,Macrofauna,5,6,7,9,4,7,8,9,6,HabitatIntegrity,Regulating
+eDNA/Benthic fish biodiversity,eDNABenthic_fish_bioDiv_Seafloor,Biological,Seafloor,,8,6,7,8,4,7,9,9,5,SpeciesDiversity_FoodWeb,Supporting
+Benthic biodiversity,Benthic_bioDiv_Seafloor,Biological,Seafloor,,7,6,7,8,5,7,9,9,6,SpeciesDiversity_FoodWeb,Supporting
+Fish condition,Fish_Cond_WaterCol_Fish,Biological,Water column,Fish,9,7,8,7,4,6,8,8,5,Fisheries_FoodProvision,Provisioning
+Fish condition,Fish_Cond_WaterCol_Fish,Biological,Water column,Fish,9,7,8,7,4,6,8,8,5,Fisheries_FoodProvision,Provisioning
+Fish condition,Fish_Cond_WaterCol_Fish,Biological,Water column,Fish,9,7,8,7,4,6,8,8,5,Fisheries_FoodProvision,Provisioning
+Fish condition,Fish_Cond_WaterCol_Fish,Biological,Water column,Fish,9,7,8,7,4,6,8,8,5,Fisheries_FoodProvision,Provisioning
+Fish condition,Fish_Cond_WaterCol_Fish,Biological,Water column,Fish,9,7,8,7,4,6,8,8,5,Fisheries_FoodProvision,Provisioning
+Fish condition,Fish_Cond_UIW_Fish,Biological,UIW,Fish,9,7,8,7,4,6,8,8,5,Fisheries_FoodProvision,Provisioning
+Fish condition,Fish_Cond_UIW_Fish,Biological,UIW,Fish,9,7,8,7,4,6,8,8,5,Fisheries_FoodProvision,Provisioning
+Fish condition,Fish_Cond_UIW_Fish,Biological,UIW,Fish,9,7,8,7,4,6,8,8,5,Fisheries_FoodProvision,Provisioning
+Fish condition,Fish_Cond_UIW_Fish,Biological,UIW,Fish,9,7,8,7,4,6,8,8,5,Fisheries_FoodProvision,Provisioning
+Fish condition,Fish_Cond_UIW_Fish,Biological,UIW,Fish,9,7,8,7,4,6,8,8,5,Fisheries_FoodProvision,Provisioning
+Fish diversity,Fish_Div_WaterCol_Fish,Biological,Water column,Fish,8,7,8,7,5,6,9,8,5,SpeciesDiversity_FoodWeb,Supporting
+Fish diversity,Fish_Div_WaterCol_Fish,Biological,Water column,Fish,8,7,8,7,5,6,9,8,5,SpeciesDiversity_FoodWeb,Supporting
+Fish diversity,Fish_Div_WaterCol_Fish,Biological,Water column,Fish,8,7,8,7,5,6,9,8,5,SpeciesDiversity_FoodWeb,Supporting
+Fish diversity,Fish_Div_WaterCol_Fish,Biological,Water column,Fish,8,7,8,7,5,6,9,8,5,SpeciesDiversity_FoodWeb,Supporting
+Fish diversity,Fish_Div_WaterCol_Fish,Biological,Water column,Fish,8,7,8,7,5,6,9,8,5,SpeciesDiversity_FoodWeb,Supporting
+Fish condition,Fish_Cond_Seafloor_Fish,Biological,Seafloor,Fish,9,6,7,7,3,6,8,8,5,Fisheries_FoodProvision,Provisioning
+Fish condition,Fish_Cond_Seafloor_Fish,Biological,Seafloor,Fish,9,6,7,7,3,6,8,8,5,Fisheries_FoodProvision,Provisioning
+Fish condition,Fish_Cond_Seafloor_Fish,Biological,Seafloor,Fish,9,6,7,7,3,6,8,8,5,Fisheries_FoodProvision,Provisioning
+Fish condition,Fish_Cond_Seafloor_Fish,Biological,Seafloor,Fish,9,6,7,7,3,6,8,8,5,Fisheries_FoodProvision,Provisioning
+Fish diversity,Fish_Div_Seafloor_Fish,Biological,Seafloor,Fish,8,6,7,8,4,6,9,9,5,SpeciesDiversity_FoodWeb,Supporting
+Fish diversity,Fish_Div_Seafloor_Fish,Biological,Seafloor,Fish,8,6,7,8,4,6,9,9,5,SpeciesDiversity_FoodWeb,Supporting
+Fish diversity,Fish_Div_Seafloor_Fish,Biological,Seafloor,Fish,8,6,7,8,4,6,9,9,5,SpeciesDiversity_FoodWeb,Supporting
+Fish diversity,Fish_Div_Seafloor_Fish,Biological,Seafloor,Fish,8,6,7,8,4,6,9,9,5,SpeciesDiversity_FoodWeb,Supporting
+Ice algae abundance,Ice_algae_Abund_SeaIce_Protist,Biological,Sea ice ,Protist,6,10,7,7,5,8,9,9,8,NaturalProducts_Krill,Provisioning
+Ice algae diversity,Ice_algae_Div_SeaIce_Protist,Biological,Sea ice ,Protist,5,9,7,7,5,8,9,9,7,NaturalProducts_Krill,Provisioning
+Phytoplankton abundance & diversity,Phytoplankton_Abund_&_Div_UIW_Protist,Biological,UIW,Protist,7,9,7,7,5,9,9,8,8,NaturalProducts_Krill,Provisioning
+Phytoplankton abundance & diversity,Phytoplankton_Abund_&_Div_WaterCol_Protist,Biological,Water column,Protist,7,9,7,7,5,9,9,8,8,NaturalProducts_Krill,Provisioning
+Pigment composition,Pigment_Comp_UIW_Protist,Biological,UIW,Protist,6,8,6,6,4,8,8,7,7,NaturalProducts_Krill,Provisioning
+Pigment composition,Pigment_Comp_SeaIce_Protist,Biological,Sea ice,Protist,6,9,6,6,4,8,8,8,7,NaturalProducts_Krill,Provisioning
+Pigment composition,Pigment_Comp_WaterCol_Protist,Biological,Water column,Protist,6,8,6,6,4,8,8,7,7,NaturalProducts_Krill,Provisioning
+Photophysiology (WaterPam),Photophysiology_WaterPam_SeaIce_Protist,Biological,Sea ice ,Protist,5,8,6,6,4,8,8,8,7,NaturalProducts_Krill,Provisioning
+Photophysiology (WaterPam),Photophysiology_WaterPam_UIW_Protist,Biological,UIW,Protist,5,8,6,6,4,8,8,7,7,NaturalProducts_Krill,Provisioning
+Photophysiology (WaterPam),Photophysiology_WaterPam_WaterCol_Protist,Biological,Water column,Protist,5,8,6,6,4,8,8,7,7,NaturalProducts_Krill,Provisioning
+Cell abundance (bacteria and phytoplankton),Cell_Abund_bacteria_SeaIce_Protist,Biological,Sea ice ,Protist,6,9,7,7,4,9,9,8,8,NaturalProducts_Krill,Provisioning
+Cell abundance (bacteria and phytoplankton),Cell_Abund_bacteria_UIW_Protist,Biological,UIW,Protist,6,9,7,7,4,9,9,8,8,NaturalProducts_Krill,Provisioning
+Cell abundance (bacteria and phytoplankton),Cell_Abund_bacteria_WaterCol_Protist,Biological,Water column,Protist,6,9,7,7,4,9,9,8,8,NaturalProducts_Krill,Provisioning
+Ice-algae mesoscale biomass distribution,Ice_algae_mesoscale_SeaIce_Protist,Biological,Sea ice,Protist,6,10,7,7,5,8,9,9,8,NaturalProducts_Krill,Provisioning
+Protists taxonomy – diversity,Protists_taxonomy_Div_WaterCol_Protists,Biological,Water column,Protists,6,8,7,7,4,8,9,8,7,SpeciesDiversity_FoodWeb,Supporting
+Protists taxonomy – abundance,Protists_taxonomy_Abund_WaterCol_Protists,Biological,Water column,Protists,6,9,7,7,4,8,9,8,7,NaturalProducts_Krill,Provisioning
+Protists taxonomy – turnover,Protists_taxonomy_turnove_WaterCol_Protists,Biological,Water column,Protists,6,8,7,7,4,8,9,8,7,SpeciesDiversity_FoodWeb,Supporting
+Fluorescence,Fluorescence_watercolumn_Protist,BGC,water column,Protist,6,8,6,6,4,8,8,7,7,NaturalProducts_Krill,Provisioning
+Chlorophyll a concentration,Chl_a_Conc_SeaIce_Protist,Biological,Sea ice,Protist,7,10,7,7,5,8,9,9,8,NaturalProducts_Krill,Provisioning
+Chlorophyll a concentration,Chl_a_Conc_WaterCol_Protist,Biological,Water column,Protist,7,9,7,7,5,9,9,8,8,NaturalProducts_Krill,Provisioning
+Chlorophyll a concentration,Chl_a_Conc_UIW_Protist,Biological,UIW,Protist,7,9,7,7,5,9,9,8,8,NaturalProducts_Krill,Provisioning
+Primary production + DMSP production,Primary_Prod_+_DMSP_Prod_WaterCol_Protist,Biological,Water column,Protist,7,9,7,7,4,9,9,8,9,NaturalProducts_Krill,Provisioning
+Primary production + DMSP production,Primary_Prod_+_DMSP_Prod_UIW_Protist,Biological,UIW,Protist,7,9,7,7,4,9,9,8,9,NaturalProducts_Krill,Provisioning
+Primary production + DMSP production,Primary_Prod_+_DMSP_Prod_SeaIce,Biological,Sea ice,,7,10,7,7,4,9,9,9,9,NaturalProducts_Krill,Provisioning
+POM stable isotope composition (C&N),POM_stable_isotope_SeaIce,Biological,Sea ice,,6,8,7,7,4,8,8,8,8,NaturalProducts_Krill,Provisioning
+POM stable isotope composition (C&N),POM_stable_isotope_WaterCol,Biological,Water column,,7,8,7,7,4,8,8,7,8,NaturalProducts_Krill,Provisioning
+POM stable isotope composition (C&N),POM_stable_isotope_UIW,Biological,UIW,,7,8,7,7,4,8,8,8,8,NaturalProducts_Krill,Provisioning
+Nutrient concentrations,Nutrient_Concs_UIW,BGC,UIW,,7,9,7,7,4,10,9,8,8,CleanWater_NutrientCycling,Supporting
+Nutrient concentrations,Nutrient_Concs_SeaIce,BGC,Sea ice,,6,9,7,7,4,10,9,8,7,CleanWater_NutrientCycling,Supporting
+Nutrient concentrations,Nutrient_Concs_WaterCol,BGC,Water column,,7,9,7,7,4,10,9,8,8,CleanWater_NutrientCycling,Supporting
+Sinking particles – POC,Sinking_particles_POC_WaterCol,BGC,Water column,,5,7,6,7,3,8,7,7,9,CarbonStorage_Cycling,Regulating
+Sinking particles – PON,Sinking_particles_PON_WaterCol,BGC,Water column,,5,7,6,7,3,9,7,7,9,CarbonStorage_Cycling,Regulating
+Sinking particles – POP,Sinking_particles_POP_WaterCol,BGC,Water column,,5,7,6,7,3,9,7,7,8,CleanWater_NutrientCycling,Supporting
+Sinking particles – bSI,Sinking_particles_bSI_WaterCol,BGC,Water column,,5,7,6,7,3,8,7,7,8,CarbonStorage_Cycling,Regulating
+Particulate Organic Matter (POC/PON),Particulate_Organic_Matter_SeaIce,BGC,Sea ice ,,5,8,6,7,3,9,8,8,9,CarbonStorage_Cycling,Regulating
+Particulate Organic Matter (POC/PON),Particulate_Organic_Matter_UIW,BGC,UIW,,6,8,6,7,3,9,8,8,9,CarbonStorage_Cycling,Regulating
+Particulate Organic Matter (POC/PON),Particulate_Organic_Matter_WaterCol,BGC,Water column,,6,8,6,7,3,9,8,7,9,CarbonStorage_Cycling,Regulating
+Biogenic Silica,Biogenic_Silica_SeaIce,BGC,Sea ice,,5,8,6,7,3,9,7,8,7,CleanWater_NutrientCycling,Supporting
+Biogenic Silica,Biogenic_Silica_WaterCol,BGC,Water column,,5,8,6,7,3,9,7,7,8,CleanWater_NutrientCycling,Supporting
+Biogenic Silica,Biogenic_Silica_Seafloor,BGC,Seafloor,,5,7,6,7,3,9,7,8,8,CleanWater_NutrientCycling,Supporting
+Extracellular polymeric substance,Extracellular_polymeric_s_SeaIce,BGC,Sea ice,,4,7,5,6,3,8,7,8,7,CleanWater_NutrientCycling,Supporting
+Extracellular polymeric substance,Extracellular_polymeric_s_UIW,BGC,UIW,,4,7,5,6,3,8,7,7,7,CleanWater_NutrientCycling,Supporting
+Sediment oxygen demand,Sediment_oxygen_demand_Seafloor_Benthic,BGC,Seafloor,Benthic community,5,6,6,8,3,9,7,9,8,CleanWater_NutrientCycling,Supporting
+Nutrient fluxes – N,Nutrient_fluxes_N_Seafloor_Benthic,BGC,Seafloor,Benthic community,6,7,6,8,3,10,8,9,9,CleanWater_NutrientCycling,Supporting
+Nutrient fluxes – P,Nutrient_fluxes_P_Seafloor_Benthic,BGC,Seafloor,Benthic community,6,7,6,8,3,10,8,9,9,CleanWater_NutrientCycling,Supporting
+Nutrient fluxes – Si,Nutrient_fluxes_Si_Seafloor_Benthic,BGC,Seafloor,Benthic community,6,8,6,8,3,10,8,9,9,CleanWater_NutrientCycling,Supporting
+Sediment pigment concentration,Sediment_pigment_Conc_Seafloor_Benthic,BGC,Seafloor,Benthic community,5,7,6,8,3,8,7,9,8,HabitatIntegrity,Regulating
+Sediment porosity,Sediment_porosity_Seafloor,BGC,Seafloor,,4,5,5,7,3,7,6,8,7,HabitatIntegrity,Regulating
+Sediment total organic carbon,Sediment_total_organic_Seafloor,BGC,Seafloor,,5,6,6,8,3,9,7,9,9,CarbonStorage_Cycling,Regulating
+Sediment total nitrogen,Sediment_total_nitrogen_Seafloor,BGC,Seafloor,,5,6,6,8,3,9,7,9,9,CarbonStorage_Cycling,Regulating
+Sediment grain size,Sediment_grain_size_Seafloor,BGC,Seafloor,,4,5,5,7,3,6,6,8,6,HabitatIntegrity,Regulating
+Sediment bromide depth profile,Sediment_bromide_depth_Seafloor,BGC,Seafloor,,3,4,4,7,2,7,6,7,6,CleanWater_NutrientCycling,Supporting
+Sediment luminophore concentration (depth profile),Sediment_luminophore_Conc_Seafloor,BGC,Seafloor,,4,5,5,7,3,7,6,8,7,HabitatIntegrity,Regulating
+14 C org,14_C_org_Seafloor,BGC,Seafloor,,4,5,5,8,3,8,6,8,9,CarbonStorage_Cycling,Regulating
+210 Pb ,210_Pb_Seafloor,BGC,Seafloor,,3,4,4,7,2,6,5,7,7,CarbonStorage_Cycling,Regulating
+Sea floor backscatter,Sea_floor_backscatter_Seafloor,Geological,Seafloor,,6,5,6,8,4,6,7,9,5,HabitatIntegrity,Regulating
+Bathymetry,Bathymetry_Seafloor,Geological,Seafloor,,6,6,7,8,5,6,7,9,5,HabitatIntegrity,Regulating
+Acoustic backscatter,Acoustic_backscatter_WaterCol,Physical,Water column,,6,7,6,6,4,6,7,7,5,NaturalProducts_Krill,Provisioning
