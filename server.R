@@ -67,20 +67,6 @@ server <- function(input, output, session) {
       attribution = "OpenStreetMap | GBIF",
       options = gbif_tile_options
     ) |>
-    addDrawToolbar(
-      targetGroup = "draw",
-      singleFeature = TRUE,
-      polygonOptions = FALSE,
-      markerOptions = FALSE,
-      rectangleOptions = FALSE,
-      circleOptions = FALSE,
-      circleMarkerOptions = FALSE,
-      editOptions = editToolbarOptions(
-        edit = FALSE,
-        remove = TRUE,
-        selectedPathOptions = selectedPathOptions()
-      )
-    ) |>
     addLayersControl(
       overlayGroups = c("Statistical Areas", "Management Units", "Study Area", "Points of Interest"),
       position = "bottomleft"
@@ -478,6 +464,24 @@ server <- function(input, output, session) {
   #       strip.text = element_text(size = 16),
   #       axis.text = element_text(size = 14)
   #     )
+  # })
+
+  ## flowerplot ----
+  # output$d3_flower <- renderD3({
+  #   flower_json <- fromJSON(
+  #     file.path(dirData, "flowerplot/flowerplot.json"),
+  #     simplifyVector = FALSE
+  #   )
+  #
+  #   r2d3(
+  #     data = flower_json,
+  #     script = file.path(dirData, "flowerplot/flowerplot.js"),
+  #     d3_version = "6",
+  #     options = list(
+  #       plotYear = "BalticSea",
+  #       addViewDepth = 0
+  #     )
+  #   )
   # })
 
   session$onSessionEnded(function() {

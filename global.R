@@ -25,6 +25,7 @@ library(httr2)
 library(jsonlite)
 library(curl)
 library(terra)
+library(r2d3)
 
 ## directories ----
 dirData <- here("www")

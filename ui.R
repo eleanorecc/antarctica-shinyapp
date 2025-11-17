@@ -48,6 +48,7 @@ htmlTemplate(
   map2caption = htmlOutput("map2cap")
 
   ## system graphic ----
+  # d3_flower_ui = d3Output("d3_flower", height = "100%")
 
 
   ## resources ----

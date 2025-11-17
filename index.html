@@ -144,17 +144,17 @@
                 </p>
                 {{ taxonkey_input }}
                 <br>
-                <p class="input-label">Upload Shapefile</p>
-                <p class="input-description">
-                  Upload a zipped shapefile (.zip) to view as an overlay on the map.
-                </p>
-                {{ shapefile_input }}
-                <br>
                 <p class="input-label">Model Output</p>
                 {{ distant_input }}
                 <p class="input-description">
                   Add a layer from SCAR DistAnt Ecological Model Output Repository (Note, this takes some time...)
                 </p>
+                <br>
+                <p class="input-label">Upload Shapefile</p>
+                <p class="input-description">
+                  Upload a zipped shapefile (.zip) to view as an overlay on the map.
+                </p>
+                {{ shapefile_input }}
             </div>
             <div class="mapbox1" id="map1ui">
               {{ map1ui }}
@@ -234,16 +234,26 @@
         </div>
       </div>
     </section>-->
-    <section class="overlay blue-bg" id="overview">
-      <div class="container" style="padding-top:200px;padding-bottom:20px;">
-        <h3 style="color:white;">
-            Another Section...
-        </h3>
-        <br>
-        <h4 style="color:white;">
-            Weddell Sea Social-Ecological System
-            <br>On Monitoring key Variables...
-        </h4>
+    <section class="overlay blue-bg full-height" id="overview">
+      <div class="container" style="padding-top:150px;padding-bottom:100px;">
+        <div class="row">
+          <div class="col-md-12">
+            <h3 style="color:white;">
+                Categories of Ecosystem Services
+            </h3>
+            <br>
+            <h4 style="color:white;">
+                Weddell Sea Social-Ecological System
+                <br>Key Variables and Indicators
+            </h4>
+          </div>
+          <!-- Flowerplot temporarily disabled
+          <div class="col-md-6">
+            <div class="flower-box">
+            </div>
+          </div>
+          -->
+        </div>
       </div>
     </section>
     <!--System Overview/-->
