@@ -120,11 +120,67 @@ Currently hardcoded as 9-year periods (1998-2006, 2007-2015, 2016-2024). To chan
 - Regenerate all tiles
 - Update layer names in global.R `allrasters` list
 
+## UI Styling System
+
+### Design System (www/style.css)
+
+The app uses a modern design system with CSS custom properties (design tokens) defined in `:root`:
+
+**Key Variables:**
+- **Colors**: `--primary-blue`, `--secondary-blue`, `--accent-green`, plus light variations
+- **Shadows**: `--shadow-soft`, `--shadow-medium` for consistent depth
+- **Border Radius**: `--border-radius-sm` (12px), `--border-radius-md` (20px), `--border-radius-lg` (40px)
+- **Transitions**: `--transition-smooth` for consistent animations
+
+**To modify the color scheme**: Update CSS variables at the top of `www/style.css` rather than individual selectors.
+
+### Visual Design Patterns
+
+**Glassmorphism**: Applied to navigation menu, map input panel, data section headers, and map captions using `backdrop-filter: blur()` for a modern, layered aesthetic.
+
+**Gradients**: Used on backgrounds, buttons, and overlays for depth and visual interest.
+
+**Micro-interactions**:
+- Box hover: Slide right effect with shadow increase
+- Button hover: Lift effect (-2px transform)
+- Input focus: Green accent border with glow
+- All transitions use smooth cubic-bezier timing (0.3s)
+
+**Animations**: Fade-in animations (0.6s ease-out) applied to content boxes, maps, and input panels using keyframe animations.
+
+### Typography
+
+- **Hierarchy**: H2 (98px) → H3 (40px) → Body (13px)
+- **Weights**: 700 (headings) → 600 (subheadings) → 400 (body)
+- **Font smoothing**: `-webkit-font-smoothing: antialiased` for crisp rendering
+- **Letter spacing**: Negative on large headings (-2px), positive on UI elements (0.5px)
+
+### Accessibility
+
+- **Focus states**: All interactive elements have visible green accent focus borders
+- **Color contrast**: WCAG compliant color combinations
+- **Motion**: Animations respect `prefers-reduced-motion` media query
+- **Smooth scrolling**: CSS scroll-behavior with snap points for section navigation
+
+### Responsive Design
+
+- Background attachments change to `scroll` on mobile for performance
+- Existing media queries preserved for layout adjustments
+- Touch-friendly sizing maintained for interactive elements
+
+### Future Enhancement Opportunities
+
+- Dark mode toggle
+- Loading animations/skeleton screens for data loading
+- Progress indicators for map tile loading
+- Enhanced tooltips with animations
+- Interactive legend with hover effects
+
 ## File Structure Notes
 
 - `www/distAnt.csv`: DistAnt model raster URLs and metadata for dynamic tile generation
 - `www/tsdata.csv`: Time series data (currently unused, commented out in server.R:462-481)
 - `www/images/`: Static assets for HTML template
 - `www/modules/`: Additional assets or modules
-- `www/style.css`: Custom CSS for the HTML template
+- `www/style.css`: Custom CSS with design tokens and modern UI patterns (glassmorphism, gradients, animations)
 - `index.html`: Main HTML template with placeholders for Shiny inputs/outputs
