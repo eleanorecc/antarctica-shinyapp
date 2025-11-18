@@ -26,6 +26,7 @@ library(jsonlite)
 library(curl)
 library(terra)
 library(r2d3)
+library(reticulate)
 
 ## directories ----
 dirData <- here("www")
@@ -35,6 +36,24 @@ if(length(list.files(dirData)) == 0){
     check that the drive is mounted \n"
   )
 }
+
+## python configuration ----
+## local: use pyenv virtualenv (for Positron GUI)
+## shinyapps.io: auto-detects system Python
+if(Sys.getenv("SHINY_PORT") == ""){
+  pyenv_root <- Sys.getenv("PYENV_ROOT", file.path(Sys.getenv("HOME"), ".pyenv"))
+  pyenv_python <- file.path(pyenv_root, "versions/antarctica-shinyapp/bin/python")
+
+  if(file.exists(pyenv_python)){
+    use_python(pyenv_python, required = TRUE)
+  } else {
+    stop(paste(
+      "Python virtualenv not found at: ", pyenv_python, "\n",
+      "Run: pyenv virtualenv 3.11.0 antarctica-shinyapp"
+    ))
+  }
+}
+
 
 ## datasets ----
 

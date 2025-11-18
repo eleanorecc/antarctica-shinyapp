@@ -93,12 +93,82 @@ All environmental data are processed to show **9-year period averages** to captu
 ### Prerequisites
 
 - **R** (version 4.5 or higher)
-- **RStudio** (recommended)
-- **System dependencies**:
-  - **netCDF library**: Required for processing oceanographic data
-    - macOS: `brew install netcdf`
-    - Ubuntu/Debian: `sudo apt-get install libnetcdf-dev`
-    - Other systems: See [netCDF installation guide](https://www.unidata.ucar.edu/software/netcdf/)
+- **RStudio** or **Positron** (recommended)
+- **Homebrew** (macOS package manager): [Install Homebrew](https://brew.sh/)
+
+#### System Dependencies
+
+- **netCDF library**: Required for processing oceanographic data
+  - macOS: `brew install netcdf`
+  - Ubuntu/Debian: `sudo apt-get install libnetcdf-dev`
+  - Other systems: See [netCDF installation guide](https://www.unidata.ucar.edu/software/netcdf/)
+
+- **GDAL**: Required for spatial data processing and generating distAnt model tiles
+  - macOS: `brew install gdal`
+  - Ubuntu/Debian: `sudo apt-get install gdal-bin libgdal-dev`
+
+  This installs GDAL C libraries and command-line tools system-wide.
+
+#### Python Environment Setup
+
+This project uses Python (via reticulate) for GDAL tile generation. **Both local development and shinyapps.io deployment use the same Python packages** specified in `requirements.txt`.
+
+##### 1. Install pyenv and pyenv-virtualenv (macOS with zsh)
+
+```bash
+# Install pyenv for Python version management
+brew install pyenv
+
+# Install pyenv-virtualenv for virtual environment support
+brew install pyenv-virtualenv
+
+# Add to your ~/.zshrc (for zsh shell)
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc
+echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zshrc
+echo 'eval "$(pyenv init --path)"' >> ~/.zshrc
+echo 'eval "$(pyenv init -)"' >> ~/.zshrc
+echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.zshrc
+
+# Restart your shell
+exec "$SHELL"
+```
+
+##### 2. Install Python and Create Virtual Environment
+
+```bash
+# Install Python 3.11 (matches shinyapps.io)
+pyenv install 3.11.0
+
+# Navigate to project directory
+cd /path/to/antarctica-shinyapp
+
+# Create project-specific virtual environment
+pyenv virtualenv 3.11.0 antarctica-shinyapp
+
+# Set local Python version (auto-activates in this directory)
+pyenv local antarctica-shinyapp
+```
+
+##### 3. Install Python Packages
+
+**Important:** You need **both** brew GDAL (C libraries) and pip GDAL (Python bindings):
+- `brew install gdal` → System C libraries (prerequisite)
+- `pip install GDAL` → Python bindings that link to C libraries
+
+```bash
+# Ensure virtualenv is activated (should auto-activate in project dir)
+# Install GDAL Python bindings (links to brew's GDAL C libraries)
+pip install GDAL==$(gdal-config --version)
+
+# Install numpy (required by GDAL for tile generation)
+# Version range ensures compatibility with both local (numpy 2.x) and shinyapps.io (numpy 1.x)
+pip install "numpy>=1.24,<3.0"
+
+# Verify installation
+python -c "from osgeo import gdal; print('GDAL Python bindings installed successfully')"
+```
+
+**Note:** On shinyapps.io, Python packages are installed automatically from `requirements.txt` — no additional configuration needed for deployment.
 
 ### Package Management
 
@@ -160,6 +230,30 @@ Key functions:
 - `get_chla()` — Download chlorophyll-a data
 - `get_seaice()` — Download sea ice concentration data
 - `get_salinity()` — Download sea surface salinity data
+
+**Installing copernicusmarine for data preparation (optional):**
+
+The Shiny app does not require `copernicusmarine` — this is only needed if you want to download new data from Copernicus Marine Service. Install in your `antarctica-shinyapp` virtual environment:
+
+```bash
+# Activate the virtual environment
+pyenv activate antarctica-shinyapp
+
+# Install copernicusmarine
+pip install copernicusmarine
+```
+
+To use the data acquisition functions, provide your Copernicus Marine Service credentials as function arguments:
+
+```r
+library(reticulate)
+source("dataprep/getdata.R")
+
+params <- dataparams(getdates = c("2024-01-01", "2024-12-31"), bboxcoords = bbox)
+results <- get_chla(params, user = "your_username", pass = "your_password")
+```
+
+Register for a free account at [Copernicus Marine Service](https://data.marine.copernicus.eu/) to obtain credentials.
 
 ### Data Wrangling (`dataprep/wrangledata.R`)
 

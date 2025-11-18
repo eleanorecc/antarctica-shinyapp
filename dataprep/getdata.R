@@ -25,10 +25,6 @@ get_seaice <- function(params, user, pass){
   require(ncdf4)
   require(terra)
 
-  virtualenv_create(envname = "CopernicusMarine")
-  virtualenv_install("CopernicusMarine", packages = c("copernicusmarine"))
-  use_virtualenv("CopernicusMarine", required = TRUE)
-
   cmt <- import("copernicusmarine")
   cmt$login(user, pass)
 
@@ -179,10 +175,6 @@ get_chla <- function(params, user, pass){
   library(ncdf4)
   require(terra)
 
-  virtualenv_create(envname = "CopernicusMarine")
-  virtualenv_install("CopernicusMarine", packages = c("copernicusmarine"))
-  use_virtualenv("CopernicusMarine", required = TRUE)
-
   cmt <- import("copernicusmarine")
   cmt$login(user, pass)
 
@@ -239,10 +231,6 @@ get_salinity <- function(params, user, pass){
   require(reticulate)
   library(ncdf4)
   require(terra)
-
-  virtualenv_create(envname = "CopernicusMarine")
-  virtualenv_install("CopernicusMarine", packages = c("copernicusmarine"))
-  use_virtualenv("CopernicusMarine", required = TRUE)
 
   cmt <- import("copernicusmarine")
   cmt$login(user, pass)
