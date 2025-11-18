@@ -38,6 +38,7 @@ htmlTemplate(
       onInitialize = I('function() { this.setValue(""); }')
     )
   ),
+  distant_progress = htmlOutput("distAntProgress"),
 
   ## main content area
   # timeseries_ui = plotOutput("timeseries", height = "36vh"),

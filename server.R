@@ -250,6 +250,28 @@ server <- function(input, output, session) {
       )
   })
 
+  ## distAnt progress indicator ----
+  output$distAntProgress <- renderUI({
+    if(!is.null(input$distAnt) && input$distAnt != "") {
+      info <- filter(distcsv, name == input$distAnt)
+      tileDir <- file.path(addData, info$dir)
+
+      if(!file.exists(file.path(tileDir, "palette.csv"))) {
+        tags$div(
+          style = "margin-top: 8px;",
+          tags$div(
+            class = "progress-bar-container",
+            tags$div(class = "progress-bar-fill")
+          ),
+          tags$p(
+            style = "font-size: 10px; color: rgba(200, 210, 225, 0.9); margin-top: 4px;",
+            "Processing layer... this may take a moment"
+          )
+        )
+      }
+    }
+  })
+
   ## update map with distAnt data ----
   distAnt <- reactive({
     req(input$distAnt)
@@ -257,24 +279,25 @@ server <- function(input, output, session) {
     info <- filter(distcsv, name == input$distAnt)
 
     tileDir <- file.path(addData, info$dir)
-    # if(!file.exists(tileDir)){
+
+    ## check if tiles already exist (enable caching)
+    if(!file.exists(file.path(tileDir, "palette.csv"))){
       dir.create(tileDir, recursive = TRUE, showWarnings = FALSE)
 
       r <- curl_fetch_memory(info$url)
       if(r$status_code == 200){
-        ## download the raster
-        message("Getting data to make map tiles...")
-        tmptif <- file.path(tileDir, "rast0.tif")
-        download.file(info$url, destfile = tmptif)
+        ## stream raster via GDAL VSI (no full download needed)
+        message("Streaming COG and processing...")
+        vsi_url <- paste0("/vsicurl/", info$url)
 
         ## template matching leaflet map tiles/extent
         x <- 12367396.2185
         template <- rast(ext(c(-x,x,-x,x)), nrow = 8192, ncol = 8192, crs = crs("EPSG:3031"))
 
         ## project to sterographic south after cropping
-        ## then resample to template
-        message("reprojecting and cropping data...")
-        rresamp <- project(rast(tmptif, lyrs = info$lyrnum), "EPSG:4326") |>
+        ## then resample to template (using VSI streaming)
+        message("Reprojecting and cropping data...")
+        rresamp <- project(rast(vsi_url, lyrs = info$lyrnum), "EPSG:4326") |>
           crop(ext(c(-180, 180, -90, -50))) |>
           project("EPSG:3031") |>
           resample(template)
@@ -321,21 +344,28 @@ server <- function(input, output, session) {
           overwrite = TRUE
         )
 
-        message("making .vrt file")
-        system(paste(
-          "gdal_translate -of vrt -expand rgba",
-          file.path(tileDir, "rint.tif"),
-          file.path(tileDir, "rint.vrt")
-        ))
-        message("tile-izing...")
-        system(paste(
-          "gdal2tiles.py -p raster -z 2-4 -x -tmscompatible",
+        message("Making .vrt file...")
+        gdal <- import("osgeo.gdal")
+        gdal$Translate(
+          destName = file.path(tileDir, "rint.vrt"),
+          srcDS = file.path(tileDir, "rint.tif"),
+          format = "VRT",
+          creationOptions = list("EXPAND=RGBA")
+        )
+
+        message("Generating tiles...")
+        gdal2tiles <- import("osgeo_utils.gdal2tiles")
+        gdal2tiles$main(c(
+          '-p', 'raster',
+          '-z', '3-4',
+          '-x',
+          '--tmscompatible',
           file.path(tileDir, "rint.vrt"),
           tileDir
         ))
-        message("tiles complete. \n\n")
+        message("Tiles complete!\n\n")
       }
-    # }
+    }
     pal2 <- read.csv(file.path(tileDir, "palette.csv"))
     return(list(
       dir = tileDir,
