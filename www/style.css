@@ -640,7 +640,7 @@ header {
 
 .leaflet .legend i {
   width: 18px;
-  height: 3px;
+  height: 8px;
   margin-right: 5px;
 }
 
@@ -895,6 +895,38 @@ header {
 
 .button i {
     margin-left: 5px;
+}
+
+/* File upload button */
+.btn.btn-default.btn-file {
+  background-color: #0d3556;
+  color: white;
+}
+
+/* Form controls */
+.form-control {
+  font-size: 12px;
+}
+
+/* Year range slider - hide grid for cleaner look */
+.irs-grid,
+.irs-grid-pol,
+.irs-grid-text {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+}
+
+/* Slider handles */
+.irs-handle {
+  width: 18px !important;
+  height: 18px !important;
+  top: 18px !important;
+  border: none !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15) !important;
 }
 
 /* REFERENCES SECTION */
