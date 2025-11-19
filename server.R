@@ -6,6 +6,9 @@ server <- function(input, output, session) {
   dir.create(addData, showWarnings = FALSE)
   # session_addData <- reactiveVal(addData)
 
+  ## track distAnt processing state ----
+  processingDistAnt <- reactiveVal(FALSE)
+
   ## map layout and options ----
 
   ## for polar crs need to custom define leaflet options
@@ -184,27 +187,44 @@ server <- function(input, output, session) {
         opacity = 1
       )
   }, ignoreNULL = TRUE)
+
   ## add GBIF occurrence tiles ----
-  observeEvent(input$taxonKey, {
-    taxon_delayed <- debounce(reactive(input$taxonKey), 1000)
-    res <- paste0("https://api.gbif.org/v1/species/match?name=", URLencode(taxon_delayed())) |>
+  ## Create debounced reactives to delay API calls until user stops typing/adjusting
+  taxon_delayed <- debounce(reactive(input$taxonKey), 1000)
+  year_delayed <- debounce(reactive(input$yearRange), 1000)
+
+  observeEvent(c(taxon_delayed(), year_delayed()), {
+    req(taxon_delayed())
+
+    nm <- taxon_delayed() |>
+      str_to_title() |>
+      URLencode()
+
+    res <- paste0("https://api.gbif.org/v1/species/match?name=", nm) |>
       request() |>
       req_headers(user_agent = "DataSummaryWOBEC/1.0") |>
       req_perform()
+
     if(resp_status(res) < 400){
       taxa <- resp_body_json(res)
       key <- taxa$usageKey
     } else {
       key <- NULL
     }
+
     if(!is.null(key)){
+      ## Build URL with year range filter
+      yr <- year_delayed()
       speciesOccurance <- paste(
         "https://api.gbif.org/v2/map/occurrence/density/{z}/{x}/{y}@1x.png?srs=EPSG%3A3031",
         paste0("taxonKey=", key),
         paste0("basisOfRecord=", c("HUMAN_OBSERVATION", "MACHINE_OBSERVATION"), collapse = "&"),
+        paste0("years=", yr[1], ",", yr[2]),
         "style=purpleYellow.point",
         sep = "&"
       )
+      message(paste("GBIF API URL:", speciesOccurance))
+
       leafletProxy("map1") |>
         clearGroup("spp") |>
         clearGroup("map1tiles") |>
@@ -252,36 +272,49 @@ server <- function(input, output, session) {
 
   ## distAnt progress indicator ----
   output$distAntProgress <- renderUI({
-    if(!is.null(input$distAnt) && input$distAnt != "") {
-      info <- filter(distcsv, name == input$distAnt)
-      tileDir <- file.path(addData, info$dir)
-
-      if(!file.exists(file.path(tileDir, "palette.csv"))) {
+    if(processingDistAnt()) {
+      tags$div(
+        style = "margin-top: 8px;",
         tags$div(
-          style = "margin-top: 8px;",
-          tags$div(
-            class = "progress-bar-container",
-            tags$div(class = "progress-bar-fill")
-          ),
-          tags$p(
-            style = "font-size: 10px; color: rgba(200, 210, 225, 0.9); margin-top: 4px;",
-            "Processing layer... this may take a moment"
-          )
+          class = "progress-bar-container",
+          tags$div(class = "progress-bar-fill")
+        ),
+        tags$p(
+          style = "font-size: 10px; color: rgba(200, 210, 225, 0.9); margin-top: 4px;",
+          "Processing layer... this may take a moment"
         )
-      }
+      )
     }
   })
 
-  ## update map with distAnt data ----
-  distAnt <- reactive({
-    req(input$distAnt)
-
-    info <- filter(distcsv, name == input$distAnt)
-
+  ## set progress state when input changes (runs before reactive)----
+  observeEvent(input$tilesDistAnt, {
+    req(input$tilesDistAnt)
+    info <- filter(distcsv, name == input$tilesDistAnt)
     tileDir <- file.path(addData, info$dir)
 
-    ## check if tiles already exist (enable caching)
-    if(!file.exists(file.path(tileDir, "palette.csv"))){
+    if(!file.exists(file.path(tileDir, "palette.csv"))) {
+      processingDistAnt(TRUE)
+    } else {
+      processingDistAnt(FALSE)
+    }
+  }, priority = 10)  ## Higher priority ensures this runs first
+
+  ## update map with distAnt data ----
+  distAnt <- reactive({
+    req(input$tilesDistAnt)
+
+    ## ADD STUFF ABOUT PROCESSING/PROGRESS BAR HERE
+
+    info <- filter(distcsv, name == input$tilesDistAnt)
+    tileDir <- file.path(addData, info$dir)
+
+    ## check if tiles already exist
+    file_palette <- file.path(tileDir, "palette.csv")
+    if(file.exists(file_palette)){
+      pal <- read.csv(file_palette)
+    } else {
+      ## (enable caching)
       dir.create(tileDir, recursive = TRUE, showWarnings = FALSE)
 
       r <- curl_fetch_memory(info$url)
@@ -302,60 +335,53 @@ server <- function(input, output, session) {
           project("EPSG:3031") |>
           resample(template)
 
-        message("creating color palette...")
-        pal <- data.frame(value = 0:255, col = hcl.colors(256, "viridis"))
+        message("Creating quantile-based color palette...")
+        ## Calculate 257 quantile breaks from the full data range
+        ## This gives actual data values at each percentile
+        qt <- global(rresamp, quantile, probs = seq(0, 1, length.out = 257), na.rm = TRUE)
+        breaks <- unlist(qt)
 
-        # message("trying to extract values")
-        # v <- values(rresamp)
-        # message("values extracted for palette")
+        message("Converting to 8-bit indexed color via quantile classification...")
+        ## Classify data into 256 bins based on quantile breaks
+        ## This allocates equal pixel counts per bin, giving better differentiation
+        ## to the middle values without losing extreme value representation
+        rcm <- matrix(c(breaks[1:256], breaks[2:257], 0:255), ncol = 3)
+        rint <- classify(rresamp, rcm, include.lowest = TRUE, right = FALSE)
+        cols <- data.frame(value = 0:255, col = hcl.colors(256, "viridis"))
+        coltab(rint) <- cols
 
-        # q <- quantile(v, probs = seq(0, 1, length.out = 256), na.rm = TRUE)
-        qt <- global(rresamp, quantile, probs = seq(0, 1, length.out = 256), na.rm = TRUE)
-          # mutate(name = as.numeric(substr(name, 2, 7)))
-        message("quantiles extracted for palette")
-
-       data.frame(breaks = unlist(c(qt))) |>
-          # global(rresamp, quantile, probs = seq(0, 1, length.out = 256), na.rm = TRUE) |>
-          # data.frame() |>
-          cbind(pal) |>
-          # setNames(c("breaks","value","col"))
-        # values(rresamp) |>
-        #   quantile(probs = seq(0, 1, length.out = 256), na.rm = TRUE) |>
-        #   data.frame() |>
-        #   cbind(pal) |>
-        #   setNames(c("breaks","value","col")) |>
-          write.csv(
-            file.path(tileDir, "palette.csv"),
-            row.names = FALSE
-          )
-
-
-        message("making int1u raster...")
-        rint <- rresamp |>
-          stretch(minq = 0.02, maxq = 0.98, minv = 0, maxv = 255) |>
-          as.int(datatype = "INT1U")
-        message("assign palette to int1u raster")
-        coltab(rint) <- pal
-
-        message("starting tiles...")
         writeRaster(
           rint, file.path(tileDir, "rint.tif"),
           datatype = "INT1U",
           overwrite = TRUE
         )
-
-        message("Making .vrt file...")
-        gdal <- import("osgeo.gdal")
-        gdal$Translate(
-          destName = file.path(tileDir, "rint.vrt"),
-          srcDS = file.path(tileDir, "rint.tif"),
-          format = "VRT",
-          creationOptions = list("EXPAND=RGBA")
+        ## each color index maps to original data value range
+        pal <- data.frame(
+          breaks_lower = breaks[1:256],
+          breaks_upper = breaks[2:257],
+          value = 0:255,
+          col = cols$col
+        ) 
+        write.csv(
+          pal, file.path(tileDir, "palette.csv"),
+          row.names = FALSE
         )
 
+        message("Creating VRT with RGBA expansion...")
+        ## Use system call - simple, robust, works across environments
+        ## gdal_translate is a C++ binary, no Python/numpy dependency
+        system(paste(
+          "gdal_translate -of vrt -expand rgba",
+          file.path(tileDir, "rint.tif"),
+          file.path(tileDir, "rint.vrt")
+        ))
+
         message("Generating tiles...")
+        ## Use Python binding - ensures numpy version consistency from requirements.txt
+        ## gdal2tiles.py is numpy-intensive, needs correct Python environment
         gdal2tiles <- import("osgeo_utils.gdal2tiles")
-        gdal2tiles$main(c(
+        gdal2tiles$main(list(
+          'gdal2tiles.py',
           '-p', 'raster',
           '-z', '3-4',
           '-x',
@@ -365,11 +391,11 @@ server <- function(input, output, session) {
         ))
         message("Tiles complete!\n\n")
       }
+      pal <- read.csv(file.path(tileDir, "palette.csv"))
     }
-    pal2 <- read.csv(file.path(tileDir, "palette.csv"))
     return(list(
       dir = tileDir,
-      pal = pal2
+      pal = pal
     ))
   })
 
@@ -379,6 +405,19 @@ server <- function(input, output, session) {
 
     message(sprintf("filepath %s exists: %s", x$dir, file.exists(x$dir)))
     addResourcePath("distAntTiles", x$dir)
+
+    ## Get unique breaks only (removes duplicates from quantiles with repeated values)
+    unique_breaks <- unique(sort(c(x$pal$breaks_lower, x$pal$breaks_upper)))
+
+    ## Reduce to max 20 bins for legend display
+    max_bins <- 20
+    if(length(unique_breaks) > max_bins) {
+      ## Select evenly-spaced subset of breaks
+      indices <- round(seq(1, length(unique_breaks), length.out = max_bins))
+      legend_breaks <- unique_breaks[indices]
+    } else {
+      legend_breaks <- unique_breaks
+    }
 
     leafletProxy("map2") |>
       clearGroup("map2tiles") |>
@@ -399,13 +438,18 @@ server <- function(input, output, session) {
       addLegend(
         position = "bottomright",
         title = "DistAnt<br>Model",
-        pal = colorNumeric(palette = x$pal$col, domain = x$pal$breaks),
-        labFormat = labelFormat(
-          transform = function(x) sort(x)
+        pal = colorBin(
+          palette = x$pal$col,
+          domain = range(unique_breaks),
+          bins = legend_breaks,
+          pretty = FALSE
         ),
-        values = x$pal$breaks,
+        values = legend_breaks,
         opacity = 1
       )
+
+    ## Tiles successfully added, hide progress indicator
+    processingDistAnt(FALSE)
   })
 
   ## handling user-uploaded data ----

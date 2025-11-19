@@ -28,8 +28,17 @@ htmlTemplate(
     label = NULL,
     value = ""
   ),
+  gbif_years = sliderInput(
+    inputId = "yearRange",
+    label = NULL,
+    min = 1900,
+    max = as.integer(format(Sys.Date(), "%Y")),
+    value = c(2000, as.integer(format(Sys.Date(), "%Y"))),
+    step = 1,
+    sep = ""
+  ),
   distant_input = selectizeInput(
-    inputId = "distAnt",
+    inputId = "tilesDistAnt",
     label = NULL,
     choices = distrasters,
     selected = NULL,

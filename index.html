@@ -143,12 +143,13 @@
                   Search GBIF using scientific name
                 </p>
                 {{ taxonkey_input }}
-                <br>
+                <p class="input-description" style="margin-top: 10px;">Filter years (optional)</p>
+                {{ gbif_years }}
                 <p class="input-label">Model Output</p>
-                {{ distant_input }}
                 <p class="input-description">
                   Add a layer from SCAR DistAnt Ecological Model Output Repository
                 </p>
+                {{ distant_input }}
                 {{ distant_progress }}
                 <br>
                 <p class="input-label">Upload Shapefile</p>
