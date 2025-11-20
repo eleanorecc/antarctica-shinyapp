@@ -294,3 +294,24 @@ rast2tile <- function(url, lyrnum, saveDir){
 distcsv <-  read.csv(file.path(dirData, "distAnt.csv"))
 distrasters <- as.list(pull(distcsv, name))
 
+caption_metadata <- data.frame(
+  layer_pattern = c("chlorophyll", "seaice", "salinity"),
+  title = c("Chlorophyll A Data", "Sea Ice Data", "Salinity Data"),
+  description = c(
+    "Chlorophyll A averages calculated from Copernicus Marine Dataset:",
+    "Sea Ice averages and minimums calculated (taking >15% covered area as 'ice covered') from Copernicus Marine Dataset:",
+    "Salinity averages calculated from Copernicus Marine Dataset:"
+  ),
+  dataset_name = c(
+    "c3s_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M",
+    "cmems_mod_glo_phy_my_0.083deg_P1D-m",
+    "cmems_obs-mob_glo_phy-sss_my_multi_P1M"
+  ),
+  url = c(
+    "https://data.marine.copernicus.eu/product/OCEANCOLOUR_GLO_BGC_L4_MY_009_108/services",
+    "https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/service",
+    "https://data.marine.copernicus.eu/product/MULTIOBS_GLO_PHY_S_SURFACE_MYNRT_015_013/services"
+  ),
+  stringsAsFactors = FALSE
+)
+

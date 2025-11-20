@@ -54,8 +54,8 @@ htmlTemplate(
   map1ui = leafletOutput(outputId = "map1", height = "100%"),
   map2ui = leafletOutput(outputId = "map2", height = "100%"),
 
-  map1caption = htmlOutput("map1cap"),
-  map2caption = htmlOutput("map2cap")
+  map1caption = uiOutput("map1cap"),
+  map2caption = uiOutput("map2cap")
 
   ## system graphic ----
   # d3_flower_ui = d3Output("d3_flower", height = "100%")

@@ -119,36 +119,75 @@ server <- function(input, output, session) {
   output$map2 <- renderLeaflet({ syncWith(basemap, "maps") })
 
   ## caption based on map layer ----
-  chooseCaption <- function(inputCaption){
-    if(str_detect(inputCaption, "chlorophyll")){
-      s <- '<p style="font-size:16px;color:#98c01e;">Chlorophyll A Data:</p>
-                  <p class="intro-text">
-                      Chlorophyll A averages calculated from Copernicus Marine Dataset:
-                      <a href="https://data.marine.copernicus.eu/product/OCEANCOLOUR_GLO_BGC_L4_MY_009_108/services" target="_blank" style="color:#205d9e">
-                          <br>c3s_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M
-                      </a>
-                  </p>'
-    } else if(str_detect(inputCaption, "seaice")){
-      s <- '<p style="font-size:16px;color:#98c01e;">Sea Ice Data:</p>
-                  <p class="intro-text">
-                      Sea Ice averages and minimums calculated (taking >%15 covered area as "ice covered") from Copernicus Marine Dataset:
-                      <a href="https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/service" target="_blank" style="color:#205d9e">
-                          <br>cmems_mod_glo_phy_my_0.083deg_P1D-m
-                      </a>
-                  </p>'
-    } else {
-      s <- '<p style="font-size:16px;color:#98c01e;">Salinity Data:</p>
-                  <p class="intro-text">
-                      Salinity averages calculated from Copernicus Marine Dataset:
-                      <a href="https://data.marine.copernicus.eu/product/MULTIOBS_GLO_PHY_S_SURFACE_MYNRT_015_013/services" target="_blank" style="color:#205d9e">
-                          <br>cmems_obs-mob_glo_phy-sss_my_multi_P1M
-                      </a>
-                  </p>'
+  getCaptionData <- function(layer_name) {
+    if (layer_name %in% distcsv$name) {
+      info <- filter(distcsv, name == layer_name)
+      return(list(
+        title = info$name,
+        description = "Data accessed from SCAR DistAnt Ecological Model Output Repository",
+        dataset = "https://source.coop/scar/distant",
+        url = "https://source.coop/scar/distant",
+        reference = info$reference
+      ))
     }
-    return(s)
+
+    for (i in 1:nrow(caption_metadata)) {
+      if (str_detect(layer_name, regex(caption_metadata$layer_pattern[i], ignore_case = TRUE))) {
+        return(list(
+          title = caption_metadata$title[i],
+          description = caption_metadata$description[i],
+          dataset = caption_metadata$dataset_name[i],
+          url = caption_metadata$url[i],
+          reference = ""
+        ))
+      }
+    }
+
+    return(list(title = "Data Layer", description = "", dataset = "", url = "", reference = ""))
   }
-  output$map1cap <- renderUI({HTML(chooseCaption(input$tilesLeft))})
-  output$map2cap <- renderUI({HTML(chooseCaption(input$tilesRight))})
+
+  renderCaption <- function(caption_data) {
+    tags$div(
+      tags$p(class = "caption-title", caption_data$title),
+      tags$p(
+        class = "intro-text",
+        caption_data$description,
+        if (nzchar(caption_data$dataset) && nzchar(caption_data$url)) {
+          tagList(
+            tags$br(),
+            tags$a(href = caption_data$url, target = "_blank", style = "color:#205d9e", caption_data$dataset)
+          )
+        }
+      ),
+      if (nzchar(caption_data$reference)) {
+        tags$p(class = "caption-reference", caption_data$reference)
+      }
+    )
+  }
+
+  output$map1cap <- renderUI({
+    if (!is.null(input$taxonKey) && nzchar(input$taxonKey)) {
+      renderCaption(list(
+        title = "Species Observations Data",
+        description = "Species observations (basis of record: human and machine observation) collected in the Global Biodiversity Information Facility (GBIF)",
+        dataset = "api.gbif.org/v2/map/occurrence/density/{z}/{x}/{y}@1x.png?srs=EPSG:3031",
+        url = "https://www.gbif.org/occurrence/search?occurrence_status=present",
+        reference = ""
+      ))
+    } else {
+      req(input$tilesLeft)
+      renderCaption(getCaptionData(input$tilesLeft))
+    }
+  })
+
+  output$map2cap <- renderUI({
+    if (!is.null(input$tilesDistAnt) && nzchar(input$tilesDistAnt)) {
+      renderCaption(getCaptionData(input$tilesDistAnt))
+    } else {
+      req(input$tilesRight)
+      renderCaption(getCaptionData(input$tilesRight))
+    }
+  })
 
   ## update left map tiles based on user selection ----
   observeEvent(input$tilesLeft, {
