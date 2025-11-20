@@ -551,37 +551,6 @@ header {
   overflow-y: auto;
 }
 
-/* Progress bar for distAnt loading */
-.progress-bar-container {
-  width: 100%;
-  height: 4px;
-  background-color: rgba(191, 211, 218, 0.3);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.progress-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--secondary-blue), var(--accent-green));
-  animation: progress-animation 1.5s ease-in-out infinite;
-  border-radius: 2px;
-}
-
-@keyframes progress-animation {
-  0% {
-    width: 0%;
-    margin-left: 0%;
-  }
-  50% {
-    width: 50%;
-    margin-left: 25%;
-  }
-  100% {
-    width: 0%;
-    margin-left: 100%;
-  }
-}
-
 /* Map layer dropdown positioning */
 #map1ui .shiny-input-container,
 #map2ui .shiny-input-container {

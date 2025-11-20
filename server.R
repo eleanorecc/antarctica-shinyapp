@@ -1,13 +1,14 @@
 server <- function(input, output, session) {
 
-  ## temporary directory to save added data ----
-  # addData <- file.path(tempdir(), paste0("session_", session$token))
-  addData <- tempdir()
-  dir.create(addData, showWarnings = FALSE)
-  # session_addData <- reactiveVal(addData)
+  ## directory for pre-generated distAnt tiles ----
+  addData <- file.path(dirData, "distAnt")
 
-  ## track distAnt processing state ----
-  processingDistAnt <- reactiveVal(FALSE)
+  ## OLD APPROACH (streaming COGs) - commented out to avoid memory issues on shinyapps.io
+  # addData <- tempdir()
+  # dir.create(addData, showWarnings = FALSE)
+
+  ## OLD: track distAnt processing state (no longer needed with pre-generated tiles)
+  # processingDistAnt <- reactiveVal(FALSE)
 
   ## map layout and options ----
 
@@ -309,133 +310,86 @@ server <- function(input, output, session) {
       )
   })
 
-  ## distAnt progress indicator ----
-  output$distAntProgress <- renderUI({
-    if(processingDistAnt()) {
-      tags$div(
-        style = "margin-top: 8px;",
-        tags$div(
-          class = "progress-bar-container",
-          tags$div(class = "progress-bar-fill")
-        ),
-        tags$p(
-          style = "font-size: 10px; color: rgba(200, 210, 225, 0.9); margin-top: 4px;",
-          "Processing layer... this may take a moment"
-        )
-      )
-    }
-  })
+  ## OLD: distAnt progress indicator (no longer needed with pre-generated tiles)
+  # output$distAntProgress <- renderUI({
+  #   if(processingDistAnt()) {
+  #     tags$div(
+  #       style = "margin-top: 8px;",
+  #       tags$div(
+  #         class = "progress-bar-container",
+  #         tags$div(class = "progress-bar-fill")
+  #       ),
+  #       tags$p(
+  #         style = "font-size: 10px; color: rgba(200, 210, 225, 0.9); margin-top: 4px;",
+  #         "Processing layer... this may take a moment"
+  #       )
+  #     )
+  #   }
+  # })
 
-  ## set progress state when input changes (runs before reactive)----
-  observeEvent(input$tilesDistAnt, {
-    req(input$tilesDistAnt)
-    info <- filter(distcsv, name == input$tilesDistAnt)
-    tileDir <- file.path(addData, info$dir)
-
-    if(!file.exists(file.path(tileDir, "palette.csv"))) {
-      processingDistAnt(TRUE)
-    } else {
-      processingDistAnt(FALSE)
-    }
-  }, priority = 10)  ## Higher priority ensures this runs first
+  ## OLD: set progress state when input changes (no longer needed with pre-generated tiles)
+  # observeEvent(input$tilesDistAnt, {
+  #   req(input$tilesDistAnt)
+  #   info <- filter(distcsv, name == input$tilesDistAnt)
+  #   tileDir <- file.path(addData, info$dir)
+  #   if(!file.exists(file.path(tileDir, "palette.csv"))) {
+  #     processingDistAnt(TRUE)
+  #   } else {
+  #     processingDistAnt(FALSE)
+  #   }
+  # }, priority = 10)
 
   ## update map with distAnt data ----
   distAnt <- reactive({
     req(input$tilesDistAnt)
 
-    ## ADD STUFF ABOUT PROCESSING/PROGRESS BAR HERE
-
     info <- filter(distcsv, name == input$tilesDistAnt)
     tileDir <- file.path(addData, info$dir)
 
-    ## check if tiles already exist
-    file_palette <- file.path(tileDir, "palette.csv")
-    if(file.exists(file_palette)){
-      pal <- read.csv(file_palette)
-    } else {
-      ## (enable caching)
-      dir.create(tileDir, recursive = TRUE, showWarnings = FALSE)
+    ## Read pre-generated palette
+    pal <- read.csv(file.path(tileDir, "palette.csv"))
 
-      r <- curl_fetch_memory(info$url)
-      if(r$status_code == 200){
-        ## stream raster via GDAL VSI (no full download needed)
-        message("Streaming COG and processing...")
-        vsi_url <- paste0("/vsicurl/", info$url)
-
-        ## template matching leaflet map tiles/extent
-        x <- 12367396.2185
-        template <- rast(ext(c(-x,x,-x,x)), nrow = 8192, ncol = 8192, crs = crs("EPSG:3031"))
-
-        ## project to sterographic south after cropping
-        ## then resample to template (using VSI streaming)
-        message("Reprojecting and cropping data...")
-        rresamp <- project(rast(vsi_url, lyrs = info$lyrnum), "EPSG:4326") |>
-          crop(ext(c(-180, 180, -90, -50))) |>
-          project("EPSG:3031") |>
-          resample(template)
-
-        message("Creating quantile-based color palette...")
-        ## Calculate 257 quantile breaks from the full data range
-        ## This gives actual data values at each percentile
-        qt <- global(rresamp, quantile, probs = seq(0, 1, length.out = 257), na.rm = TRUE)
-        breaks <- unlist(qt)
-
-        message("Converting to 8-bit indexed color via quantile classification...")
-        ## Classify data into 256 bins based on quantile breaks
-        ## This allocates equal pixel counts per bin, giving better differentiation
-        ## to the middle values without losing extreme value representation
-        rcm <- matrix(c(breaks[1:256], breaks[2:257], 0:255), ncol = 3)
-        rint <- classify(rresamp, rcm, include.lowest = TRUE, right = FALSE)
-        cols <- data.frame(value = 0:255, col = hcl.colors(256, "viridis"))
-        coltab(rint) <- cols
-
-        writeRaster(
-          rint, file.path(tileDir, "rint.tif"),
-          datatype = "INT1U",
-          overwrite = TRUE
-        )
-        ## each color index maps to original data value range
-        pal <- data.frame(
-          breaks_lower = breaks[1:256],
-          breaks_upper = breaks[2:257],
-          value = 0:255,
-          col = cols$col
-        ) 
-        write.csv(
-          pal, file.path(tileDir, "palette.csv"),
-          row.names = FALSE
-        )
-
-        message("Creating VRT with RGBA expansion...")
-        ## Use system call - simple, robust, works across environments
-        ## gdal_translate is a C++ binary, no Python/numpy dependency
-        system(paste(
-          "gdal_translate -of vrt -expand rgba",
-          file.path(tileDir, "rint.tif"),
-          file.path(tileDir, "rint.vrt")
-        ))
-
-        message("Generating tiles...")
-        ## Use Python binding - ensures numpy version consistency from requirements.txt
-        ## gdal2tiles.py is numpy-intensive, needs correct Python environment
-        gdal2tiles <- import("osgeo_utils.gdal2tiles")
-        gdal2tiles$main(list(
-          'gdal2tiles.py',
-          '-p', 'raster',
-          '-z', '3-4',
-          '-x',
-          '--tmscompatible',
-          file.path(tileDir, "rint.vrt"),
-          tileDir
-        ))
-        message("Tiles complete!\n\n")
-      }
-      pal <- read.csv(file.path(tileDir, "palette.csv"))
-    }
     return(list(
       dir = tileDir,
       pal = pal
     ))
+
+    ## OLD APPROACH (streaming COGs on-the-fly) - causes OOM on shinyapps.io
+    ## Kept for reference - use dataprep/generate_distant_tiles.R to pre-generate instead
+    # if(file.exists(file.path(tileDir, "palette.csv"))){
+    #   pal <- read.csv(file.path(tileDir, "palette.csv"))
+    # } else {
+    #   dir.create(tileDir, recursive = TRUE, showWarnings = FALSE)
+    #   r <- curl_fetch_memory(info$url)
+    #   if(r$status_code == 200){
+    #     vsi_url <- paste0("/vsicurl/", info$url)
+    #     x <- 12367396.2185
+    #     template <- rast(ext(c(-x,x,-x,x)), nrow = 8192, ncol = 8192, crs = crs("EPSG:3031"))
+    #     rresamp <- project(rast(vsi_url, lyrs = info$lyrnum), "EPSG:4326") |>
+    #       crop(ext(c(-180, 180, -90, -50))) |>
+    #       project("EPSG:3031") |>
+    #       resample(template)
+    #     qt <- global(rresamp, quantile, probs = seq(0, 1, length.out = 257), na.rm = TRUE)
+    #     breaks <- unlist(qt)
+    #     rcm <- matrix(c(breaks[1:256], breaks[2:257], 0:255), ncol = 3)
+    #     rint <- classify(rresamp, rcm, include.lowest = TRUE, right = FALSE)
+    #     cols <- data.frame(value = 0:255, col = hcl.colors(256, "viridis"))
+    #     coltab(rint) <- cols
+    #     writeRaster(rint, file.path(tileDir, "rint.tif"), datatype = "INT1U", overwrite = TRUE)
+    #     pal <- data.frame(
+    #       breaks_lower = breaks[1:256],
+    #       breaks_upper = breaks[2:257],
+    #       value = 0:255,
+    #       col = cols$col
+    #     )
+    #     write.csv(pal, file.path(tileDir, "palette.csv"), row.names = FALSE)
+    #     system(paste("gdal_translate -of vrt -expand rgba", file.path(tileDir, "rint.tif"), file.path(tileDir, "rint.vrt")))
+    #     gdal2tiles <- import("osgeo_utils.gdal2tiles")
+    #     gdal2tiles$main(list('gdal2tiles.py', '-p', 'raster', '-z', '3-4', '-x', '--tmscompatible', file.path(tileDir, "rint.vrt"), tileDir))
+    #   }
+    #   pal <- read.csv(file.path(tileDir, "palette.csv"))
+    # }
+    # return(list(dir = tileDir, pal = pal))
   })
 
   observe({
@@ -597,7 +551,8 @@ server <- function(input, output, session) {
   #   )
   # })
 
-  session$onSessionEnded(function() {
-    unlink(addData, recursive = TRUE, force = TRUE)
-  })
+  ## OLD: cleanup temp directory (no longer needed with pre-generated tiles)
+  # session$onSessionEnded(function() {
+  #   unlink(addData, recursive = TRUE, force = TRUE)
+  # })
 }
