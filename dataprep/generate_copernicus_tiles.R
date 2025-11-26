@@ -38,7 +38,7 @@ for(i in 1:nrow(results)){
   
   ## read the tiff file and resample
   ## reprojection happens with save tiff in get data script
-  r <- rast(tif) |> project("EPSG:3031")
+  r <- rast(tif) 
   rresamp <- resample(r, template)
   chkvar <- all(global(rresamp, var, na.rm = TRUE) > 0)
   ## why/what is this checking again??
@@ -56,11 +56,20 @@ for(i in 1:nrow(results)){
     
     ## (1) tiles for each timeperiod
     lapply(1:nlyr(rresamp), function(x) {
-       success <- make_tiles(rresamp[[x]], tiledirs[x])
+      ## make_tiles function will tile the first raster in the stack
+      ## but we pass the whole stack so the palette quantiles are calculated using all the values
+       success <- make_tiles(
+        resampled_raster = rresamp, idx = x,
+        tile_directory = tiledirs[x]
+      )
     })
     ## (2) tiles for differences between time periods
     lapply(1:nlyr(diffs), function(x) {
-       success <- make_tiles(diffs[[x]], tiledirs[x+nlyr(rresamp)], "plasma")
+      success <- make_tiles(
+        resampled_raster = diffs, idx = x,
+        tile_directory = tiledirs[x+nlyr(rresamp)], 
+        usepal = "plasma"
+      )
     })
     
     results$timestamp[i] <- as.character(Sys.time())
