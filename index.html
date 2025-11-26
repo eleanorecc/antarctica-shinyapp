@@ -12,6 +12,7 @@
     <title>WOBEC Dashboard</title>
     <!-- Shiny added header -->
     {{ headContent() }}
+    {{ shinyjs_init }}
 
     <!-- Stylesheet -->
     <link rel="stylesheet" href="style.css">
@@ -143,7 +144,7 @@
                   Search GBIF using scientific name
                 </p>
                 {{ taxonkey_input }}
-                <p class="input-description" style="margin-top: 10px;">Filter years (optional)</p>
+                <p class="input-description" style="margin-top: 10px;">Filter years</p>
                 {{ gbif_years }}
                 <p class="input-label">Model Output</p>
                 <p class="input-description">

@@ -1,6 +1,9 @@
 htmlTemplate(
   filename = here("index.html"),
 
+  ## Enable shinyjs for JavaScript execution
+  shinyjs_init = useShinyjs(),
+
   ## header ----
 
 

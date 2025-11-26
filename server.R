@@ -1,14 +1,9 @@
 server <- function(input, output, session) {
 
-  ## directory for pre-generated distAnt tiles ----
-  addData <- file.path(dirData, "distAnt")
-
-  ## OLD APPROACH (streaming COGs) - commented out to avoid memory issues on shinyapps.io
-  # addData <- tempdir()
-  # dir.create(addData, showWarnings = FALSE)
-
-  ## OLD: track distAnt processing state (no longer needed with pre-generated tiles)
-  # processingDistAnt <- reactiveVal(FALSE)
+  ## add data folder
+  ## for user-uploaded shapefile
+  addData <- tempdir()
+  dir.create(addData, showWarnings = FALSE)
 
   ## map layout and options ----
 
@@ -119,57 +114,25 @@ server <- function(input, output, session) {
   output$map1 <- renderLeaflet({ syncWith(basemap, "maps") })
   output$map2 <- renderLeaflet({ syncWith(basemap, "maps") })
 
-  ## caption based on map layer ----
-  getCaptionData <- function(layer_name) {
-    if (layer_name %in% distcsv$name) {
-      info <- filter(distcsv, name == layer_name)
-      return(list(
-        title = info$name,
-        description = "Data accessed from SCAR DistAnt Ecological Model Output Repository",
-        dataset = "https://source.coop/scar/distant",
-        url = "https://source.coop/scar/distant",
-        reference = info$reference
-      ))
-    }
 
-    for (i in 1:nrow(caption_metadata)) {
-      if (str_detect(layer_name, regex(caption_metadata$layer_pattern[i], ignore_case = TRUE))) {
-        return(list(
-          title = caption_metadata$title[i],
-          description = caption_metadata$description[i],
-          dataset = caption_metadata$dataset_name[i],
-          url = caption_metadata$url[i],
-          reference = ""
-        ))
-      }
-    }
-
-    return(list(title = "Data Layer", description = "", dataset = "", url = "", reference = ""))
-  }
-
-  renderCaption <- function(caption_data) {
-    tags$div(
-      tags$p(class = "caption-title", caption_data$title),
-      tags$p(
-        class = "intro-text",
-        caption_data$description,
-        if (nzchar(caption_data$dataset) && nzchar(caption_data$url)) {
-          tagList(
-            tags$br(),
-            tags$a(href = caption_data$url, target = "_blank", style = "color:#205d9e", caption_data$dataset)
-          )
-        }
-      ),
-      if (nzchar(caption_data$reference)) {
-        tags$p(class = "caption-reference", caption_data$reference)
-      }
-    )
-  }
-
+  ## render the captions
   output$map1cap <- renderUI({
-    if (!is.null(input$taxonKey) && nzchar(input$taxonKey)) {
+    if(!is.null(input$taxonKey) && nzchar(input$taxonKey)) {
+      
+      ## Add species name and year range to GBIF caption title
+      species_name <- str_to_title(input$taxonKey)
+      year_range <- if(!is.null(input$yearRange)) {
+        paste0(input$yearRange[1], "-", input$yearRange[2])
+      } else {
+        ""
+      }
+      title <- if(nzchar(year_range)) {
+        paste0("Species Observations (", species_name, "), ", year_range)
+      } else {
+        paste0("Species Observations (", species_name, ")")
+      }
       renderCaption(list(
-        title = "Species Observations Data",
+        title = title,
         description = "Species observations (basis of record: human and machine observation) collected in the Global Biodiversity Information Facility (GBIF)",
         dataset = "api.gbif.org/v2/map/occurrence/density/{z}/{x}/{y}@1x.png?srs=EPSG:3031",
         url = "https://www.gbif.org/occurrence/search?occurrence_status=present",
@@ -177,26 +140,90 @@ server <- function(input, output, session) {
       ))
     } else {
       req(input$tilesLeft)
-      renderCaption(getCaptionData(input$tilesLeft))
+      caption_data <- getCaptionData(input$tilesLeft)
+
+      ## Check if it's a diff layer and modify title
+      if(str_detect(input$tilesLeft, "diff")) {
+        ## Extract years from filename like "20072015diff"
+        year_match <- str_extract(input$tilesLeft, "(\\d{4})(\\d{4})diff")
+        if(!is.na(year_match)) {
+          year1 <- str_sub(year_match, 1, 4)
+          year2 <- str_sub(year_match, 5, 8)
+          ## Modify title to say "Difference"
+          caption_data$title <- str_replace(caption_data$title, " Data$", " Data Difference")
+          caption_data$title <- paste0(caption_data$title, ", ", year1, "-", year2, " minus 1998-2006")
+        }
+      } else {
+        ## Extract year range from selection name for non-diff layers
+        for(category in allrasters) {
+          year_label <- names(which(category == input$tilesLeft))[1]
+          if(!is.na(year_label)) {
+            year_match <- str_extract(year_label, "\\d{4}-\\d{4}")
+            if(!is.na(year_match)) {
+              caption_data$title <- paste0(caption_data$title, ", ", year_match)
+            }
+            break
+          }
+        }
+      }
+      renderCaption(caption_data)
     }
   })
-
   output$map2cap <- renderUI({
-    if (!is.null(input$tilesDistAnt) && nzchar(input$tilesDistAnt)) {
+    if(!is.null(input$tilesDistAnt) && nzchar(input$tilesDistAnt)) {
       renderCaption(getCaptionData(input$tilesDistAnt))
     } else {
       req(input$tilesRight)
-      renderCaption(getCaptionData(input$tilesRight))
+      caption_data <- getCaptionData(input$tilesRight)
+
+      ## Check if it's a diff layer and modify title
+      if(str_detect(input$tilesLeft, "diff")) {
+        ## Extract years from filename like "20072015diff"
+        year_match <- str_extract(input$tilesLeft, "(\\d{4})(\\d{4})diff")
+        if(!is.na(year_match)) {
+          year1 <- str_sub(year_match, 1, 4)
+          year2 <- str_sub(year_match, 5, 8)
+          ## Modify title to say "Difference"
+          caption_data$title <- str_replace(caption_data$title, " Data$", " Data Difference")
+          caption_data$title <- paste0(caption_data$title, ", ", year1, "-", year2, " minus 1998-2006")
+        }
+      } else {
+        ## Extract year range from selection name for non-diff layers
+        for(category in allrasters) {
+          year_label <- names(which(category == input$tilesRight))[1]
+          if(!is.na(year_label)) {
+            year_match <- str_extract(year_label, "\\d{4}-\\d{4}")
+            if(!is.na(year_match)) {
+              caption_data$title <- paste0(caption_data$title, ", ", year_match)
+            }
+            break
+          }
+        }
+      }
+      renderCaption(caption_data)
     }
   })
 
   ## update left map tiles based on user selection ----
   observeEvent(input$tilesLeft, {
     p1 <- read.csv(file.path(
-      dirData,
-      first(unlist(str_split(input$tilesLeft, "_"))),
-      ifelse(str_detect(input$tilesLeft, "diff"), "diffspalette.csv", "palette.csv")
+      dirData, str_replace_all(input$tilesLeft, "_", "/"),
+      "palette.csv"
     ))
+
+    ## Get unique breaks only (removes duplicates from quantiles with repeated values)
+    unique_breaks <- unique(sort(c(p1$breaks_lower, p1$breaks_upper)))
+
+    ## Reduce to max 20 bins for legend display
+    max_bins <- 20
+    if(length(unique_breaks) > max_bins) {
+      ## Select evenly-spaced subset of breaks
+      indices <- round(seq(1, length(unique_breaks), length.out = max_bins))
+      legend_breaks <- unique_breaks[indices]
+    } else {
+      legend_breaks <- unique_breaks
+    }
+
     leafletProxy("map1") |>
       clearGroup("spp") |>
       clearGroup("map1tiles") |>
@@ -218,14 +245,19 @@ server <- function(input, output, session) {
       clearControls() |>
       addLegend(
         position = "bottomright",
-        title = str_replace(input$tilesLeft, "_", "<br>"),
-        pal = colorNumeric(palette = p1$col, domain = p1$breaks),
-        labFormat = labelFormat(
-          transform = function(x) sort(x)
+        title = NULL,
+        pal = colorBin(
+          palette = p1$col,
+          domain = range(unique_breaks),
+          bins = legend_breaks,
+          pretty = FALSE
         ),
-        values = p1$breaks,
+        values = legend_breaks,
         opacity = 1
       )
+    
+    ## remove has-tiles class if no GBIF tiles are displayed
+    runjs("$('#tilesLeft').siblings('.selectize-control').removeClass('has-tiles');")
   }, ignoreNULL = TRUE)
 
   ## add GBIF occurrence tiles ----
@@ -234,12 +266,14 @@ server <- function(input, output, session) {
   year_delayed <- debounce(reactive(input$yearRange), 1000)
 
   observeEvent(c(taxon_delayed(), year_delayed()), {
+    ## req stops execution if value is null or empty
+    ## avoids api calls with invalid or empty search terms
     req(taxon_delayed())
 
+    ## need to find taxon key given the species name
     nm <- taxon_delayed() |>
       str_to_title() |>
       URLencode()
-
     res <- paste0("https://api.gbif.org/v1/species/match?name=", nm) |>
       request() |>
       req_headers(user_agent = "DataSummaryWOBEC/1.0") |>
@@ -253,13 +287,12 @@ server <- function(input, output, session) {
     }
 
     if(!is.null(key)){
-      ## Build URL with year range filter
       yr <- year_delayed()
       speciesOccurance <- paste(
         "https://api.gbif.org/v2/map/occurrence/density/{z}/{x}/{y}@1x.png?srs=EPSG%3A3031",
         paste0("taxonKey=", key),
         paste0("basisOfRecord=", c("HUMAN_OBSERVATION", "MACHINE_OBSERVATION"), collapse = "&"),
-        paste0("years=", yr[1], ",", yr[2]),
+        paste0("year=", yr[1], ",", yr[2]),
         "style=purpleYellow.point",
         sep = "&"
       )
@@ -274,15 +307,32 @@ server <- function(input, output, session) {
           urlTemplate = speciesOccurance,
           options = spp_options
         )
+
+      ## add has-tiles to make selectize controls semi-transparent
+      runjs("$('#tilesLeft').siblings('.selectize-control').addClass('has-tiles');")
     }
   })
+
   ## update right map tiles based on user selection ----
   observeEvent(input$tilesRight, {
     p2 <- read.csv(file.path(
-      dirData,
-      first(unlist(str_split(input$tilesRight, "_"))),
-      ifelse(str_detect(input$tilesRight, "diff"),"diffspalette.csv","palette.csv")
+      dirData, str_replace_all(input$tilesRight, "_", "/"),
+      "palette.csv"
     ))
+
+    ## Get unique breaks only (removes duplicates from quantiles with repeated values)
+    unique_breaks <- unique(sort(c(p2$breaks_lower, p2$breaks_upper)))
+
+    ## Reduce to max 20 bins for legend display
+    max_bins <- 20
+    if(length(unique_breaks) > max_bins) {
+      ## Select evenly-spaced subset of breaks
+      indices <- round(seq(1, length(unique_breaks), length.out = max_bins))
+      legend_breaks <- unique_breaks[indices]
+    } else {
+      legend_breaks <- unique_breaks
+    }
+
     leafletProxy("map2") |>
       clearGroup("map2tiles") |>
       addTiles(
@@ -303,48 +353,27 @@ server <- function(input, output, session) {
       clearControls() |>
       addLegend(
         position = "bottomright",
-        title = str_replace(input$tilesRight, "_", "<br>"),
-        pal = colorNumeric(palette = p2$col, domain = p2$breaks),
-        values = p2$breaks,
+        title = NULL,
+        pal = colorBin(
+          palette = p2$col,
+          domain = range(unique_breaks),
+          bins = legend_breaks,
+          pretty = FALSE
+        ),
+        values = legend_breaks,
         opacity = 1
       )
+    
+    ## remove transparency when switching back to Copernicus tiles
+    runjs("$('#tilesRight').siblings('.selectize-control').removeClass('has-tiles');")
   })
-
-  ## OLD: distAnt progress indicator (no longer needed with pre-generated tiles)
-  # output$distAntProgress <- renderUI({
-  #   if(processingDistAnt()) {
-  #     tags$div(
-  #       style = "margin-top: 8px;",
-  #       tags$div(
-  #         class = "progress-bar-container",
-  #         tags$div(class = "progress-bar-fill")
-  #       ),
-  #       tags$p(
-  #         style = "font-size: 10px; color: rgba(200, 210, 225, 0.9); margin-top: 4px;",
-  #         "Processing layer... this may take a moment"
-  #       )
-  #     )
-  #   }
-  # })
-
-  ## OLD: set progress state when input changes (no longer needed with pre-generated tiles)
-  # observeEvent(input$tilesDistAnt, {
-  #   req(input$tilesDistAnt)
-  #   info <- filter(distcsv, name == input$tilesDistAnt)
-  #   tileDir <- file.path(addData, info$dir)
-  #   if(!file.exists(file.path(tileDir, "palette.csv"))) {
-  #     processingDistAnt(TRUE)
-  #   } else {
-  #     processingDistAnt(FALSE)
-  #   }
-  # }, priority = 10)
 
   ## update map with distAnt data ----
   distAnt <- reactive({
     req(input$tilesDistAnt)
 
-    info <- filter(distcsv, name == input$tilesDistAnt)
-    tileDir <- file.path(addData, info$dir)
+    info <- filter(distant_data, name == input$tilesDistAnt)
+    tileDir <- file.path(dirData, "distAnt", info$dir)
 
     ## Read pre-generated palette
     pal <- read.csv(file.path(tileDir, "palette.csv"))
@@ -353,50 +382,10 @@ server <- function(input, output, session) {
       dir = tileDir,
       pal = pal
     ))
-
-    ## OLD APPROACH (streaming COGs on-the-fly) - causes OOM on shinyapps.io
-    ## Kept for reference - use dataprep/generate_distant_tiles.R to pre-generate instead
-    # if(file.exists(file.path(tileDir, "palette.csv"))){
-    #   pal <- read.csv(file.path(tileDir, "palette.csv"))
-    # } else {
-    #   dir.create(tileDir, recursive = TRUE, showWarnings = FALSE)
-    #   r <- curl_fetch_memory(info$url)
-    #   if(r$status_code == 200){
-    #     vsi_url <- paste0("/vsicurl/", info$url)
-    #     x <- 12367396.2185
-    #     template <- rast(ext(c(-x,x,-x,x)), nrow = 8192, ncol = 8192, crs = crs("EPSG:3031"))
-    #     rresamp <- project(rast(vsi_url, lyrs = info$lyrnum), "EPSG:4326") |>
-    #       crop(ext(c(-180, 180, -90, -50))) |>
-    #       project("EPSG:3031") |>
-    #       resample(template)
-    #     qt <- global(rresamp, quantile, probs = seq(0, 1, length.out = 257), na.rm = TRUE)
-    #     breaks <- unlist(qt)
-    #     rcm <- matrix(c(breaks[1:256], breaks[2:257], 0:255), ncol = 3)
-    #     rint <- classify(rresamp, rcm, include.lowest = TRUE, right = FALSE)
-    #     cols <- data.frame(value = 0:255, col = hcl.colors(256, "viridis"))
-    #     coltab(rint) <- cols
-    #     writeRaster(rint, file.path(tileDir, "rint.tif"), datatype = "INT1U", overwrite = TRUE)
-    #     pal <- data.frame(
-    #       breaks_lower = breaks[1:256],
-    #       breaks_upper = breaks[2:257],
-    #       value = 0:255,
-    #       col = cols$col
-    #     )
-    #     write.csv(pal, file.path(tileDir, "palette.csv"), row.names = FALSE)
-    #     system(paste("gdal_translate -of vrt -expand rgba", file.path(tileDir, "rint.tif"), file.path(tileDir, "rint.vrt")))
-    #     gdal2tiles <- import("osgeo_utils.gdal2tiles")
-    #     gdal2tiles$main(list('gdal2tiles.py', '-p', 'raster', '-z', '3-4', '-x', '--tmscompatible', file.path(tileDir, "rint.vrt"), tileDir))
-    #   }
-    #   pal <- read.csv(file.path(tileDir, "palette.csv"))
-    # }
-    # return(list(dir = tileDir, pal = pal))
   })
 
   observe({
-    message("adding distAnt tiles to map...")
     x <- distAnt()
-
-    message(sprintf("filepath %s exists: %s", x$dir, file.exists(x$dir)))
     addResourcePath("distAntTiles", x$dir)
 
     ## Get unique breaks only (removes duplicates from quantiles with repeated values)
@@ -430,7 +419,7 @@ server <- function(input, output, session) {
       clearControls() |>
       addLegend(
         position = "bottomright",
-        title = "DistAnt<br>Model",
+        title = NULL,
         pal = colorBin(
           palette = x$pal$col,
           domain = range(unique_breaks),
@@ -441,8 +430,8 @@ server <- function(input, output, session) {
         opacity = 1
       )
 
-    ## Tiles successfully added, hide progress indicator
-    processingDistAnt(FALSE)
+    ## has-tiles class to make selectize controls semi-transparent
+    runjs("$('#tilesRight').siblings('.selectize-control').addClass('has-tiles');")
   })
 
   ## handling user-uploaded data ----
@@ -509,8 +498,6 @@ server <- function(input, output, session) {
     }
   })
 
-
-
   ## time series plots ----
   # output$timeseries <- renderPlot({
   #   plotvars <- c(input$tilesLeft, input$tilesRight) |>
@@ -551,8 +538,7 @@ server <- function(input, output, session) {
   #   )
   # })
 
-  ## OLD: cleanup temp directory (no longer needed with pre-generated tiles)
-  # session$onSessionEnded(function() {
-  #   unlink(addData, recursive = TRUE, force = TRUE)
-  # })
+  session$onSessionEnded(function() {
+    unlink(addData, recursive = TRUE, force = TRUE)
+  })
 }

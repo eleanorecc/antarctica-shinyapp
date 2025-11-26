@@ -40,7 +40,10 @@ for(i in 1:nrow(distant_data)) {
       project("EPSG:3031") |>
       resample(template)
 
-    success <- make_tiles(rresamp, tiledir)
+    success <- make_tiles(
+      resampled_raster = rresamp, 
+      tile_directory = tiledir
+    )
     results$success[i] <- success
     results$timestamp[i] <- as.character(Sys.time())
 

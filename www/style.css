@@ -145,9 +145,13 @@ header {
 }
 
 .overlay,
-.overlay a,
 .mainmenu-area a {
     color: #ffffff;
+}
+
+/* Leaflet attribution links - darker grey to match OSM/GBIF attributions */
+.overlay a {
+    color: #666666;
 }
 
 .mainmenu-area .logo {
@@ -551,6 +555,16 @@ header {
   overflow-y: auto;
 }
 
+/* Style optgroup headers with blue to contrast with options */
+.selectize-dropdown-content .optgroup-header {
+  background-color: var(--secondary-blue);
+  color: #ffffff;
+  font-weight: 600;
+  padding: 8px 12px;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
 /* Map layer dropdown positioning */
 #map1ui .shiny-input-container,
 #map2ui .shiny-input-container {
@@ -593,6 +607,19 @@ header {
 #map2ui .selectize-dropdown {
   z-index: 1001;
 }
+
+/* Make selectize controls semi-transparent when tiles are displayed */
+.mapbox1 .selectize-control.has-tiles,
+.mapbox2 .selectize-control.has-tiles {
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.mapbox1 .selectize-control.has-tiles:hover,
+.mapbox2 .selectize-control.has-tiles:hover {
+   opacity: 1;
+}
+
 
 /* Ensure leaflet containers don't clip dropdowns */
 #map1ui .leaflet-container,
