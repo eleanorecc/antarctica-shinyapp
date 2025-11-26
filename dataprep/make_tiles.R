@@ -1,4 +1,4 @@
-make_tiles <- function(resampled_raster, tile_directory) {
+make_tiles <- function(resampled_raster, tile_directory, usepal = "viridis") {
   tryCatch({
     ## calculate the quantiles and breaks
     qt <- global(resampled_raster, quantile, probs = seq(0, 1, length.out = 257), na.rm = TRUE)
@@ -27,7 +27,7 @@ make_tiles <- function(resampled_raster, tile_directory) {
     )
     write.csv(
       pal, 
-      file.path(tile_directory, "palette.csv"), 
+      file.path(tile_directory, ifelse(usepal == "viridis", "palette.csv", "diffspalette.csv")), 
       row.names = FALSE
     )
 
