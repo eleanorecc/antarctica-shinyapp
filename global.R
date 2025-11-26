@@ -32,7 +32,8 @@ ts_data <- read.csv(file.path(dirData, "tsdata.csv"))
 distant_data <-  read.csv(file.path(dirData, "distant.csv"))
 
 ## for selectizeInput for tiles
-distrasters <- setNames(distant_data$name, distant_data$name)
+# distrasters <- setNames(distant_data$name, distant_data$name)
+distrasters <- as.list(pull(distant_data, name))
 
 ## python configuration ----
 ## local: use pyenv virtualenv (for Positron GUI)

@@ -369,38 +369,169 @@ server <- function(input, output, session) {
   })
 
   ## update map with distAnt data ----
+  # distAnt <- reactive({
+  #   req(input$tilesDistAnt)
+
+  #   info <- filter(distant_data, name == input$tilesDistAnt)
+  #   tileDir <- file.path(dirData, "distAnt", info$dir)
+
+  #   ## Read pre-generated palette
+  #   pal <- read.csv(file.path(tileDir, "palette.csv"))
+
+  #   return(list(
+  #     dir = tileDir,
+  #     pal = pal
+  #   ))
+  # })
+  
+  # observe({
+  #   x <- distAnt()
+  #   addResourcePath("distAntTiles", x$dir)
+
+  #   ## Get unique breaks only (removes duplicates from quantiles with repeated values)
+  #   unique_breaks <- unique(sort(c(x$pal$breaks_lower, x$pal$breaks_upper)))
+
+  #   ## Reduce to max 20 bins for legend display
+  #   max_bins <- 20
+  #   if(length(unique_breaks) > max_bins) {
+  #     ## Select evenly-spaced subset of breaks
+  #     indices <- round(seq(1, length(unique_breaks), length.out = max_bins))
+  #     legend_breaks <- unique_breaks[indices]
+  #   } else {
+  #     legend_breaks <- unique_breaks
+  #   }
+
+  #   leafletProxy("map2") |>
+  #     clearGroup("map2tiles") |>
+  #     addTiles(
+  #       group = "map2tiles",
+  #       urlTemplate = "distAntTiles/{z}/{x}/{-y}.png",
+  #       # urlTemplate = sprintf("%s/{z}/{x}/{-y}.png", x$dir),
+  #       options = tileOptions(
+  #         tileSize = 256,
+  #         noWrap = TRUE,
+  #         opacity = 0.8,
+  #         tms = TRUE,
+  #         continuousWorld = TRUE,
+  #         pane = "customtiles"
+  #       )
+  #     ) |>
+  #     clearControls() |>
+  #     addLegend(
+  #       position = "bottomright",
+  #       title = NULL,
+  #       pal = colorBin(
+  #         palette = x$pal$col,
+  #         domain = range(unique_breaks),
+  #         bins = legend_breaks,
+  #         pretty = FALSE
+  #       ),
+  #       values = legend_breaks,
+  #       opacity = 1
+  #     )
+
+  #   ## has-tiles class to make selectize controls semi-transparent
+  #   runjs("$('#tilesRight').siblings('.selectize-control').addClass('has-tiles');")
+  # })
+  ## update map with distAnt data ----
   distAnt <- reactive({
     req(input$tilesDistAnt)
-
+ 
     info <- filter(distant_data, name == input$tilesDistAnt)
-    tileDir <- file.path(dirData, "distAnt", info$dir)
-
-    ## Read pre-generated palette
-    pal <- read.csv(file.path(tileDir, "palette.csv"))
-
+ 
+    tileDir <- file.path(addData, info$dir)
+    # if(!file.exists(tileDir)){
+      dir.create(tileDir, recursive = TRUE, showWarnings = FALSE)
+ 
+      r <- curl_fetch_memory(info$url)
+      if(r$status_code == 200){
+        ## download the raster
+        message("Getting data to make map tiles...")
+        tmptif <- file.path(tileDir, "rast0.tif")
+        download.file(info$url, destfile = tmptif)
+ 
+        ## template matching leaflet map tiles/extent
+        x <- 12367396.2185
+        template <- rast(ext(c(-x,x,-x,x)), nrow = 8192, ncol = 8192, crs = crs("EPSG:3031"))
+ 
+        ## project to sterographic south after cropping
+        ## then resample to template
+        message("reprojecting and cropping data...")
+        rresamp <- project(rast(tmptif, lyrs = info$lyrnum), "EPSG:4326") |>
+          crop(ext(c(-180, 180, -90, -50))) |>
+          project("EPSG:3031") |>
+          resample(template)
+ 
+        message("creating color palette...")
+        pal <- data.frame(value = 0:255, col = hcl.colors(256, "viridis"))
+ 
+        # message("trying to extract values")
+        # v <- values(rresamp)
+        # message("values extracted for palette")
+ 
+        # q <- quantile(v, probs = seq(0, 1, length.out = 256), na.rm = TRUE)
+        qt <- global(rresamp, quantile, probs = seq(0, 1, length.out = 256), na.rm = TRUE)
+          # mutate(name = as.numeric(substr(name, 2, 7)))
+        message("quantiles extracted for palette")
+ 
+       data.frame(breaks = unlist(c(qt))) |>
+          # global(rresamp, quantile, probs = seq(0, 1, length.out = 256), na.rm = TRUE) |>
+          # data.frame() |>
+          cbind(pal) |>
+          # setNames(c("breaks","value","col"))
+        # values(rresamp) |>
+        #   quantile(probs = seq(0, 1, length.out = 256), na.rm = TRUE) |>
+        #   data.frame() |>
+        #   cbind(pal) |>
+        #   setNames(c("breaks","value","col")) |>
+          write.csv(
+            file.path(tileDir, "palette.csv"),
+            row.names = FALSE
+          )
+ 
+        message("making int1u raster...")
+        rint <- rresamp |>
+          stretch(minq = 0.02, maxq = 0.98, minv = 0, maxv = 255) |>
+          as.int(datatype = "INT1U")
+        message("assign palette to int1u raster")
+        coltab(rint) <- pal
+ 
+        message("starting tiles...")
+        writeRaster(
+          rint, file.path(tileDir, "rint.tif"),
+          datatype = "INT1U",
+          overwrite = TRUE
+        )
+ 
+        message("making .vrt file")
+        system(paste(
+          "gdal_translate -of vrt -expand rgba",
+          file.path(tileDir, "rint.tif"),
+          file.path(tileDir, "rint.vrt")
+        ))
+        message("tile-izing...")
+        system(paste(
+          "gdal2tiles.py -p raster -z 2-4 -x -tmscompatible",
+          file.path(tileDir, "rint.vrt"),
+          tileDir
+        ))
+        message("tiles complete. \n\n")
+      }
+    # }
+    pal2 <- read.csv(file.path(tileDir, "palette.csv"))
     return(list(
       dir = tileDir,
-      pal = pal
+      pal = pal2
     ))
   })
-
+ 
   observe({
+    message("adding distAnt tiles to map...")
     x <- distAnt()
+ 
+    message(sprintf("filepath %s exists: %s", x$dir, file.exists(x$dir)))
     addResourcePath("distAntTiles", x$dir)
-
-    ## Get unique breaks only (removes duplicates from quantiles with repeated values)
-    unique_breaks <- unique(sort(c(x$pal$breaks_lower, x$pal$breaks_upper)))
-
-    ## Reduce to max 20 bins for legend display
-    max_bins <- 20
-    if(length(unique_breaks) > max_bins) {
-      ## Select evenly-spaced subset of breaks
-      indices <- round(seq(1, length(unique_breaks), length.out = max_bins))
-      legend_breaks <- unique_breaks[indices]
-    } else {
-      legend_breaks <- unique_breaks
-    }
-
+ 
     leafletProxy("map2") |>
       clearGroup("map2tiles") |>
       addTiles(
@@ -419,17 +550,14 @@ server <- function(input, output, session) {
       clearControls() |>
       addLegend(
         position = "bottomright",
-        title = NULL,
-        pal = colorBin(
-          palette = x$pal$col,
-          domain = range(unique_breaks),
-          bins = legend_breaks,
-          pretty = FALSE
+        title = "DistAnt<br>Model",
+        pal = colorNumeric(palette = x$pal$col, domain = x$pal$breaks),
+        labFormat = labelFormat(
+          transform = function(x) sort(x)
         ),
-        values = legend_breaks,
+        values = x$pal$breaks,
         opacity = 1
       )
-
     ## has-tiles class to make selectize controls semi-transparent
     runjs("$('#tilesRight').siblings('.selectize-control').addClass('has-tiles');")
   })
