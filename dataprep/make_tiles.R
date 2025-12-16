@@ -1,4 +1,4 @@
-make_tiles <- function(resampled_raster, idx = 1, tile_directory, usepal = "viridis") {
+make_tiles <- function(resampled_raster, idx = 1, tile_directory, usepal = "viridis", tms = "") {
   tryCatch({
     ## calculate the quantiles and breaks
     breaks <- quantile(
@@ -42,6 +42,7 @@ make_tiles <- function(resampled_raster, idx = 1, tile_directory, usepal = "viri
     ))
     system(paste(
       "gdal2tiles.py -p raster -z 2-4 -x -w none --processes=4",
+      tms,
       file.path(tile_directory, "rint.vrt"),
       tile_directory
     ))

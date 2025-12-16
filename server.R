@@ -592,7 +592,7 @@ server <- function(input, output, session) {
   })
 
   ## increase upload limit to 30MB (from default of 5) in options
-  options(shiny.maxRequestSize = 30*1024^2)
+  options(shiny.maxRequestSize = 80*1024^2)
 
   ## update when user uploads shapefile
   observe({

@@ -42,7 +42,8 @@ for(i in 1:nrow(distant_data)) {
 
     success <- make_tiles(
       resampled_raster = rresamp, 
-      tile_directory = tiledir
+      tile_directory = tiledir,
+      tms = "-tmscompatible"
     )
     results$success[i] <- success
     results$timestamp[i] <- as.character(Sys.time())
