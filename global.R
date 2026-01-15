@@ -19,6 +19,10 @@ library(ncdf4)
 library(r2d3)
 library(ggplot2)
 
+## if get errors with renv, can try installation with binaries
+## and update renv to version installed before re-trying restore
+# renv::record("geometries@0.2.5")
+# renv::restore()
 
 ## directories and files ----
 dirData <- here("www")
@@ -28,7 +32,8 @@ if(length(list.files(dirData)) == 0){
     check that the drive is mounted \n"
   )
 }
-ts_data <- read.csv(file.path(dirData, "tsdata.csv"))
+ts_csv <- file.path(dirData, "tsdata.csv")
+if(file.exists(ts_csv)){ ts_data <- read.csv(ts_csv)}
 distant_data <-  read.csv(file.path(dirData, "distAnt.csv"))
 
 ## for selectizeInput for tiles
@@ -36,19 +41,39 @@ distant_data <-  read.csv(file.path(dirData, "distAnt.csv"))
 distrasters <- as.list(pull(distant_data, name))
 
 ## python configuration ----
-## local: use pyenv virtualenv (for Positron GUI)
-## shinyapps.io: auto-detects system Python
+## check python installation with gdal
+## to use gdal2tiles function via reticulate
+## note shinyapps.io auto-detects system Python
 if(Sys.getenv("SHINY_PORT") == ""){
-  pyenv_root <- Sys.getenv("PYENV_ROOT", file.path(Sys.getenv("HOME"), ".pyenv"))
-  pyenv_python <- file.path(pyenv_root, "versions/antarctica-shinyapp/bin/python")
-
-  if(file.exists(pyenv_python)){
-    use_python(pyenv_python, required = TRUE)
-  } else {
-    stop(paste(
-      "Python virtualenv not found at: ", pyenv_python, "\n",
-      "Run: pyenv virtualenv 3.11.0 antarctica-shinyapp"
-    ))
+  python_candidates <- c(
+    ## first try pyenv virtualenv
+    ## pyenv virtualenv 3.11.0 antarctica-shinyapp
+    file.path(
+      Sys.getenv("PYENV_ROOT", file.path(Sys.getenv("HOME"), ".pyenv")),
+      "versions/antarctica-shinyapp/bin/python"
+    ),
+    ## next try homebrew
+    "/opt/homebrew/bin/python3",
+    "/usr/local/bin/python3",
+    ## lastly try system python
+    Sys.which("python3"),
+    Sys.which("python")
+  )
+  valid_python <- NULL
+  for(py_path in python_candidates){
+    if(nzchar(py_path) && file.exists(py_path)){
+      ## test python with gdal
+      tryCatch({
+        use_python(py_path, required = FALSE)
+        py_run_string("from osgeo import gdal")
+        valid_python <- py_path
+        message("Using Python: ", py_path)
+        break
+      }, error = function(e) NULL)
+    }
+  }
+  if(!is.null(valid_python)) {
+    use_python(valid_python, required = TRUE)
   }
 }
 

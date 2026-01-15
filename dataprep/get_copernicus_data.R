@@ -1,10 +1,12 @@
 ## Download and process Copernicus Marine Service data
 
+## first will need copernicusmarine
+# reticulate::py_install("copernicusmarine")
 
 ## set login for copernicus
 ## don't save in script!
 cmt <- import("copernicusmarine")
-cmt$login(user, pass)
+cmt$login(copernicus_login_user, copernicus_login_pass)
 
 ## load make_timeseries function and create timeseries table
 source(here("dataprep/make_timeseries.R"))
@@ -16,6 +18,9 @@ polygons <- filter(asd, str_detect(GAR_Name, "48|58.6|58.7|58.4.4"))
 ## helper functions using arrays for aggregations
 ## annual summaries, timeperiod averages, extents, and save tiffs
 annual_summaries <- function(ncFile, ncvarname, months) {
+
+  ## would need to have checked the ncvarname, and 
+  ## downloaded one netcdf file to check about the time dimension...
 
   ## get the data and time variable from the netcdf file
   nc_data <- nc_open(ncFile)
@@ -31,6 +36,7 @@ annual_summaries <- function(ncFile, ncvarname, months) {
     origin <- as.POSIXct("1970-01-01", tz = "UTC")
     datayears <- format(as.POSIXct(xtime, origin = origin, tz = "UTC"), "%Y")
   }
+  ## why is this not consistent across copernicus datasets??
   if(ncvarname == "sos"){
     datayears <- c(xtime/24) |>
       as.Date(origin = "1950-01-01") |>
@@ -73,8 +79,8 @@ timeperiod_averages <- function(y) {
   ))
 }
 
-extents <- function(x, cutoff, spatialweights) {
-  ## make a binary raster to apply this aggregation
+ice_summary <- function(x, cutoff, spatialweights) {
+  ## make a binary raster to apply aggregation
   x[x < cutoff] <- NA
   x[x >= cutoff] <- 1
 
@@ -92,7 +98,7 @@ extents <- function(x, cutoff, spatialweights) {
   return(list(
     extent = x[,,i],
     sum = rowSums(x, na.rm = TRUE, dims = 2),
-    df = data.frame(index = i, coveragearea = totalarea[i])
+    df = data.frame(index = i, coverage_area = totalarea[i])
   ))
 }
 
@@ -180,13 +186,13 @@ get_monthly_data <- function(saveDir, vars, downloads) {
 
 ## seaice data is extracted one year at a time because it is daily rather than monthly
 ## thus much larger, and it needs special processing to get sea ice minextent and total ice-days
-get_seaice <- function(saveDir, vars, downloads){
+get_seaice_data <- function(saveDir, vars, downloads) {
   
   ## setup year ranges that we will loop over
   yrs <- substr(c(params$start_datetime, params$end_datetime), 1, 4)
   yrs <- yrs[1]:yrs[2]
   ystart <- as.Date(paste0(yrs, "-01-01"))
-  df <- data.frame(year = numeric(), index = numeric(), coveragearea = numeric())
+  df <- data.frame(year = numeric(), index = numeric(), coverage_area = numeric())
 
   ## download first year to initialize arrays and calculate spatial weights
   ## daily data is ~365 timesteps per year, too large to download all at once
@@ -219,7 +225,7 @@ get_seaice <- function(saveDir, vars, downloads){
   ## calculate ice extent (minimum across year) and ice days (sum across year)
   ## using 15% concentration as threshold for "ice covered"
   useCutoff <- 0.15
-  tmp <- extents(nctmp, cutoff = useCutoff, spatialweights)
+  tmp <- ice_summary(nctmp, cutoff = useCutoff, spatialweights)
   df <- rbind(df, cbind(year = yrs[1], tmp$df))
   extents[,,1] <- tmp$extent
   sums[,,1] <- tmp$sum
@@ -373,7 +379,7 @@ params_ice_myint <- dataparams(
 params_ice_my$datasetID <- "cmems_mod_glo_phy_my_0.083deg_P1D-m"
 params_ice_myint$datasetID <- "cmems_mod_glo_phy_myint_0.083deg_P1D-m"
 
-get_seaice(
+get_seaice_data(
   file.path(dirData, "seaiceDays"),
   vars = list("siconc"),
   downloads = list(
