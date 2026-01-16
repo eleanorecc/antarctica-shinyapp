@@ -267,8 +267,8 @@ get_seaice_data <- function(saveDir, vars, downloads, cutoff, polygons) {
   yrsums <- array(do.call(c, yrsums), dim = c(dim2, nyears))
   prd <- timeperiod_averages(yrsums)
 
-  save_tiff(prd$averages, r, file.path(saveDir, "timeperiod_icedays_all_months.tif"))
-  save_tiff(prd$variability, r, file.path(saveDir, "timeperiod_icedays_all_months_var.tif"))
+  save_tiff(prd$averages, r, file.path(saveDir, "timeperiod_all_months_icedays.tif"))
+  save_tiff(prd$variability, r, file.path(saveDir, "timeperiod_all_months_icedays_var.tif"))
 
   ## spatial weights used to average across raster pixels with differing areas
   spatialweights <- rast(ext(r), resolution = res(r), crs = crs(r)) |>
@@ -324,7 +324,8 @@ get_monthly_data(
   downloads = list(
     list(params = params_sos_my, nm = "salinity_my.nc"),
     list(params = params_sos_nrt, nm = "salinity_nrt.nc")
-  )
+  ),
+  polygons
 )
 
 ## date range is based on where all 3 variables have data
@@ -340,35 +341,27 @@ params_chla$datasetID <- "c3s_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1M"
 get_monthly_data(
   file.path(dirData, "chlorophyllA"),
   vars = list("CHL"),
-  downloads = list(list(params = params_chla, nm = "chlorophyll.nc"))
+  downloads = list(list(params = params_chla, nm = "chlorophyll.nc")),
+  polygons
 )
 
-
-## seaice is also split into 2 datasets
+## seaice
 params_ice_my <- dataparams(
   ## daterange for 'my' dataset
-  c("1998-01-01", "2021-12-31"), 
-  c(latmin, latmax),
-  c(lonmin, lonmax),
-  c(0.5, 10)
-)
-params_ice_myint <- dataparams(
-  ## daterange for 'myint' dataset
-  c("2022-01-01", "2024-12-31"), 
+  ## now includes through 2024 december
+  c("1998-01-01", "2024-12-31"), 
   c(latmin, latmax),
   c(lonmin, lonmax),
   c(0.5, 10)
 )
 params_ice_my$datasetID <- "cmems_mod_glo_phy_my_0.083deg_P1D-m"
-params_ice_myint$datasetID <- "cmems_mod_glo_phy_myint_0.083deg_P1D-m"
 
 get_seaice_data(
   file.path(dirData, "seaiceDays"),
   vars = list("siconc"),
-  downloads = list(
-    list(params = params_ice_my, nm = "seaice_cover_fraction_my.nc"),
-    list(params = params_ice_myint, nm = "seaice_cover_fraction_myint.nc")
-  )
+  downloads = list(list(params = params_ice_my, nm = "seaice_cover_fraction_my.nc")),
+  cutoff = 0.15,
+  polygons
 )
 
 ## merge timeseries tables

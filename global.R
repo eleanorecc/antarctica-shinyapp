@@ -183,13 +183,13 @@ resolutions <- 2*extent/256/2^zooms
 dims <- rep(256*2^5, 2)
 
 allrasters <- list(
-  # `Sea Ice Days` = list(
-  #   `1998-2006` = "seaiceDays_19982006",
-  #   `2007-2015` = "seaiceDays_20072015",
-  #   `2016-2024` = "seaiceDays_20162024",
-  #   `2007-2015 minus 1998-2006` = "seaiceDays_20072015diff",
-  #   `2016-2024 minus 1998-2006` = "seaiceDays_20162024diff"
-  # ),
+  `Days with >15% Sea Ice Cover` = list(
+    `1998-2006` = "seaiceDays_all_19982006",
+    `2007-2015` = "seaiceDays_all_20072015",
+    `2016-2024` = "seaiceDays_all_20162024",
+    `2007-2015 minus 1998-2006` = "seaiceDays_all_20072015diff",
+    `2016-2024 minus 1998-2006` = "seaiceDays_all_20162024diff"
+  ),
   `Chlorophyll A` = list(
     `1998-2006` = "chlorophyllA_all_19982006",
     `2007-2015` = "chlorophyllA_all_20072015",
