@@ -13,6 +13,7 @@ library(curl)
 library(httr2)
 library(jsonlite)
 library(reticulate)
+library(lubridate)
 library(sf)
 library(terra)
 library(ncdf4)
@@ -32,7 +33,7 @@ if(length(list.files(dirData)) == 0){
     check that the drive is mounted \n"
   )
 }
-ts_csv <- file.path(dirData, "tsdata.csv")
+ts_csv <- file.path(dirData, "tsData.csv")
 if(file.exists(ts_csv)){ ts_data <- read.csv(ts_csv)}
 distant_data <-  read.csv(file.path(dirData, "distAnt.csv"))
 

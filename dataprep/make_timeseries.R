@@ -1,4 +1,4 @@
-make_timeseries <- function(y, polygons, spatialweights, outfile){
+make_timeseries <- function(y, polygons, spatialweights, outfile) {
 
   ## rasterize the polygons and make an array with ids 
   ## this will be used to mask and calculate zonal stats on the arrays
@@ -48,52 +48,64 @@ make_timeseries <- function(y, polygons, spatialweights, outfile){
     )
   }))
   write.csv(tstab, outfile, row.names = FALSE)
-  return(tstab)
+  return(TRUE)
 }
 
-merge_timeseries <- function(dirData){
-  chla <- bind_rows(
-    read.csv(file.path(dirData, "chlorophyllA", "timeperiod_all_months_chla.csv")) |>
-      mutate(plot_with = "chlorophyllA") |>
-      cbind(year = 1998:2024),
-    read.csv(file.path(dirData, "chlorophyllA", "timeperiod_summer_months_chla.csv")) |>
-      mutate(plot_with = "chlorophyllA_Summer") |>
-      cbind(year = 1998:2024),
-    read.csv(file.path(dirData, "chlorophyllA", "timeperiod_winter_months_chla.csv")) |>
-      mutate(plot_with = "chlorophyllA_Winter") |>
-      cbind(year = 1998:2024)) |>
-    mutate(yaxislabel = "Chlorophyll-a (mg m^-3)")
+read_tstabs <- function(dir, file, name) {
+  here("www", dir, file) |> 
+    read.csv() |> 
+    mutate(year = 1997 + year) |> 
+    mutate(plot_with = name)
+}
 
-  salinity <- bind_rows(
-    read.csv(file.path(dirData, "surfaceSalinity", "timeperiod_all_months_salinity.csv")) |>
-      mutate(plot_with = "surfaceSalinity") |>
-      cbind(year = 1998:2024),
-    read.csv(file.path(dirData, "surfaceSalinity", "timeperiod_summer_months_salinity.csv")) |>
-      mutate(plot_with = "surfaceSalinity_Summer") |>
-      cbind(year = 1998:2024)) |>
-    mutate(yaxislabel = "Salinity (PSU)")
-
-  icedays <- read.csv(file.path(dirData, "seaiceDays", "seaice_icedays.csv")) |>
-    mutate(plot_with = "seaiceDays") |>
-    mutate(yaxislabel = "Number of Days with Ice-Cover > 15%, Area Average") |>
-    cbind(year = 1998:2024)
-
-  iceext <- read.csv(file.path(dirData, "seaiceMinExtent", "seaice_coverage_minext.csv")) |>
-    mutate(coveragearea = coveragearea/1e6) |>
-    pivot_longer(cols = c(index, coveragearea), values_to = "yrwgtmean") |>
-    mutate(plot_with = "seaiceMinExtent") |>
-    mutate(yaxislabel = ifelse(
-      name == "coveragearea",
-      "Area of Minimum Ice Extent (million km^2)",
-      "Day of the Year with Minimum Ice Extent"
-    ))
-
-  tsdata <- bind_rows(chla, salinity, icedays, iceext) |>
-    select(plot_with, year, yvariable = yrwgtmean, yaxislabel)
-
-  write.csv(tsdata, file.path(dirData, "tsdata.csv"), row.names = FALSE)
-
-  message("Generated tsdata.csv with ", nrow(tsdata), " rows")
-
-  return(tsdata)
+merge_timeseries <- function() {
+  datasets <- list(
+    list(
+      dir = "chlorophyllA", 
+      file = "timeperiod_all_months_chl.csv", 
+      name = "chlorophyllA"
+    ),
+    list(
+      dir = "chlorophyllA", 
+      file = "timeperiod_summer_months_chl.csv", 
+      name = "chlorophyllA_Summer"
+    ),
+    list(
+      dir = "chlorophyllA", 
+      file = "timeperiod_winter_months_chl.csv", 
+      name = "chlorophyllA_Winter"
+    ),
+    list(
+      dir = "surfaceSalinity", 
+      file = "timeperiod_all_months_sos.csv", 
+      name = "surfaceSalinity"
+    ),
+    list(
+      dir = "surfaceSalinity", 
+      file = "timeperiod_summer_months_sos.csv", 
+      name = "surfaceSalinity_Summer"
+    ),
+    list(
+      dir = "surfaceSalinity", 
+      file = "timeperiod_winter_months_sos.csv", 
+      name = "surfaceSalinity_Winter"
+    ),
+    list(
+      dir = "seaiceDays", 
+      file = "timeperiod_all_months_icedays.csv", 
+      name = "seaiceDays"
+    )
+  )
+  
+  datasets |> 
+     lapply(function(ds){
+       read_tstabs(ds$dir, ds$file, ds$name)
+     }) |> 
+     bind_rows() |> 
+     write.csv(
+      file.path(dirData, "tsData.csv"), 
+      row.names = FALSE
+    )
+  
+  return(TRUE)
 }

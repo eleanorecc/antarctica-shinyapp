@@ -17,7 +17,7 @@ polygons <- filter(asd, str_detect(GAR_Name, "48|58.6|58.7|58.4.4"))
   
 ## helper functions using arrays for aggregations
 ## annual summaries, timeperiod averages, extents, and save tiffs
-annual_summaries <- function(ncFile, ncvarname, months) {
+annual_summaries <- function(ncFile, ncvarname, months, summarystat) {
 
   ## would need to have checked the ncvarname, and 
   ## downloaded one netcdf file to check about the time dimension...
@@ -32,12 +32,13 @@ annual_summaries <- function(ncFile, ncvarname, months) {
 
   ## formatting of the time variable
   ## differs between datasets
-  if(ncvarname == "CHL"){
+  if(ncvarname %in% c("CHL")){
     origin <- as.POSIXct("1970-01-01", tz = "UTC")
     datayears <- format(as.POSIXct(xtime, origin = origin, tz = "UTC"), "%Y")
   }
   ## why is this not consistent across copernicus datasets??
-  if(ncvarname == "sos"){
+  ## note- sea ice ncdf created by get_seaice_data function below
+  if(ncvarname %in% c("sos", "icedays")){
     datayears <- c(xtime/24) |>
       as.Date(origin = "1950-01-01") |>
       format("%Y") |>
@@ -54,7 +55,14 @@ annual_summaries <- function(ncFile, ncvarname, months) {
   for(i in 1:length(yrs)){
     k <- which(datayears == yrs[i])
     k <- k[months]
-    y[,,i] <- rowMeans(x[,,k], na.rm = TRUE, dims = 2)
+
+    if(summarystat == "mean"){
+      y[,,i] <- rowMeans(x[,,k], na.rm = TRUE, dims = 2)
+    }
+    if(summarystat == "sum"){
+      y[,,i] <- rowSums(x[,,k], na.rm = TRUE, dims = 2)
+    }
+
     y[is.nan(y)] <- NA
   }
   return(y)
@@ -79,29 +87,6 @@ timeperiod_averages <- function(y) {
   ))
 }
 
-ice_summary <- function(x, cutoff, spatialweights) {
-  ## make a binary raster to apply aggregation
-  x[x < cutoff] <- NA
-  x[x >= cutoff] <- 1
-
-  ## multiply by spatial weights to account for the fact that
-  ## lat/lon gridcells further from pole represent larger areas
-  totalarea <- x |>
-    sweep(MARGIN = c(1,2), FUN = "*", spatialweights) |>
-    apply(MARGIN = 3, FUN = sum, na.rm = TRUE)
-
-  ## choose which we want to use...
-  ## could also calculate max extent
-  # i = which.max(totalarea)
-  i = which.min(totalarea)
-
-  return(list(
-    extent = x[,,i],
-    sum = rowSums(x, na.rm = TRUE, dims = 2),
-    df = data.frame(index = i, coverage_area = totalarea[i])
-  ))
-}
-
 save_tiff <- function(saveArray, r, saveDir) {
   saveArray |>
     apply(MARGIN = c(1,3), FUN = function(x){rev(x)}) |>
@@ -119,7 +104,7 @@ save_tiff <- function(saveArray, r, saveDir) {
 ## (1) timeperiod averages for each raster pixel
 ## (2) averages per year within CCAMLR statistical areas
 
-get_monthly_data <- function(saveDir, vars, downloads) {
+get_monthly_data <- function(saveDir, vars, downloads, polygons) {
   if(!file.exists(saveDir)){
     dir.create(saveDir, recursive = TRUE, showWarnings = FALSE)
 
@@ -138,7 +123,8 @@ get_monthly_data <- function(saveDir, vars, downloads) {
     }
   }
   
-  ## open as a raster to easily access info on crs and extent
+  ## open one a raster to easily access info on crs and extent
+  ## doesn't matter which one because they have same dims
   r <- rast(file.path(saveDir, d$nm))
   v <- unlist(vars)
 
@@ -149,7 +135,7 @@ get_monthly_data <- function(saveDir, vars, downloads) {
     function(m){
       yravgs <- lapply(
         list.files(saveDir, pattern = ".nc$", full.names = TRUE),
-        function(nc){annual_summaries(nc, v, m)}
+        function(nc){annual_summaries(nc, v, m, "mean")}
       )
       
       ## average by timeperiod
@@ -184,123 +170,120 @@ get_monthly_data <- function(saveDir, vars, downloads) {
   return(TRUE)
 }
 
-## seaice data is extracted one year at a time because it is daily rather than monthly
-## thus much larger, and it needs special processing to get sea ice minextent and total ice-days
-get_seaice_data <- function(saveDir, vars, downloads) {
-  
-  ## setup year ranges that we will loop over
-  yrs <- substr(c(params$start_datetime, params$end_datetime), 1, 4)
-  yrs <- yrs[1]:yrs[2]
-  ystart <- as.Date(paste0(yrs, "-01-01"))
-  df <- data.frame(year = numeric(), index = numeric(), coverage_area = numeric())
+## seaice data is extracted one month at a time because it is daily, thus much larger
+## we use daily dataset to calculate the total monthly ice-days, later aggregate to annual
+get_seaice_data <- function(saveDir, vars, downloads, cutoff, polygons) {
+  if(!file.exists(saveDir)){
+    dir.create(saveDir, recursive = TRUE, showWarnings = FALSE)
 
-  ## download first year to initialize arrays and calculate spatial weights
-  ## daily data is ~365 timesteps per year, too large to download all at once
-  datasetID <- "cmems_mod_glo_phy_my_0.083deg_P1D-m"
-  cmt$subset(
-    dataset_id = datasetID, variables = vars,
-    start_datetime = paste0(ystart[1], "T00:00:00"),
-    end_datetime = paste0(ystart[1] + years(1) - days(1), "T00:00:00"),
-    minimum_longitude = params$min_longitude, minimum_latitude = params$min_latitude,
-    maximum_longitude = params$max_longitude, maximum_latitude = params$max_latitude,
-    minimum_depth = params$min_depth, maximum_depth = params$max_depth,
-    output_filename = nm, output_directory = saveDir, overwrite = TRUE
+    for(i in 1:length(downloads)) {
+      d <- downloads[[i]]
+
+      ## set up looping over months
+      month_starts <- seq(
+        as.Date(d$params$start_datetime), 
+        as.Date(d$params$end_datetime), 
+        by = "month"
+      )
+      month_ends <- ceiling_date(month_starts, "month") - days(1)
+
+      ## get the month's data and save it to a temporary nc file, 
+      ## apply 15% cutoff to make it binary - ice / not ice covered
+      ## sum icedays per month and save that to new ncdf file with proper time dimension
+    
+      savefile <- file.path(saveDir, str_replace(d$nm, "cover_fraction", "days"))
+
+      for(m in 1:length(month_starts)){
+        cmt$subset(
+          dataset_id = d$params$datasetID, variables = vars,
+          start_datetime = paste0(month_starts[m], "T00:00:00"), 
+          end_datetime = paste0(month_ends[m], "T00:00:00"),
+          minimum_longitude = d$params$min_longitude, minimum_latitude = d$params$min_latitude,
+          maximum_longitude = d$params$max_longitude, maximum_latitude = d$params$max_latitude,
+          minimum_depth = d$params$min_depth, maximum_depth = d$params$max_depth,
+          output_filename = d$nm, output_directory = saveDir, 
+          overwrite = TRUE
+        )
+        nc_data <- nc_open(file.path(saveDir, d$nm))
+        x <- ncvar_get(nc_data, unlist(vars))
+
+        if(m == 1){
+          ## initialize ncdf to store monthly results
+          ## the dimensions here are called latitude and longitude
+          lon <- ncvar_get(nc_data, "longitude")
+          lat <- ncvar_get(nc_data, "latitude")
+          dim_lon <- ncdim_def("longitude", "degrees_east", lon)
+          dim_lat <- ncdim_def("latitude", "degrees_north", lat)
+
+          monthtimes <- as.numeric(difftime(month_starts, as.Date("1950-01-01"), units = "hours"))
+          dim_time <- ncdim_def("time", "hours since 1950-01-01 00:00:00", monthtimes, unlim = TRUE)
+
+          var_icedays <- ncvar_def(
+            name = "icedays",
+            units = "days",
+            dim = list(dim_lon, dim_lat, dim_time),
+            missval = -9999,
+            longname = "Days per month with sea ice (concentration >= 15%)"
+          )
+          nc_out <- nc_create(savefile, vars = list(var_icedays))
+          nc_close(nc_out)
+        }
+        nc_close(nc_data)
+
+        ## calculate icedays
+        x[x < cutoff] <- NA
+        x[x >= cutoff] <- 1
+
+        nc_out <- nc_open(savefile, write = TRUE)
+        ncvar_put(
+          nc_out, 
+          "icedays", 
+          rowSums(x, na.rm = TRUE, dims = 2),
+          start = c(1, 1, m),
+          count = c(-1, -1, 1)
+        )
+        nc_close(nc_out)
+      }
+    }
+  }
+
+  ## now calculate annual summaries 
+  ## based on the monthly icedays ncdf file created
+
+  ## open one a raster to easily access info on crs and extent
+  ## doesn't matter which one because they have same dims
+  r <- rast(file.path(saveDir, d$nm))
+
+  ## annual sum for total seaice days
+  ## summary stat for seaice days is sum not average like for other vars
+  yrsums <- lapply(
+    list.files(saveDir, pattern = "days.*nc$", full.names = TRUE),
+    function(nc){annual_summaries(nc, "icedays", months = 1:12, summarystat = "sum")}
+  )
+  ## average by timeperiod
+  ## after first merging arrays where multiple nc files
+  dim2 <- dim(yrsums[[1]])[1:2]
+  nyears <- sum(sapply(yrsums, function(x) dim(x)[3]))
+  yrsums <- array(do.call(c, yrsums), dim = c(dim2, nyears))
+  prd <- timeperiod_averages(yrsums)
+
+  save_tiff(prd$averages, r, file.path(saveDir, "timeperiod_icedays_all_months.tif"))
+  save_tiff(prd$variability, r, file.path(saveDir, "timeperiod_icedays_all_months_var.tif"))
+
+  ## spatial weights used to average across raster pixels with differing areas
+  spatialweights <- rast(ext(r), resolution = res(r), crs = crs(r)) |>
+    cellSize(unit = "km") |> 
+    ## looks upside-down now, but will align correctly
+    ## once t() and as.array() are applied in make_timeseries function 
+    flip(direction = "vertical")
+  
+  make_timeseries(
+    yrsums, polygons, spatialweights,
+    file.path(saveDir, "timeperiod_all_months_icedays.csv")
   )
 
-  nc_data <- nc_open(file.path(saveDir, nm))
-  nctmp <- ncvar_get(nc_data, "siconc")
-  nc_close(nc_data)
-
-  dim2 <- dim(nctmp)[1:2]
-  extents <- array(NA, dim = c(dim2, length(yrs)))
-  sums <- array(NA, dim = c(dim2, length(yrs)))
-
-  r <- rast(file.path(saveDir, nm))
-  spatialweights <- rast(ext(r), resolution = res(r), crs = crs(r)) |>
-    cellSize(unit = "km") |>
-    flip(direction = "vertical") |>
-    t() |>
-    as.array()
-
-  ## calculate ice extent (minimum across year) and ice days (sum across year)
-  ## using 15% concentration as threshold for "ice covered"
-  useCutoff <- 0.15
-  tmp <- ice_summary(nctmp, cutoff = useCutoff, spatialweights)
-  df <- rbind(df, cbind(year = yrs[1], tmp$df))
-  extents[,,1] <- tmp$extent
-  sums[,,1] <- tmp$sum
-
-  ## loop through remaining years, downloading and processing one at a time
-  for(i in 2:length(ystart)){
-    cmt$subset(
-      dataset_id = datasetID, variables = list("siconc"),
-      start_datetime = paste0(ystart[i], "T00:00:00"),
-      end_datetime = paste0(ystart[i] + years(1) - days(1), "T00:00:00"),
-      minimum_longitude = params$min_longitude, minimum_latitude = params$min_latitude,
-      maximum_longitude = params$max_longitude, maximum_latitude = params$max_latitude,
-      minimum_depth = params$min_depth, maximum_depth = params$max_depth,
-      output_filename = nm, output_directory = saveDir, overwrite = TRUE
-    )
-
-    nc_data <- nc_open(file.path(saveDir, nm))
-    nctmp <- ncvar_get(nc_data, "siconc")
-    nc_close(nc_data)
-
-    ## handle dataset transition in 2021 from 'my' to 'myint'
-    ## need to download both parts and merge for complete year
-    if(ystart[i] == "2021-01-01"){
-      datasetID <- "cmems_mod_glo_phy_myint_0.083deg_P1D-m"
-      cmt$subset(
-        dataset_id = datasetID, variables = list("siconc"),
-        start_datetime = paste0(ystart[i], "T00:00:00"),
-        end_datetime = paste0(ystart[i] + years(1) - days(1), "T00:00:00"),
-        minimum_longitude = params$min_longitude, minimum_latitude = params$min_latitude,
-        maximum_longitude = params$max_longitude, maximum_latitude = params$max_latitude,
-        minimum_depth = params$min_depth, maximum_depth = params$max_depth,
-        output_filename = "part2_seaice.nc", output_directory = saveDir, overwrite = TRUE
-      )
-
-      nc_data <- nc_open(file.path(saveDir, "part2_seaice.nc"))
-      nctmp2 <- ncvar_get(nc_data, "siconc")
-      nc_close(nc_data)
-
-      nctmp <- array(c(nctmp, nctmp2), dim = c(dim2, 365))
-    }
-
-    tmp <- extents_and_sums(nctmp, cutoff = useCutoff, spatialweights, metric = "minext")
-    df <- rbind(df, cbind(year = yrs[i], tmp$df))
-    extents[,,i] <- tmp$extent
-    sums[,,i] <- tmp$sum
-  }
-
-  ## save annual results as CSV, RDS, and TIFF
-  write.csv(df, file.path(saveDir, "seaice_coverage_minext.csv"), row.names = FALSE)
-  saveRDS(extents, file.path(saveDir, "seaice_minext.rds"))
-  saveRDS(sums, file.path(saveDir, "seaice_icedays.rds"))
-
-  save_tiff(extents, r, file.path(saveDir, "seaice_minext.tif"))
-  save_tiff(sums, r, file.path(saveDir, "seaice_icedays.tif"))
-
-  ## calculate 9-year timeperiod minimum extents
-  prd_ext <- array(NA, dim = c(dim2, 3))
-  for(i in 1:3){
-    k <- (9*i-8):(9*i)
-    tmp <- extents(extents[,,k], cutoff = 1, spatialweights)
-    prd_ext[,,i] <- tmp$extent
-  }
-  save_tiff(prd_ext, r, file.path(saveDir, "timeperiod_seaice_minext.tif"))
-
-  ## calculate timeperiod ice day averages and variability
-  prd_icedays <- timeperiod_averages(sums)
-  seaiceDaysDir <- file.path(dirname(saveDir), "seaiceDays")
-  dir.create(seaiceDaysDir, recursive = TRUE, showWarnings = FALSE)
-  save_tiff(prd_icedays$averages, r, file.path(seaiceDaysDir, "timeperiod_seaice_icedays.tif"))
-  save_tiff(prd_icedays$variability, r, file.path(seaiceDaysDir, "timeperiod_seaice_icedays_var.tif"))
-  make_timeseries(sums, spatialweights, file.path(seaiceDaysDir, "seaice_icedays.csv"))
-
-  return(list(extents = extents, sums = sums, df = df))
+  return(TRUE)
 }
-
 
 ## parameters to give copernicusmarine 
 ## define a subset of data to extract from their database
@@ -387,3 +370,7 @@ get_seaice_data(
     list(params = params_ice_myint, nm = "seaice_cover_fraction_myint.nc")
   )
 )
+
+## merge timeseries tables
+## to create tsData.csv
+merge_timeseries()
