@@ -5,6 +5,7 @@ make_timeseries <- function(y, polygons, spatialweights, outfile) {
   zones_rast <- polygons |> 
     rasterize(spatialweights, field = "GAR_Name") |> 
     flip(direction = "vertical")
+  zones_lookup <- cats(zones_rast)[[1]]
   zones_array <- as.array(t(zones_rast))
   zone_ids <- unique(values(zones_rast))
   zone_ids <- zone_ids[!is.na(zone_ids)]
@@ -32,21 +33,20 @@ make_timeseries <- function(y, polygons, spatialweights, outfile) {
       sweep(MARGIN = c(1,2), FUN = function(a, b){ ifelse(is.na(a), NA, b) }, spatialweights) |>
       apply(MARGIN = 3, FUN = sum, na.rm = TRUE)
 
-    ## simple statistics treating all pixels as equal-area
-    ## for comparison but not spatially accurate
-    yrsd <- apply(y_masked, MARGIN = 3, FUN = sd, na.rm = TRUE)
-
     ## combine metrics and calculate weighted mean (yrwgtsum / nonNAarea)
     ## yrwgtmean is the spatially-accurate average to use for plotting
+    nm <- zones_lookup$GAR_Name[zones_lookup$ID == z]
+
     data.frame(
       zone = z,
       year = 1:dim(y)[3],
       yrwgtsum = yrwgtsum,
       nonNAarea = nonNAarea,
       yrwgtmean = yrwgtsum / nonNAarea,
-      yrsd = yrsd
+      name = nm
     )
   }))
+  
   write.csv(tstab, outfile, row.names = FALSE)
   return(TRUE)
 }
