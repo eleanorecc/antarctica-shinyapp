@@ -115,10 +115,6 @@ weddell_gyre <- weddell_gyre_coords |>
 ## https://github.com/ccamlr/data/tree/main/geographical_data/asd
 asd <- st_read(file.path(dirData, "statisticalAreasCCAMLR"))
 
-## https://github.com/ccamlr/data/tree/main/geographical_data/ssmu
-# ssmu <- st_read(file.path(dirData, "mgmtAreasCCAMLR"))
-mgmt <- st_read(file.path(dirData, "mgmtAreas"))
-
 ## add wobecs study area on top
 ## make the file if it doesnt yet exist
 # latmin <- -75.54747
@@ -183,7 +179,7 @@ resolutions <- 2*extent/256/2^zooms
 dims <- rep(256*2^5, 2)
 
 allrasters <- list(
-  `Days with >15% Sea Ice Cover` = list(
+  `Days with >15% Sea Ice` = list(
     `1998-2006` = "seaiceDays_all_19982006",
     `2007-2015` = "seaiceDays_all_20072015",
     `2016-2024` = "seaiceDays_all_20162024",
@@ -297,3 +293,20 @@ renderCaption <- function(caption_data) {
     }
   )
 }
+
+## add Polarstern expedition coordinates
+url_polarstern <- "https://follow-polarstern.awi.de/wp-json/data-api/v1/data?expedition=1637"
+
+# Create request and perform
+data <- request(url_polarstern) |> 
+  req_timeout(30) |> 
+  req_retry(max_tries = 3) |> 
+  req_perform() |> 
+  resp_body_json(simplifyVector = TRUE)
+
+coords_polarstern <- data$sensor |> 
+  distinct(date, longitude, latitude) |> 
+  filter(!is.na(longitude), !is.na(latitude)) |> 
+  arrange(date) |> 
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326) |> 
+  summarise(geometry = st_cast(st_combine(geometry), "LINESTRING"))

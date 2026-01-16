@@ -67,11 +67,11 @@ server <- function(input, output, session) {
       options = gbif_tile_options
     ) |>
     addLayersControl(
-      overlayGroups = c("Statistical Areas", "Management Units", "Study Area", "Points of Interest"),
+      overlayGroups = c("WOBEC Expedition", "Statistical Areas", "Study Area", "Points of Interest"),
       position = "bottomleft"
     ) |>
+    hideGroup("WOBEC Expedition") |>
     hideGroup("Statistical Areas") |>
-    hideGroup("Management Units") |>
     hideGroup("Study Area") |>
     hideGroup("Points of Interest") |>
     addPolygons(
@@ -81,13 +81,12 @@ server <- function(input, output, session) {
       fillOpacity = 0, weight = 1,
       options = pathOptions(pane = "overlays")
     ) |>
-    addPolygons(
-      data = mgmt,
-      group = "Management Units",
-      fillOpacity = 0, weight = 2,
-      color = "white", opacity = 0.5,
+    addPolylines(
+      data = coords_polarstern,
+      group = "WOBEC Expedition",
+      color = "red", weight = 1,
       options = pathOptions(pane = "overlays")
-    ) |>
+    ) |> 
     addPolygons(
       data = wobec,
       group = "Study Area",
