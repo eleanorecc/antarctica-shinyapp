@@ -12,6 +12,7 @@ template <- rast(
 results <- data.frame(
   timestamp = NA,
   name = c(
+    list.files(here(dirData, "seaiceDays"), pattern = "icedays.tif$", full.names = TRUE),
     list.files(here(dirData, "surfaceSalinity"), pattern = "sos.tif$", full.names = TRUE),
     list.files(here(dirData, "chlorophyllA"), pattern = "chl.tif$", full.names = TRUE)
   )
@@ -41,7 +42,7 @@ for(i in 1:nrow(results)){
   r <- rast(tif) 
   rresamp <- resample(r, template)
   chkvar <- all(global(rresamp, var, na.rm = TRUE) > 0)
-  ## why/what is this checking again??
+  ## check that variance is non-zero i.e. that the data isnt all the same value
   
   if(chkvar) {
     ## need to loop over the layers and tile each, 
@@ -73,6 +74,6 @@ for(i in 1:nrow(results)){
     })
     
     results$timestamp[i] <- as.character(Sys.time())
-    write.csv(results, file.path(dirData, "log.csv"), row.names = FALSE)
+    write.csv(results, file.path(dirData, "copernicus_tiles_log.csv"), row.names = FALSE)
   }
 }

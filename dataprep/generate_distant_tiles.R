@@ -18,6 +18,7 @@ results <- data.frame(
 ## load the make_tile function
 source(here("dataprep/make_tiles.R"))
 
+
 ## process all datasets
 for(i in 1:nrow(distant_data)) {
   nm <- distant_data$name[i]
@@ -36,19 +37,21 @@ for(i in 1:nrow(distant_data)) {
     vsi_url <- paste0("/vsicurl/", info$url)
     rresamp <- rast(vsi_url, lyrs = info$lyrnum) |> 
       project("EPSG:4326") |>
-      crop(ext(c(-180, 180, -90, latmax))) |>
+      crop(ext(c(-180, 180, -90, -45))) |>
       project("EPSG:3031") |>
       resample(template)
+
+    rc <- info$reclass
 
     success <- make_tiles(
       resampled_raster = rresamp, 
       tile_directory = tiledir,
-      tms = "-tmscompatible"
+      reclass = rc
     )
     results$success[i] <- success
     results$timestamp[i] <- as.character(Sys.time())
 
-    write.csv(results, file.path(dirData, "distAnt", "log.csv"), row.names = FALSE)
+    write.csv(results, file.path(dirData, "distAnt_tiles_log.csv"), row.names = FALSE)
     if(i %% 10 == 0) {
       message(sprintf("%d/%d layers completed", i, nrow(distant_data)))
     }
