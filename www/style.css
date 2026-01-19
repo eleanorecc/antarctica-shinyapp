@@ -525,9 +525,9 @@ header {
 }
 
 .shiny-input-select {
-  font-size: 10px;
+  font-size: 9px;
   background-color: #fff;
-  border: 1px solid var(--light-blue);
+  border: 0px solid var(--light-blue);
   border-radius: var(--border-radius-sm);
   transition: var(--transition-smooth);
 }

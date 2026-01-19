@@ -39,7 +39,10 @@ distant_data <-  read.csv(file.path(dirData, "distAnt.csv"))
 
 ## for selectizeInput for tiles
 # distrasters <- setNames(distant_data$name, distant_data$name)
-distrasters <- as.list(pull(distant_data, name))
+distrasters <- distant_data |> 
+  pull(dir) |> 
+  as.list() |> 
+  setNames(distant_data$name)
 
 ## python configuration ----
 ## check python installation with gdal
@@ -180,55 +183,55 @@ dims <- rep(256*2^5, 2)
 
 allrasters <- list(
   `Days with >15% Sea Ice` = list(
-    `1998-2006` = "seaiceDays_all_19982006",
-    `2007-2015` = "seaiceDays_all_20072015",
-    `2016-2024` = "seaiceDays_all_20162024",
-    `2007-2015 minus 1998-2006` = "seaiceDays_all_20072015diff",
-    `2016-2024 minus 1998-2006` = "seaiceDays_all_20162024diff"
+    `T1: 1998-2006` = "seaiceDays_all_19982006",
+    `T2: 2007-2015` = "seaiceDays_all_20072015",
+    `T3: 2016-2024` = "seaiceDays_all_20162024",
+    `T1 vs T2: 2007-2015` = "seaiceDays_all_20072015diff",
+    `T1 vs T3: 2016-2024` = "seaiceDays_all_20162024diff"
   ),
-  `Chlorophyll A` = list(
-    `1998-2006` = "chlorophyllA_all_19982006",
-    `2007-2015` = "chlorophyllA_all_20072015",
-    `2016-2024` = "chlorophyllA_all_20162024",
-    `2007-2015 minus 1998-2006` = "chlorophyllA_all_20072015diff",
-    `2016-2024 minus 1998-2006` = "chlorophyllA_all_20162024diff"
+  `Chlorophyll A Annual` = list(
+    `T1: 1998-2006` = "chlorophyllA_all_19982006",
+    `T2: 2007-2015` = "chlorophyllA_all_20072015",
+    `T3: 2016-2024` = "chlorophyllA_all_20162024",
+    `T1 vs T2: 2007-2015` = "chlorophyllA_all_20072015diff",
+    `T1 vs T3: 2016-2024` = "chlorophyllA_all_20162024diff"
   ),
   `Chlorophyll A Summer` = list(
-    `1998-2006` = "chlorophyllA_summer_19982006",
-    `2007-2015` = "chlorophyllA_summer_20072015",
-    `2016-2024` = "chlorophyllA_summer_20162024",
-    `2007-2015 minus 1998-2006` = "chlorophyllA_summer_20072015diff",
-    `2016-2024 minus 1998-2006` = "chlorophyllA_summer_20162024diff"
+    `T1: 1998-2006` = "chlorophyllA_summer_19982006",
+    `T2: 2007-2015` = "chlorophyllA_summer_20072015",
+    `T3: 2016-2024` = "chlorophyllA_summer_20162024",
+    `T1 vs T2: 2007-2015` = "chlorophyllA_summer_20072015diff",
+    `T1 vs T3: 2016-2024` = "chlorophyllA_summer_20162024diff"
   ),
   `Chlorophyll A Winter` = list(
-    `1998-2006` = "chlorophyllA_winter_19982006",
-    `2007-2015` = "chlorophyllA_winter_20072015",
-    `2016-2024` = "chlorophyllA_winter_20162024",
-    `2007-2015 minus 1998-2006` = "chlorophyllA_winter_20072015diff",
-    `2016-2024 minus 1998-2006` = "chlorophyllA_winter_20162024diff"
+    `T1: 1998-2006` = "chlorophyllA_winter_19982006",
+    `T2: 2007-2015` = "chlorophyllA_winter_20072015",
+    `T3: 2016-2024` = "chlorophyllA_winter_20162024",
+    `T1 vs T2: 2007-2015` = "chlorophyllA_winter_20072015diff",
+    `T1 vs T3: 2016-2024` = "chlorophyllA_winter_20162024diff"
   ),
-  `Surface Salinity` = list(
-    `1998-2006` = "surfaceSalinity_all_19982006",
-    `2007-2015` = "surfaceSalinity_all_20072015",
-    `2016-2024` = "surfaceSalinity_all_20162024",
-    `2007-2015 minus 1998-2006` = "surfaceSalinity_all_20072015diff",
-    `2016-2024 minus 1998-2006` = "surfaceSalinity_all_20162024diff"
+  `Surface Salinity Annual` = list(
+    `T1: 1998-2006` = "surfaceSalinity_all_19982006",
+    `T2: 2007-2015` = "surfaceSalinity_all_20072015",
+    `T3: 2016-2024` = "surfaceSalinity_all_20162024",
+    `T1 vs T2: 2007-2015` = "surfaceSalinity_all_20072015diff",
+    `T1 vs T3: 2016-2024` = "surfaceSalinity_all_20162024diff"
   ),
   `Surface Salinity Summer` = list(
-    `1998-2006` = "surfaceSalinity_summer_19982006",
-    `2007-2015` = "surfaceSalinity_summer_20072015",
-    `2016-2024` = "surfaceSalinity_summer_20162024",
-    `2007-2015 minus 1998-2006` = "surfaceSalinity_summer_20072015diff",
-    `2016-2024 minus 1998-2006` = "surfaceSalinity_summer_20162024diff"
+    `T1: 1998-2006` = "surfaceSalinity_summer_19982006",
+    `T2: 2007-2015` = "surfaceSalinity_summer_20072015",
+    `T3: 2016-2024` = "surfaceSalinity_summer_20162024",
+    `T1 vs T2: 2007-2015` = "surfaceSalinity_summer_20072015diff",
+    `T1 vs T3: 2016-2024` = "surfaceSalinity_summer_20162024diff"
   )
 )
 
 caption_metadata <- data.frame(
   layer_pattern = c("chlorophyll", "seaice", "salinity"),
-  title = c("Chlorophyll A Data", "Sea Ice Data", "Salinity Data"),
+  title = c("Chlorophyll A Data", "Sea Ice Data", "Surface Salinity Data"),
   description = c(
     "Chlorophyll A averages calculated from Copernicus Marine Dataset:",
-    "Sea Ice averages and minimums calculated (taking >15% covered area as 'ice covered') from Copernicus Marine Dataset:",
+    "Sea Ice averages calculated (taking >15% sea ice concentrations as 'ice covered') from Copernicus Marine Dataset:",
     "Salinity averages calculated from Copernicus Marine Dataset:"
   ),
   dataset_name = c(
@@ -246,8 +249,8 @@ caption_metadata <- data.frame(
 
 ## caption based on map layer ----
 getCaptionData <- function(layer_name) {
-  if(layer_name %in% distant_data$name) {
-    info <- filter(distant_data, name == layer_name)
+  if(layer_name %in% distant_data$dir) {
+    info <- filter(distant_data, dir == layer_name)
     return(list(
       title = info$name,
       description = "Data accessed from SCAR DistAnt Ecological Model Output Repository",

@@ -67,12 +67,12 @@ server <- function(input, output, session) {
       options = gbif_tile_options
     ) |>
     addLayersControl(
-      overlayGroups = c("WOBEC Expedition", "Statistical Areas", "Study Area", "Points of Interest"),
+      overlayGroups = c("WOBEC Expedition", "Study Area", "Statistical Areas", "Points of Interest"),
       position = "bottomleft"
     ) |>
     hideGroup("WOBEC Expedition") |>
-    hideGroup("Statistical Areas") |>
     hideGroup("Study Area") |>
+    hideGroup("Statistical Areas") |>
     hideGroup("Points of Interest") |>
     addPolygons(
       data = asd,
@@ -141,29 +141,20 @@ server <- function(input, output, session) {
       req(input$tilesLeft)
       caption_data <- getCaptionData(input$tilesLeft)
 
-      ## Check if it's a diff layer and modify title
+      ## extract years from select dropdown input choice, same as filename
+      year_match <- str_extract(input$tilesLeft, "(\\d{4})(\\d{4})")
+      years <- paste(c(substr(year_match, 1, 4), substr(year_match, 5, 8)), collapse = "-")
+      ## check if it's a diff layer
       if(str_detect(input$tilesLeft, "diff")) {
-        ## Extract years from filename like "20072015diff"
-        year_match <- str_extract(input$tilesLeft, "(\\d{4})(\\d{4})diff")
-        if(!is.na(year_match)) {
-          year1 <- str_sub(year_match, 1, 4)
-          year2 <- str_sub(year_match, 5, 8)
-          ## Modify title to say "Difference"
-          caption_data$title <- str_replace(caption_data$title, " Data$", " Data Difference")
-          caption_data$title <- paste0(caption_data$title, ", ", year1, "-", year2, " minus 1998-2006")
-        }
+        caption_data$title <- sprintf(
+          "%s, Difference %s minus 1998-2006",
+          caption_data$title, years
+        )
       } else {
-        ## Extract year range from selection name for non-diff layers
-        for(category in allrasters) {
-          year_label <- names(which(category == input$tilesLeft))[1]
-          if(!is.na(year_label)) {
-            year_match <- str_extract(year_label, "\\d{4}-\\d{4}")
-            if(!is.na(year_match)) {
-              caption_data$title <- paste0(caption_data$title, ", ", year_match)
-            }
-            break
-          }
-        }
+        caption_data$title <- sprintf(
+          "%s, %s Average",
+          caption_data$title, years
+        )
       }
       renderCaption(caption_data)
     }
@@ -175,29 +166,20 @@ server <- function(input, output, session) {
       req(input$tilesRight)
       caption_data <- getCaptionData(input$tilesRight)
 
-      ## Check if it's a diff layer and modify title
-      if(str_detect(input$tilesLeft, "diff")) {
-        ## Extract years from filename like "20072015diff"
-        year_match <- str_extract(input$tilesLeft, "(\\d{4})(\\d{4})diff")
-        if(!is.na(year_match)) {
-          year1 <- str_sub(year_match, 1, 4)
-          year2 <- str_sub(year_match, 5, 8)
-          ## Modify title to say "Difference"
-          caption_data$title <- str_replace(caption_data$title, " Data$", " Data Difference")
-          caption_data$title <- paste0(caption_data$title, ", ", year1, "-", year2, " minus 1998-2006")
-        }
+      ## extract years from select dropdown input choice, same as filename
+      year_match <- str_extract(input$tilesRight, "(\\d{4})(\\d{4})")
+      years <- paste(c(substr(year_match, 1, 4), substr(year_match, 5, 8)), collapse = "-")
+      ## check if it's a diff layer
+      if(str_detect(input$tilesRight, "diff")) {
+        caption_data$title <- sprintf(
+          "%s, Difference %s minus 1998-2006",
+          caption_data$title, years
+        )
       } else {
-        ## Extract year range from selection name for non-diff layers
-        for(category in allrasters) {
-          year_label <- names(which(category == input$tilesRight))[1]
-          if(!is.na(year_label)) {
-            year_match <- str_extract(year_label, "\\d{4}-\\d{4}")
-            if(!is.na(year_match)) {
-              caption_data$title <- paste0(caption_data$title, ", ", year_match)
-            }
-            break
-          }
-        }
+        caption_data$title <- sprintf(
+          "%s, %s Average",
+          caption_data$title, years
+        )
       }
       renderCaption(caption_data)
     }
@@ -205,22 +187,23 @@ server <- function(input, output, session) {
 
   ## update left map tiles based on user selection ----
   observeEvent(input$tilesLeft, {
+    ## Clear taxon selection to allow caption to update
+    updateSelectizeInput(session, "taxonKey", selected = character(0))
+
     p1 <- read.csv(file.path(
       dirData, str_replace_all(input$tilesLeft, "_", "/"),
       "palette.csv"
     ))
-
-    ## Get unique breaks only (removes duplicates from quantiles with repeated values)
-    unique_breaks <- unique(sort(c(p1$breaks_lower, p1$breaks_upper)))
-
-    ## Reduce to max 20 bins for legend display
-    max_bins <- 20
-    if(length(unique_breaks) > max_bins) {
+    
+    ## Reduce to max 15 bins for legend display
+    max_bins <- 15
+    p1bk <- unique(c(p1$breaks_lower, p1$breaks_upper))
+    if(length(p1bk) > max_bins) {
       ## Select evenly-spaced subset of breaks
-      indices <- round(seq(1, length(unique_breaks), length.out = max_bins))
-      legend_breaks <- unique_breaks[indices]
+      indices <- round(seq(1, length(p1bk), length.out = max_bins))
+      p1_legend_breaks <- p1bk[indices]
     } else {
-      legend_breaks <- unique_breaks
+      p1_legend_breaks <- p1bk
     }
 
     leafletProxy("map1") |>
@@ -247,11 +230,11 @@ server <- function(input, output, session) {
         title = NULL,
         pal = colorBin(
           palette = p1$col,
-          domain = range(unique_breaks),
-          bins = legend_breaks,
+          domain = range(p1bk),
+          bins = p1_legend_breaks,
           pretty = FALSE
         ),
-        values = legend_breaks,
+        values = p1_legend_breaks,
         opacity = 1
       )
     
@@ -314,22 +297,23 @@ server <- function(input, output, session) {
 
   ## update right map tiles based on user selection ----
   observeEvent(input$tilesRight, {
+    ## Clear distAnt selection to allow caption to update
+    updateSelectizeInput(session, "tilesDistAnt", selected = character(0))
+    
     p2 <- read.csv(file.path(
       dirData, str_replace_all(input$tilesRight, "_", "/"),
       "palette.csv"
     ))
 
-    ## Get unique breaks only (removes duplicates from quantiles with repeated values)
-    unique_breaks <- unique(sort(c(p2$breaks_lower, p2$breaks_upper)))
-
-    ## Reduce to max 20 bins for legend display
-    max_bins <- 20
-    if(length(unique_breaks) > max_bins) {
+    ## Reduce to max 15 bins for legend display
+    max_bins <- 15
+    p2bk <- unique(c(p2$breaks_lower, p2$breaks_upper))
+    if(length(p2bk) > max_bins) {
       ## Select evenly-spaced subset of breaks
-      indices <- round(seq(1, length(unique_breaks), length.out = max_bins))
-      legend_breaks <- unique_breaks[indices]
+      indices <- round(seq(1, length(p2bk), length.out = max_bins))
+      p2_legend_breaks <- p2bk[indices]
     } else {
-      legend_breaks <- unique_breaks
+      p2_legend_breaks <- p2bk
     }
 
     leafletProxy("map2") |>
@@ -355,11 +339,11 @@ server <- function(input, output, session) {
         title = NULL,
         pal = colorBin(
           palette = p2$col,
-          domain = range(unique_breaks),
-          bins = legend_breaks,
+          domain = range(p2bk),
+          bins = p2_legend_breaks,
           pretty = FALSE
         ),
-        values = legend_breaks,
+        values = p2_legend_breaks,
         opacity = 1
       )
     
@@ -368,175 +352,37 @@ server <- function(input, output, session) {
   })
 
   ## update map with distAnt data ----
-  # distAnt <- reactive({
-  #   req(input$tilesDistAnt)
+  distAnt_delayed <- debounce(reactive(input$tilesDistAnt), 1000)
 
-  #   info <- filter(distant_data, name == input$tilesDistAnt)
-  #   tileDir <- file.path(dirData, "distAnt", info$dir)
+  observeEvent(c(distAnt_delayed()), {
+    req(distAnt_delayed())
 
-  #   ## Read pre-generated palette
-  #   pal <- read.csv(file.path(tileDir, "palette.csv"))
+    plotlyr <- distAnt_delayed()
 
-  #   return(list(
-  #     dir = tileDir,
-  #     pal = pal
-  #   ))
-  # })
-  
-  # observe({
-  #   x <- distAnt()
-  #   addResourcePath("distAntTiles", x$dir)
-
-  #   ## Get unique breaks only (removes duplicates from quantiles with repeated values)
-  #   unique_breaks <- unique(sort(c(x$pal$breaks_lower, x$pal$breaks_upper)))
-
-  #   ## Reduce to max 20 bins for legend display
-  #   max_bins <- 20
-  #   if(length(unique_breaks) > max_bins) {
-  #     ## Select evenly-spaced subset of breaks
-  #     indices <- round(seq(1, length(unique_breaks), length.out = max_bins))
-  #     legend_breaks <- unique_breaks[indices]
-  #   } else {
-  #     legend_breaks <- unique_breaks
-  #   }
-
-  #   leafletProxy("map2") |>
-  #     clearGroup("map2tiles") |>
-  #     addTiles(
-  #       group = "map2tiles",
-  #       urlTemplate = "distAntTiles/{z}/{x}/{-y}.png",
-  #       # urlTemplate = sprintf("%s/{z}/{x}/{-y}.png", x$dir),
-  #       options = tileOptions(
-  #         tileSize = 256,
-  #         noWrap = TRUE,
-  #         opacity = 0.8,
-  #         tms = TRUE,
-  #         continuousWorld = TRUE,
-  #         pane = "customtiles"
-  #       )
-  #     ) |>
-  #     clearControls() |>
-  #     addLegend(
-  #       position = "bottomright",
-  #       title = NULL,
-  #       pal = colorBin(
-  #         palette = x$pal$col,
-  #         domain = range(unique_breaks),
-  #         bins = legend_breaks,
-  #         pretty = FALSE
-  #       ),
-  #       values = legend_breaks,
-  #       opacity = 1
-  #     )
-
-  #   ## has-tiles class to make selectize controls semi-transparent
-  #   runjs("$('#tilesRight').siblings('.selectize-control').addClass('has-tiles');")
-  # })
-  ## update map with distAnt data ----
-  distAnt <- reactive({
-    req(input$tilesDistAnt)
- 
-    info <- filter(distant_data, name == input$tilesDistAnt)
- 
-    tileDir <- file.path(addData, info$dir)
-    # if(!file.exists(tileDir)){
-      dir.create(tileDir, recursive = TRUE, showWarnings = FALSE)
- 
-      r <- curl_fetch_memory(info$url)
-      if(r$status_code == 200){
-        ## download the raster
-        message("Getting data to make map tiles...")
-        tmptif <- file.path(tileDir, "rast0.tif")
-        download.file(info$url, destfile = tmptif)
- 
-        ## template matching leaflet map tiles/extent
-        x <- 12367396.2185
-        template <- rast(ext(c(-x,x,-x,x)), nrow = 8192, ncol = 8192, crs = crs("EPSG:3031"))
- 
-        ## project to sterographic south after cropping
-        ## then resample to template
-        message("reprojecting and cropping data...")
-        rresamp <- project(rast(tmptif, lyrs = info$lyrnum), "EPSG:4326") |>
-          crop(ext(c(-180, 180, -90, -50))) |>
-          project("EPSG:3031") |>
-          resample(template)
- 
-        message("creating color palette...")
-        pal <- data.frame(value = 0:255, col = hcl.colors(256, "viridis"))
- 
-        # message("trying to extract values")
-        # v <- values(rresamp)
-        # message("values extracted for palette")
- 
-        # q <- quantile(v, probs = seq(0, 1, length.out = 256), na.rm = TRUE)
-        qt <- global(rresamp, quantile, probs = seq(0, 1, length.out = 256), na.rm = TRUE)
-          # mutate(name = as.numeric(substr(name, 2, 7)))
-        message("quantiles extracted for palette")
- 
-       data.frame(breaks = unlist(c(qt))) |>
-          # global(rresamp, quantile, probs = seq(0, 1, length.out = 256), na.rm = TRUE) |>
-          # data.frame() |>
-          cbind(pal) |>
-          # setNames(c("breaks","value","col"))
-        # values(rresamp) |>
-        #   quantile(probs = seq(0, 1, length.out = 256), na.rm = TRUE) |>
-        #   data.frame() |>
-        #   cbind(pal) |>
-        #   setNames(c("breaks","value","col")) |>
-          write.csv(
-            file.path(tileDir, "palette.csv"),
-            row.names = FALSE
-          )
- 
-        message("making int1u raster...")
-        rint <- rresamp |>
-          stretch(minq = 0.02, maxq = 0.98, minv = 0, maxv = 255) |>
-          as.int(datatype = "INT1U")
-        message("assign palette to int1u raster")
-        coltab(rint) <- pal
- 
-        message("starting tiles...")
-        writeRaster(
-          rint, file.path(tileDir, "rint.tif"),
-          datatype = "INT1U",
-          overwrite = TRUE
-        )
- 
-        message("making .vrt file")
-        system(paste(
-          "gdal_translate -of vrt -expand rgba",
-          file.path(tileDir, "rint.tif"),
-          file.path(tileDir, "rint.vrt")
-        ))
-        message("tile-izing...")
-        system(paste(
-          "gdal2tiles.py -p raster -z 2-4 -x -tmscompatible",
-          file.path(tileDir, "rint.vrt"),
-          tileDir
-        ))
-        message("tiles complete. \n\n")
-      }
-    # }
-    pal2 <- read.csv(file.path(tileDir, "palette.csv"))
-    return(list(
-      dir = tileDir,
-      pal = pal2
+    p2 <- read.csv(file.path(
+      dirData, "distAnt", 
+      plotlyr, "palette.csv"
     ))
-  })
- 
-  observe({
-    message("adding distAnt tiles to map...")
-    x <- distAnt()
- 
-    message(sprintf("filepath %s exists: %s", x$dir, file.exists(x$dir)))
-    addResourcePath("distAntTiles", x$dir)
+
+    ## Reduce to max 15 bins for legend display
+    max_bins <- 15
+    p2bk <- unique(c(p2$breaks_lower, p2$breaks_upper))
+    if(length(p2bk) > max_bins) {
+      ## Select evenly-spaced subset of breaks
+      indices <- round(seq(1, length(p2bk), length.out = max_bins))
+      p2_legend_breaks <- p2bk[indices]
+    } else {
+      p2_legend_breaks <- p2bk
+    }
  
     leafletProxy("map2") |>
       clearGroup("map2tiles") |>
       addTiles(
         group = "map2tiles",
-        urlTemplate = "distAntTiles/{z}/{x}/{-y}.png",
-        # urlTemplate = sprintf("%s/{z}/{x}/{-y}.png", x$dir),
+        urlTemplate = sprintf(
+          "distAnt/%s/{z}/{x}/{-y}.png",
+          plotlyr
+        ),
         options = tileOptions(
           tileSize = 256,
           noWrap = TRUE,
@@ -549,14 +395,17 @@ server <- function(input, output, session) {
       clearControls() |>
       addLegend(
         position = "bottomright",
-        title = "DistAnt<br>Model",
-        pal = colorNumeric(palette = x$pal$col, domain = x$pal$breaks),
-        labFormat = labelFormat(
-          transform = function(x) sort(x)
+        title = NULL,
+        pal = colorBin(
+          palette = p2$col,
+          domain = range(p2bk),
+          bins = p2_legend_breaks,
+          pretty = FALSE
         ),
-        values = x$pal$breaks,
+        values = p2_legend_breaks,
         opacity = 1
       )
+    
     ## has-tiles class to make selectize controls semi-transparent
     runjs("$('#tilesRight').siblings('.selectize-control').addClass('has-tiles');")
   })
