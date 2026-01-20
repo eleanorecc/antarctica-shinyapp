@@ -241,7 +241,7 @@ caption_metadata <- data.frame(
   ),
   url = c(
     "https://data.marine.copernicus.eu/product/OCEANCOLOUR_GLO_BGC_L4_MY_009_108/services",
-    "https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/service",
+    "https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_PHY_001_030/services",
     "https://data.marine.copernicus.eu/product/MULTIOBS_GLO_PHY_S_SURFACE_MYNRT_015_013/services"
   ),
   stringsAsFactors = FALSE
@@ -256,19 +256,21 @@ getCaptionData <- function(layer_name) {
       description = "Data accessed from SCAR DistAnt Ecological Model Output Repository",
       dataset = "https://source.coop/scar/distant",
       url = "https://source.coop/scar/distant",
+      season = "",
       reference = info$reference
     ))
   }
-  for(i in 1:nrow(caption_metadata)) {
-    if(str_detect(layer_name, regex(caption_metadata$layer_pattern[i], ignore_case = TRUE))) {
-      return(list(
-        title = caption_metadata$title[i],
-        description = caption_metadata$description[i],
-        dataset = caption_metadata$dataset_name[i],
-        url = caption_metadata$url[i],
-        reference = ""
-      ))
-    }
+  v <- which(str_detect(layer_name, c("chlorophyllA", "seaiceDays", "surfaceSalinity")))
+  s <- str_to_title(str_extract(layer_name, "summer|winter"))
+  if(length(v) == 1){
+    return(list(
+      title = caption_metadata$title[v],
+      description = caption_metadata$description[v],
+      dataset = caption_metadata$dataset_name[v],
+      url = caption_metadata$url[v],
+      season = ifelse(is.na(s), "", s),
+      reference = ""
+    ))
   }
   return(list(
     title = "Data Layer", 
@@ -313,3 +315,33 @@ coords_polarstern <- data$sensor |>
   arrange(date) |> 
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326) |> 
   summarise(geometry = st_cast(st_combine(geometry), "LINESTRING"))
+
+
+## for deploying app
+## only include these files!
+# rsconnect::deployApp(
+#     appName = "wobec-summary-data",
+#     account = "ocean-src",
+#     appFiles = c(
+#       "global.R",
+#       "ui.R",
+#       "server.R",
+#       "requirements.txt",
+#       "renv.lock",
+#       "index.html",
+#       "www/images",
+#       "www/style.css",
+#       "www/distAnt.csv",
+#       "www/tsData.csv",
+#       "www/distAnt",
+#       "www/chlorophyllA/all",
+#       "www/chlorophyllA/summer",
+#       "www/chlorophyllA/winter",
+#       "www/surfaceSalinity/all",
+#       "www/surfaceSalinity/summer",
+#       "www/surfaceSalinity/winter",
+#       "www/seaiceDays/all",
+#       "www/statisticalAreasCCAMLR",
+#       "www/studyAreaWOBEC"
+#     )
+#   )

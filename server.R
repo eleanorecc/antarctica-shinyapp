@@ -147,13 +147,13 @@ server <- function(input, output, session) {
       ## check if it's a diff layer
       if(str_detect(input$tilesLeft, "diff")) {
         caption_data$title <- sprintf(
-          "%s, Difference %s minus 1998-2006",
-          caption_data$title, years
+          "%s, %s Difference %s minus 1998-2006",
+          caption_data$title, caption_data$season, years
         )
       } else {
         caption_data$title <- sprintf(
-          "%s, %s Average",
-          caption_data$title, years
+          "%s, %s %s Average",
+          caption_data$title, years, caption_data$season
         )
       }
       renderCaption(caption_data)
@@ -172,13 +172,13 @@ server <- function(input, output, session) {
       ## check if it's a diff layer
       if(str_detect(input$tilesRight, "diff")) {
         caption_data$title <- sprintf(
-          "%s, Difference %s minus 1998-2006",
-          caption_data$title, years
+          "%s, %s Difference %s minus 1998-2006",
+          caption_data$title, caption_data$season, years
         )
       } else {
         caption_data$title <- sprintf(
-          "%s, %s Average",
-          caption_data$title, years
+          "%s, %s %s Average",
+          caption_data$title, years, caption_data$season
         )
       }
       renderCaption(caption_data)
