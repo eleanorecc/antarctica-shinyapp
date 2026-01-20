@@ -31,7 +31,7 @@ terraOptions(tempdir = tmp_distant, memmax = 2)
 
 
 ## process all datasets
-for(i in 155:nrow(distant_data)) {
+for(i in 1:nrow(distant_data)) {
   nm <- distant_data$name[i]
 
   info <- filter(distant_data, name == nm)
@@ -51,10 +51,15 @@ for(i in 155:nrow(distant_data)) {
     vsi_url <- paste0("/vsicurl/", info$url)
     rr <- rast(vsi_url, lyrs = info$lyrnum)
 
-    ## extent matching original raster to crop before projecting just once
-    # bb <- project(ext(c(-180, 180, -90, -45)), "EPSG:4326", crs(rr))
-    bb <- project(ext(c(-70, 60, -80, -45)), "EPSG:4326", crs(rr))
-    
+    ## bounding box extent matching original raster to crop before projecting just once
+    ## use weddell gyre box created in global.R, the same as used to extract copernicus data
+    bb <- st_transform(weddell_gyre, st_crs(rr))
+
+    ## note: crop trims to bb extent without clipping to polygon's actual shape
+    ## this produces a rectangular subset aligned to the raster grid
+    ## where rr is a projected crs it won't align with other layers
+
+
     rresamp <- rr |> 
       crop(bb) |> 
       project("EPSG:3031")

@@ -1,158 +1,158 @@
-name,success,timestamp
-"Adélie penguin, habitat importance",TRUE,57:39.0
-"Andersson's lanternfish, habitat suitability",TRUE,57:39.0
-"Antarctic armhook squid, habitat importance",TRUE,57:39.0
-"Antarctic fur seal, habitat importance",TRUE,57:39.0
-"Antarctic krill, spawning habitat duration",TRUE,57:39.0
-"Antarctic krill, summer spawning habitat index",TRUE,57:39.0
-"Antarctic lanternfish, 2055 projections RCP45",TRUE,57:39.0
-"Antarctic lanternfish, 2055 projections RCP85",TRUE,57:39.0
-"Antarctic lanternfish, 2099 projections RCP45",TRUE,57:39.0
-"Antarctic lanternfish, 2099 projections RCP85",TRUE,57:39.0
-"Antarctic lanternfish, daytime individuals per 1000 cubic meter",TRUE,57:39.0
-"Antarctic lanternfish, nighttime individuals per 1000 cubic meter",TRUE,57:39.0
-"Antarctic lanternfish, habitat suitability",TRUE,57:39.0
-"Electron subantarctic lanternfish, habitat suitability",TRUE,57:39.0
-"Antarctic petrel, habitat importance",TRUE,57:39.0
-"Antarctic squid, habitat importance",TRUE,57:39.0
-"Areas of significance to multiple predators species, with results weighted by colony sizes",TRUE,57:39.0
-"Atlantic hooked squid, habitat importance",TRUE,57:39.0
-"Bathylagid, daytime individuals per 1000 cubic meter",TRUE,57:39.0
-"Bathylagid, nighttime individuals per 1000 cubic meter",TRUE,57:39.0
-"Black-browed albatross, habitat importance",TRUE,57:39.0
-"Blue whale, April, habitat suitability",TRUE,57:39.0
-"Blue whale, August, habitat suitability",TRUE,57:39.0
-"Blue whale, December, habitat suitability",TRUE,57:39.0
-"Blue whale, February, habitat suitability",TRUE,57:39.0
-"Blue whale, January habitat suitability",TRUE,57:39.0
-"Blue whale, July, habitat suitability",TRUE,57:39.0
-"Blue whale, June, habitat suitability",TRUE,57:39.0
-"Blue whale, March, habitat suitability",TRUE,57:39.0
-"Blue whale, May, habitat suitability",TRUE,57:39.0
-"Blue whale, November, habitat suitability",TRUE,57:39.0
-"Blue whale, October, habitat suitability",TRUE,57:39.0
-"Blue whale, September, habitat suitability",TRUE,57:39.0
-"Grand lanternfish, 2055 projections RCP45",TRUE,57:39.0
-"Bolin's lanternfish, 2055 projections RCP45",TRUE,57:39.0
-"Grand lanternfish, 2055 projections RCP85",TRUE,57:39.0
-"Bolin's lanternfish, 2055 projections RCP85",TRUE,57:39.0
-"Grand lanternfish, 2099 projections RCP45",TRUE,57:39.0
-"Bolin's lanternfish, 2099 projections RCP45",TRUE,57:39.0
-"Grand lanternfish, 2099 projections RCP85",TRUE,57:39.0
-"Bolin's lanternfish, 2099 projections RCP85",TRUE,57:39.0
-"Bolin's lanternfish, daytime individuals per 1000 cubic meter",TRUE,57:39.0
-"Bolin's lanternfish, nighttime individuals per 1000 cubic meter",TRUE,57:39.0
-"Grand lanternfish, habitat suitability",TRUE,57:39.0
-"Bolin's lanternfish, habitat suitability",TRUE,57:39.0
-"Brauer's lanternfish, 2055 projections RCP45",TRUE,57:39.0
-"Brauer's lanternfish, 2055 projections RCP85",TRUE,57:39.0
-"Brauer's lanternfish, 2099 projections RCP45",TRUE,57:39.0
-"Brauer's lanternfish, 2099 projections RCP85",TRUE,57:39.0
-"Brauer's lanternfish, daytime individuals per 1000 cubic meter",TRUE,57:39.0
-"Brauer's lanternfish, nighttime individuals per 1000 cubic meter",TRUE,57:39.0
-"Brauer's lanternfish, habitat suitability",TRUE,57:39.0
-"Chinstrap penguin, habitat suitability",TRUE,57:39.0
-"Circumantarctic squid, habitat importance",TRUE,57:39.0
-"Colossal squid, habitat importance",TRUE,57:39.0
-"Crabeater seal, habitat importance",TRUE,57:39.0
-"Deepsea squid, habitat importance",TRUE,57:39.0
-"Electron subantarctic lanternfish, 2055 projections RCP45",TRUE,57:39.0
-"Electron subantarctic lanternfish, 2055 projections RCP85",TRUE,57:39.0
-"Electron subantarctic lanternfish, 2099 projections RCP45",TRUE,57:39.0
-"Electron subantarctic lanternfish, 2099 projections RCP85",TRUE,57:39.0
-"Electron subantarctic, daytime individuals per 1000 cubic meter",TRUE,57:39.0
-"Electron subantarctic, nighttime individuals per 1000 cubic meter",TRUE,57:39.0
-"Eltanin's squid, habitat importance",TRUE,57:39.0
-"Emperor penguin, habitat importance",TRUE,57:39.0
-"Filippov's flying squid, habitat importance",TRUE,57:39.0
-"Fin whale, April habitat suitability",TRUE,57:39.0
-"Fin whale, August habitat suitability",TRUE,57:39.0
-"Fin whale, December habitat suitability",TRUE,57:39.0
-"Fin whale, February habitat suitability",TRUE,57:39.0
-"Fin whale, January habitat suitability",TRUE,57:39.0
-"Fin whale, July habitat suitability",TRUE,57:39.0
-"Fin whale, June habitat suitability",TRUE,57:39.0
-"Fin whale, March habitat suitability",TRUE,57:39.0
-"Fin whale, May habitat suitability",TRUE,57:39.0
-"Fin whale, November habitat suitability",TRUE,57:39.0
-"Fin whale, October habitat suitability",TRUE,57:39.0
-"Fin whale, September habitat suitability",TRUE,57:39.0
-"Fraser's lanternfish, 2055 projections RCP45",TRUE,57:39.0
-"Fraser's lanternfish, 2055 projections RCP85",TRUE,57:39.0
-"Fraser's lanternfish, 2099 projections RCP45",TRUE,57:39.0
-"Fraser's lanternfish, 2099 projections RCP85",TRUE,57:39.0
-"Fraser's lanternfish, daytime individuals per 1000 cubic meter",TRUE,57:39.0
-"Fraser's lanternfish, nighttime individuals per 1000 cubic meter",TRUE,57:39.0
-"Fraser's lanternfish, habitat suitability",TRUE,57:39.0
-"Gentoo penguin, habitat suitability",TRUE,57:39.0
-"Giant warty squid, habitat importance",TRUE,57:39.0
-"Glacial squid, habitat importance",TRUE,57:39.0
-"Glass squid, habitat importance",TRUE,57:39.0
-"Greater hooked squid, habitat importance",TRUE,57:39.0
-"Grey-headed albatross, habitat importance",TRUE,57:39.0
-"Humpback whale, April, habitat suitability",TRUE,57:39.0
-"Humpback whale, August, habitat suitability",TRUE,57:39.0
-"Humpback whale, December, habitat suitability",TRUE,57:39.0
-"Humpback whale, February, habitat suitability",TRUE,57:39.0
-"Humpback whale, habitat importance",TRUE,57:39.0
-"Humpback whale, January, habitat suitability",TRUE,57:39.0
-"Humpback whale, July, habitat suitability",TRUE,57:39.0
-"Humpback whale, June, habitat suitability",TRUE,57:39.0
-"Humpback whale, March, habitat suitability",TRUE,57:39.0
-"Humpback whale, May, habitat suitability",TRUE,57:39.0
-"Humpback whale, November, habitat suitability",TRUE,57:39.0
-"Humpback whale, October, habitat suitability",TRUE,57:39.0
-"Humpback whale, September, habitat suitability",TRUE,57:39.0
-"King penguin, habitat importance",TRUE,57:39.0
-"Krill (Euphausia crystallorophias), probability of presence",TRUE,57:39.0
-Krill (Euphausia superba) probability of presence,TRUE,57:39.0
-"Krill (Euphausia vallentini), probability of presence",TRUE,57:39.0
-"Krill (Thysanoessa macrura), probability of presence",TRUE,57:39.0
-"Light-mantled albatross, habitat importance",TRUE,57:39.0
-"Macaroni penguin, habitat importance",TRUE,57:39.0
-"Minke whale, April, habitat suitability",TRUE,57:39.0
-"Minke whale, August, habitat suitability",TRUE,57:39.0
-"Minke whale, December, habitat suitability",TRUE,57:39.0
-"Minke whale, February, habitat suitability",TRUE,57:39.0
-"Minke whale, January, habitat suitability",TRUE,57:39.0
-"Minke whale, July, habitat suitability",TRUE,57:39.0
-"Minke whale, June, habitat suitability",TRUE,57:39.0
-"Minke whale, March, habitat suitability",TRUE,57:39.0
-"Minke whale, May, habitat suitability",TRUE,57:39.0
-"Minke whale, November, habitat suitability",TRUE,57:39.0
-"Minke whale, October, habitat suitability",TRUE,57:39.0
-"Minke whale, September, habitat suitability",TRUE,57:39.0
-"Nichols's lanternfish, 2055 projections RCP45",TRUE,57:39.0
-"Nichols's lanternfish, 2055 projections RCP85",TRUE,57:39.0
-"Nichols's lanternfish, 2099 projections RCP45",TRUE,57:39.0
-"Nichols's lanternfish, 2099 projections RCP85",TRUE,57:39.0
-"Nichols's lanternfish, daytime individuals per 1000 cubic meter",TRUE,57:39.0
-"Nichols's lanternfish, nighttime individuals per 1000 cubic meter",TRUE,57:39.0
-"Nichols's lanternfish, habitat suitability",TRUE,57:39.0
-"Opistopterus lanternfish, 2055 projections RCP45",TRUE,57:39.0
-"Opistopterus lanternfish, 2055 projections RCP85",TRUE,57:39.0
-"Opistopterus lanternfish, 2099 projections RCP45",TRUE,57:39.0
-"Opistopterus lanternfish, 2099 projections RCP85",TRUE,57:39.0
-"Opistopterus lanternfish, habitat suitability",TRUE,57:39.0
-"Patagonian squid, habitat importance",TRUE,57:39.0
-"Rhombic lanternfish, 2055 projections RCP45",TRUE,57:39.0
-"Rhombic lanternfish, 2055 projections RCP85",TRUE,57:39.0
-"Rhombic lanternfish, 2099 projections RCP45",TRUE,57:39.0
-"Rhombic lanternfish, 2099 projections RCP85",TRUE,57:39.0
-"Rhombic lanternfish, daytime individuals per 1000 cubic meter",TRUE,57:39.0
-"Rhombic lanternfish, nighttime individuals per 1000 cubic meter",TRUE,57:39.0
-"Robson's squid, habitat importance",TRUE,57:39.0
-"Sevenstar flying squid, habitat importance",TRUE,57:39.0
-"Sooty albatross, habitat importance",TRUE,57:39.0
-"Southern elephant seal, habitat importance",TRUE,57:39.0
-Species richness,TRUE,57:39.0
-"Tenison's lanternfish, 2055 projections RCP45",TRUE,57:39.0
-"Tenison's lanternfish, 2055 projections RCP85",TRUE,57:39.0
-"Tenison's lanternfish, 2099 projections RCP45",TRUE,57:39.0
-"Tenison's lanternfish, 2099 projections RCP85",TRUE,57:39.0
-"Tenison's lanternfish, daytime individuals per 1000 cubic meter",TRUE,57:39.0
-"Tenison's lanternfish, nighttime individuals per 1000 cubic meter",TRUE,57:39.0
-"Tenison's lanternfish, habitat suitability",TRUE,57:39.0
-"Wandering albatross, habitat importance",TRUE,57:39.0
-"Weddell seal, habitat importance",TRUE,57:39.0
-"White-chinned petrel, habitat importance",TRUE,57:39.0
+"name","success","timestamp"
+"Adélie penguin, habitat importance",TRUE,"2026-01-19 15:59:33.479478"
+"Andersson's lanternfish, habitat suitability",TRUE,"2026-01-19 15:59:43.828238"
+"Antarctic armhook squid, habitat importance",TRUE,"2026-01-19 15:59:51.719707"
+"Antarctic fur seal, habitat importance",TRUE,"2026-01-19 15:59:59.123434"
+"Antarctic krill, spawning habitat duration",TRUE,"2026-01-19 16:00:05.982731"
+"Antarctic krill, summer spawning habitat index",TRUE,"2026-01-19 16:00:12.957316"
+"Antarctic lanternfish, 2055 projections RCP45",TRUE,"2026-01-19 16:00:19.996118"
+"Antarctic lanternfish, 2055 projections RCP85",TRUE,"2026-01-19 16:00:27.157361"
+"Antarctic lanternfish, 2099 projections RCP45",TRUE,"2026-01-19 16:00:35.100808"
+"Antarctic lanternfish, 2099 projections RCP85",TRUE,"2026-01-19 16:00:44.107234"
+"Antarctic lanternfish, daytime individuals per 1000 cubic meter",TRUE,"2026-01-19 16:00:51.848908"
+"Antarctic lanternfish, nighttime individuals per 1000 cubic meter",TRUE,"2026-01-19 16:00:59.19646"
+"Antarctic lanternfish, habitat suitability",TRUE,"2026-01-19 16:01:06.094767"
+"Electron subantarctic lanternfish, habitat suitability",TRUE,"2026-01-19 16:01:12.778075"
+"Antarctic petrel, habitat importance",TRUE,"2026-01-19 16:01:20.104349"
+"Antarctic squid, habitat importance",TRUE,"2026-01-19 16:01:27.892211"
+"Areas of significance to multiple predators species, with results weighted by colony sizes",TRUE,"2026-01-19 16:01:35.920999"
+"Atlantic hooked squid, habitat importance",TRUE,"2026-01-19 16:01:45.238102"
+"Bathylagid, daytime individuals per 1000 cubic meter",TRUE,"2026-01-19 16:01:52.880637"
+"Bathylagid, nighttime individuals per 1000 cubic meter",TRUE,"2026-01-19 16:02:00.574531"
+"Black-browed albatross, habitat importance",TRUE,"2026-01-19 16:02:08.053624"
+"Blue whale, April, habitat suitability",TRUE,"2026-01-20 11:07:57.271845"
+"Blue whale, August, habitat suitability",TRUE,"2026-01-20 11:08:12.09502"
+"Blue whale, December, habitat suitability",TRUE,"2026-01-20 11:08:22.791107"
+"Blue whale, February, habitat suitability",TRUE,"2026-01-20 11:08:33.71565"
+"Blue whale, January habitat suitability",TRUE,"2026-01-20 11:08:44.297531"
+"Blue whale, July, habitat suitability",TRUE,"2026-01-20 11:08:54.89623"
+"Blue whale, June, habitat suitability",TRUE,"2026-01-20 11:09:05.844121"
+"Blue whale, March, habitat suitability",TRUE,"2026-01-20 11:09:17.863392"
+"Blue whale, May, habitat suitability",TRUE,"2026-01-20 11:09:27.972125"
+"Blue whale, November, habitat suitability",TRUE,"2026-01-20 11:09:38.457851"
+"Blue whale, October, habitat suitability",TRUE,"2026-01-20 11:09:48.870085"
+"Blue whale, September, habitat suitability",TRUE,"2026-01-20 11:09:59.044099"
+"Grand lanternfish, 2055 projections RCP45",TRUE,"2026-01-19 16:03:39.579743"
+"Bolin's lanternfish, 2055 projections RCP45",TRUE,"2026-01-19 16:03:48.460395"
+"Grand lanternfish, 2055 projections RCP85",TRUE,"2026-01-19 16:03:55.750526"
+"Bolin's lanternfish, 2055 projections RCP85",TRUE,"2026-01-19 16:04:02.988456"
+"Grand lanternfish, 2099 projections RCP45",TRUE,"2026-01-19 16:04:09.927512"
+"Bolin's lanternfish, 2099 projections RCP45",TRUE,"2026-01-19 16:04:17.199084"
+"Grand lanternfish, 2099 projections RCP85",TRUE,"2026-01-19 16:04:24.58744"
+"Bolin's lanternfish, 2099 projections RCP85",TRUE,"2026-01-19 16:04:32.00892"
+"Bolin's lanternfish, daytime individuals per 1000 cubic meter",TRUE,"2026-01-19 16:04:40.222131"
+"Bolin's lanternfish, nighttime individuals per 1000 cubic meter",TRUE,"2026-01-19 16:04:49.480026"
+"Grand lanternfish, habitat suitability",TRUE,"2026-01-19 16:04:56.382933"
+"Bolin's lanternfish, habitat suitability",TRUE,"2026-01-19 16:05:03.297206"
+"Brauer's lanternfish, 2055 projections RCP45",TRUE,"2026-01-19 16:05:10.24169"
+"Brauer's lanternfish, 2055 projections RCP85",TRUE,"2026-01-19 16:05:17.42879"
+"Brauer's lanternfish, 2099 projections RCP45",TRUE,"2026-01-19 16:05:24.589369"
+"Brauer's lanternfish, 2099 projections RCP85",TRUE,"2026-01-19 16:05:31.733794"
+"Brauer's lanternfish, daytime individuals per 1000 cubic meter",TRUE,"2026-01-19 16:05:39.561109"
+"Brauer's lanternfish, nighttime individuals per 1000 cubic meter",TRUE,"2026-01-19 16:05:48.289092"
+"Brauer's lanternfish, habitat suitability",TRUE,"2026-01-19 16:05:56.158132"
+"Chinstrap penguin, habitat suitability",TRUE,"2026-01-19 16:06:02.944981"
+"Circumantarctic squid, habitat importance",TRUE,"2026-01-19 16:06:10.388618"
+"Colossal squid, habitat importance",TRUE,"2026-01-19 16:06:18.039019"
+"Crabeater seal, habitat importance",TRUE,"2026-01-19 16:06:25.605656"
+"Deepsea squid, habitat importance",TRUE,"2026-01-19 16:06:33.112608"
+"Electron subantarctic lanternfish, 2055 projections RCP45",TRUE,"2026-01-19 16:06:40.769689"
+"Electron subantarctic lanternfish, 2055 projections RCP85",TRUE,"2026-01-19 16:06:49.870354"
+"Electron subantarctic lanternfish, 2099 projections RCP45",TRUE,"2026-01-19 16:06:57.459998"
+"Electron subantarctic lanternfish, 2099 projections RCP85",TRUE,"2026-01-19 16:07:04.599784"
+"Electron subantarctic, daytime individuals per 1000 cubic meter",TRUE,"2026-01-19 16:07:12.380205"
+"Electron subantarctic, nighttime individuals per 1000 cubic meter",TRUE,"2026-01-19 16:07:19.677628"
+"Eltanin's squid, habitat importance",TRUE,"2026-01-19 16:07:27.449481"
+"Emperor penguin, habitat importance",TRUE,"2026-01-19 16:07:34.980244"
+"Filippov's flying squid, habitat importance",TRUE,"2026-01-19 16:07:42.929339"
+"Fin whale, April habitat suitability",TRUE,"2026-01-20 11:10:09.683556"
+"Fin whale, August habitat suitability",TRUE,"2026-01-20 11:10:21.997932"
+"Fin whale, December habitat suitability",TRUE,"2026-01-20 11:10:31.807773"
+"Fin whale, February habitat suitability",TRUE,"2026-01-20 11:10:42.050783"
+"Fin whale, January habitat suitability",TRUE,"2026-01-20 11:10:52.018345"
+"Fin whale, July habitat suitability",TRUE,"2026-01-20 11:11:02.133577"
+"Fin whale, June habitat suitability",TRUE,"2026-01-20 11:11:12.705536"
+"Fin whale, March habitat suitability",TRUE,"2026-01-20 11:11:24.997769"
+"Fin whale, May habitat suitability",TRUE,"2026-01-20 11:11:35.099891"
+"Fin whale, November habitat suitability",TRUE,"2026-01-20 11:11:45.296569"
+"Fin whale, October habitat suitability",TRUE,"2026-01-20 11:11:55.175636"
+"Fin whale, September habitat suitability",TRUE,"2026-01-20 11:12:05.307414"
+"Fraser's lanternfish, 2055 projections RCP45",TRUE,"2026-01-19 16:09:40.771831"
+"Fraser's lanternfish, 2055 projections RCP85",TRUE,"2026-01-19 16:09:57.744596"
+"Fraser's lanternfish, 2099 projections RCP45",TRUE,"2026-01-19 16:10:12.543743"
+"Fraser's lanternfish, 2099 projections RCP85",TRUE,"2026-01-19 16:11:01.180791"
+"Fraser's lanternfish, daytime individuals per 1000 cubic meter",TRUE,"2026-01-19 16:11:55.792308"
+"Fraser's lanternfish, nighttime individuals per 1000 cubic meter",TRUE,"2026-01-19 16:12:41.749768"
+"Fraser's lanternfish, habitat suitability",TRUE,"2026-01-19 16:12:55.370198"
+"Gentoo penguin, habitat suitability",TRUE,"2026-01-19 16:13:05.041756"
+"Giant warty squid, habitat importance",TRUE,"2026-01-19 16:13:49.460215"
+"Glacial squid, habitat importance",TRUE,"2026-01-19 16:14:01.283405"
+"Glass squid, habitat importance",TRUE,"2026-01-19 16:14:10.37735"
+"Greater hooked squid, habitat importance",TRUE,"2026-01-19 16:14:19.35118"
+"Grey-headed albatross, habitat importance",TRUE,"2026-01-19 16:14:52.172644"
+"Humpback whale, April, habitat suitability",TRUE,"2026-01-20 11:12:15.714845"
+"Humpback whale, August, habitat suitability",TRUE,"2026-01-20 11:12:27.379708"
+"Humpback whale, December, habitat suitability",TRUE,"2026-01-20 11:12:37.359891"
+"Humpback whale, February, habitat suitability",TRUE,"2026-01-20 11:12:47.839223"
+"Humpback whale, habitat importance",TRUE,"2026-01-20 11:12:59.000786"
+"Humpback whale, January, habitat suitability",TRUE,"2026-01-20 11:13:09.23797"
+"Humpback whale, July, habitat suitability",TRUE,"2026-01-20 11:13:19.808035"
+"Humpback whale, June, habitat suitability",TRUE,"2026-01-20 11:13:31.648845"
+"Humpback whale, March, habitat suitability",TRUE,"2026-01-20 11:13:41.366252"
+"Humpback whale, May, habitat suitability",TRUE,"2026-01-20 11:13:51.321858"
+"Humpback whale, November, habitat suitability",TRUE,"2026-01-20 11:14:01.041482"
+"Humpback whale, October, habitat suitability",TRUE,"2026-01-20 11:14:10.970766"
+"Humpback whale, September, habitat suitability",TRUE,"2026-01-20 11:14:21.407149"
+"King penguin, habitat importance",TRUE,"2026-01-19 16:29:25.9565"
+"Krill (Euphausia crystallorophias), probability of presence",TRUE,"2026-01-19 16:29:50.7058"
+"Krill (Euphausia superba) probability of presence",TRUE,"2026-01-19 16:30:17.757421"
+"Krill (Euphausia vallentini), probability of presence",TRUE,"2026-01-19 16:30:26.270839"
+"Krill (Thysanoessa macrura), probability of presence",TRUE,"2026-01-19 16:30:35.967149"
+"Light-mantled albatross, habitat importance",TRUE,"2026-01-19 16:31:09.089521"
+"Macaroni penguin, habitat importance",TRUE,"2026-01-19 16:31:23.401592"
+"Minke whale, April, habitat suitability",TRUE,"2026-01-20 11:14:33.304524"
+"Minke whale, August, habitat suitability",TRUE,"2026-01-20 11:14:43.165599"
+"Minke whale, December, habitat suitability",TRUE,"2026-01-20 11:14:53.547957"
+"Minke whale, February, habitat suitability",TRUE,"2026-01-20 11:15:03.310691"
+"Minke whale, January, habitat suitability",TRUE,"2026-01-20 11:15:13.229211"
+"Minke whale, July, habitat suitability",TRUE,"2026-01-20 11:15:24.002269"
+"Minke whale, June, habitat suitability",TRUE,"2026-01-20 11:15:36.355783"
+"Minke whale, March, habitat suitability",TRUE,"2026-01-20 11:15:46.356694"
+"Minke whale, May, habitat suitability",TRUE,"2026-01-20 11:15:56.387845"
+"Minke whale, November, habitat suitability",TRUE,"2026-01-20 11:16:06.323609"
+"Minke whale, October, habitat suitability",TRUE,"2026-01-20 11:16:16.253857"
+"Minke whale, September, habitat suitability",TRUE,"2026-01-20 11:16:26.628221"
+"Nichols's lanternfish, 2055 projections RCP45",TRUE,"2026-01-19 16:48:44.591782"
+"Nichols's lanternfish, 2055 projections RCP85",TRUE,"2026-01-19 16:50:34.121434"
+"Nichols's lanternfish, 2099 projections RCP45",TRUE,"2026-01-19 16:51:42.681802"
+"Nichols's lanternfish, 2099 projections RCP85",TRUE,"2026-01-19 16:52:34.766071"
+"Nichols's lanternfish, daytime individuals per 1000 cubic meter",TRUE,"2026-01-19 16:53:24.268662"
+"Nichols's lanternfish, nighttime individuals per 1000 cubic meter",TRUE,"2026-01-19 16:54:47.728712"
+"Nichols's lanternfish, habitat suitability",TRUE,"2026-01-19 16:55:11.141991"
+"Opistopterus lanternfish, 2055 projections RCP45",TRUE,"2026-01-19 16:55:31.112848"
+"Opistopterus lanternfish, 2055 projections RCP85",TRUE,"2026-01-19 16:56:21.551292"
+"Opistopterus lanternfish, 2099 projections RCP45",TRUE,"2026-01-19 16:56:40.349044"
+"Opistopterus lanternfish, 2099 projections RCP85",TRUE,"2026-01-19 16:57:03.058848"
+"Opistopterus lanternfish, habitat suitability",TRUE,"2026-01-19 16:57:32.664033"
+"Patagonian squid, habitat importance",TRUE,"2026-01-19 17:22:02.272466"
+"Rhombic lanternfish, 2055 projections RCP45",TRUE,"2026-01-19 17:02:11.268128"
+"Rhombic lanternfish, 2055 projections RCP85",TRUE,"2026-01-19 17:02:26.790479"
+"Rhombic lanternfish, 2099 projections RCP45",TRUE,"2026-01-19 17:02:58.269056"
+"Rhombic lanternfish, 2099 projections RCP85",TRUE,"2026-01-19 17:03:43.732354"
+"Rhombic lanternfish, daytime individuals per 1000 cubic meter",TRUE,"2026-01-19 17:04:00.8854"
+"Rhombic lanternfish, nighttime individuals per 1000 cubic meter",TRUE,"2026-01-19 17:04:32.478573"
+"Robson's squid, habitat importance",TRUE,"2026-01-19 17:04:59.690585"
+"Sevenstar flying squid, habitat importance",TRUE,"2026-01-19 17:05:25.987921"
+"Sooty albatross, habitat importance",TRUE,"2026-01-19 17:06:15.908546"
+"Southern elephant seal, habitat importance",TRUE,"2026-01-19 17:06:34.390012"
+"Species richness",TRUE,"2026-01-19 17:07:09.962378"
+"Tenison's lanternfish, 2055 projections RCP45",TRUE,"2026-01-19 17:07:35.629633"
+"Tenison's lanternfish, 2055 projections RCP85",TRUE,"2026-01-19 17:08:24.608595"
+"Tenison's lanternfish, 2099 projections RCP45",TRUE,"2026-01-19 17:09:00.110917"
+"Tenison's lanternfish, 2099 projections RCP85",TRUE,"2026-01-19 17:09:19.228185"
+"Tenison's lanternfish, daytime individuals per 1000 cubic meter",TRUE,"2026-01-19 17:09:59.98704"
+"Tenison's lanternfish, nighttime individuals per 1000 cubic meter",TRUE,"2026-01-19 17:23:51.417194"
+"Tenison's lanternfish, habitat suitability",TRUE,"2026-01-19 17:24:54.866707"
+"Wandering albatross, habitat importance",TRUE,"2026-01-19 17:12:57.139885"
+"Weddell seal, habitat importance",TRUE,"2026-01-19 17:13:43.99866"
+"White-chinned petrel, habitat importance",TRUE,"2026-01-19 17:14:11.191191"
