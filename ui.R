@@ -36,7 +36,7 @@ htmlTemplate(
     label = NULL,
     min = 1900,
     max = as.integer(format(Sys.Date(), "%Y")),
-    value = c(2000, as.integer(format(Sys.Date(), "%Y"))),
+    value = c(1960, as.integer(format(Sys.Date(), "%Y"))),
     step = 1,
     sep = ""
   ),

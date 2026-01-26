@@ -231,7 +231,7 @@ caption_metadata <- data.frame(
   title = c("Chlorophyll A Data", "Sea Ice Data", "Surface Salinity Data"),
   description = c(
     "Chlorophyll A averages calculated from Copernicus Marine Dataset:",
-    "Sea Ice averages calculated (taking >15% sea ice concentrations as 'ice covered') from Copernicus Marine Dataset:",
+    "Sea Ice-Days averages calculated (taking days with >15% sea ice concentrations as 'ice covered') from Copernicus Marine Dataset:",
     "Salinity averages calculated from Copernicus Marine Dataset:"
   ),
   dataset_name = c(
