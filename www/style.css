@@ -241,7 +241,8 @@ header {
 /* LANDING PAGE AKA HEADER */
 
 .hero-image {
-    background: linear-gradient(rgba(159, 185, 197, 0.9), rgba(14, 57, 93, 0.4)), url('images/270A8692-DRAFT.JPG') no-repeat scroll center top;
+    background: linear-gradient(rgba(8, 48, 91, 0.79), rgba(91, 188, 204, 0.33)), url('images/270A8692.JPG') no-repeat scroll center top;
+    /* background: linear-gradient(rgba(159, 185, 197, 0.9), rgba(14, 57, 93, 0.4)), url('images/270A8692-DRAFT.JPG') no-repeat scroll center top; */
     /* background: linear-gradient(rgba(197, 236, 255, 0.5), rgba(4, 61, 72, 0.6)), url('images/270A8692-Small.JPG') no-repeat scroll center top; */
     background-size: cover;
     background-attachment: fixed;
@@ -308,10 +309,12 @@ header {
 
 @media (max-width: 900px) and (orientation: portrait) {
   .header-text h2 {
-      font-size: 32px;
-      margin-top: 80px;
-      margin-bottom: 20px;
+      font-size: 18px;
+      margin-top: 70px;
+      margin-bottom: 5px;
       margin-left: 20px;
+      letter-spacing: -1px;
+      line-height: 1.1;
   }
 }
 
@@ -334,7 +337,8 @@ header {
 
 .blue-bg {
     color: white !important;
-    background: linear-gradient(190deg, rgba(255, 255, 255, 0.45), rgba(117, 167, 183, 0.54), rgb(0, 27, 49)), url('images/WeddellSea-Art.jpg') no-repeat scroll center top / cover;
+    background: linear-gradient(190deg, rgba(90, 170, 255, 0.44), rgba(81, 112, 139, 0.62), rgb(0, 27, 49)), url('images/WeddellSea-Art.jpg') no-repeat scroll center top / cover;
+    /* background: linear-gradient(190deg, rgba(255, 255, 255, 0.45), rgba(117, 167, 183, 0.54), rgb(0, 27, 49)), url('images/WeddellSea-Art.jpg') no-repeat scroll center top / cover; */
     background-attachment: fixed;
 }
 
@@ -351,7 +355,7 @@ header {
   position: relative;
   width: 70vw;
   padding: 20px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   margin: 10px;
   z-index: 2;
 }
@@ -363,7 +367,9 @@ header {
   border-radius: 80px;
   padding-left: 110px;
   padding-right: 30px;
-  margin-left: -140px;
+  padding-top: 10px;
+  padding-bottom: 5px;
+  margin-left: -150px;
   box-shadow: var(--shadow-soft);
   transition: var(--transition-smooth);
 }
@@ -378,13 +384,15 @@ header {
      width: 90vw !important;
       margin-left: 5px;
       margin-right: 5px;
-      padding: 20px;
-      border-radius: 50px;
+      padding: 12px;
+      padding-bottom: 2px;
+      border-radius: 15px;
   }
 
   .left-box .intro-text {
     font-size: 11px;
-    line-height: 1.5;
+    line-height: 1.3;
+    font-weight: 400;
   }
 }
 
@@ -451,7 +459,8 @@ header {
   left: 0vw;
   width: 18vw;
   z-index: 0;
-  background: linear-gradient(180deg, rgba(14, 58, 93, 0.95), rgba(14, 58, 93, 0.85));
+  /* background: linear-gradient(180deg, rgba(14, 58, 93, 0.95), rgba(14, 58, 93, 0.85)); */
+  background: linear-gradient(180deg, rgb(16, 55, 88), rgb(64, 93, 124));
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
@@ -489,6 +498,12 @@ header {
     border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
     box-shadow: var(--shadow-medium);
   }
+  .map-inputbox .input-label {
+    font-size: 12px;
+  }
+  .map-inputbox .input-description {
+    font-size: 10.5px;
+  }
 }
 
 .hidden-header {
@@ -506,15 +521,17 @@ header {
 }
 
 .hidden-header h4 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  font-size: 1.6rem;
+  letter-spacing: -1px;
+  color: #0e3556;
+  font-weight: 400;
 }
 
 @media (max-width: 991px) {
   .hidden-header h4 {
-    font-size: 0.65rem;
-    line-height: 1.2;
+    font-size: 0.9rem;
+    line-height: 1.1;
+    font-weight: 500;
     padding-right: 100px;
   }
 }
@@ -550,6 +567,15 @@ header {
   font-size: 10px;
 }
 
+@media (max-width: 991px) {
+  .item {
+    font-size: 11px;
+  }
+  .option {
+    font-size: 9px;
+  }
+}
+
 .selectize-dropdown-content {
   max-height: 100px;
   overflow-y: auto;
@@ -565,6 +591,12 @@ header {
   letter-spacing: 0.5px;
 }
 
+@media (max-width: 991px) {
+  .selectize-input {
+    font-size: 10px;
+  }
+}
+
 /* Map layer dropdown positioning */
 #map1ui .shiny-input-container,
 #map2ui .shiny-input-container {
@@ -572,7 +604,7 @@ header {
   top: 10px;
   left: 10px;
   z-index: 1000;
-  width: 200px;
+  width: 190px;
 }
 
 #map1ui .shiny-input-container select,
@@ -684,6 +716,25 @@ header {
   font-size: 13px;
   font-style: italic;
   margin: 8px 0 0 0;
+}
+
+@media (max-width: 576px) {
+  .caption-title {
+    font-size: 12px;
+  }
+  .caption-reference {
+    font-size: 10px;
+  }
+  .map-caption1 .intro-text {
+    font-size: 11px;
+    line-height: 1.2;
+    font-weight: 400;
+  }
+  .map-caption2 .intro-text {
+    font-size: 11px;
+    line-height: 1.2;
+    font-weight: 400;
+  }
 }
 
 .caption-reference:empty {
@@ -806,15 +857,15 @@ header {
     top: 93px;
     left: 35vw;
     width: 65vw;
-    height: 328px;
+    height: calc((100vh - 93px - 5px) / 2);
     z-index: 0;
   }
   #map2ui {
     position: fixed;
-    top: 421px;
+    top: calc(93px + (100vh - 93px - 5px) / 2 + 5px);
     left: 35vw;
     width: 65vw;
-    height: 328px;
+    height: calc((100vh - 93px - 5px) / 2);
     z-index: 0;
   }
 }
@@ -844,8 +895,8 @@ header {
 }
 
 .highlight-blue {
-  color: var(--secondary-blue);
-  font-weight: 700;
+  /* color: var(--secondary-blue); */
+  /* font-weight: 700; */
 }
 
 .highlight-green {
@@ -1023,6 +1074,16 @@ header {
   border-bottom-color: var(--accent-green);
 }
 
+@media (max-width: 991px) {
+  .reference-list li {
+    line-height: 1.2;
+    font-size: 12px;
+  }
+  .reference-list li a {
+    font-size: 10px;
+  }
+}
+
 /* Scrollbar styling for references container */
 .references-container::-webkit-scrollbar {
   width: 8px;
@@ -1045,7 +1106,7 @@ header {
 @media (max-width: 1024px) {
   .references-grid {
     grid-template-columns: 1fr;
-    gap: 30px;
+    gap: 18px;
   }
 }
 
@@ -1055,13 +1116,13 @@ header {
   }
 
   .references-container {
-    padding: 20px 15px;
+    padding: 10px 15px;
     border-radius: var(--border-radius-md);
   }
 
   .references-title {
-    font-size: 22px;
-    margin-bottom: 20px;
+    font-size: 20px;
+    margin-bottom: 15px;
     text-align: left;
   }
 
