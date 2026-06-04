@@ -683,6 +683,62 @@ section:not(#data) {
 
 /* MAPS */
 
+/* Legend toggles — hidden on wide screens */
+.legend-toggles {
+  display: none;
+}
+
+@media (max-width: 991px) {
+  /* Hide legends by default on narrow screens */
+  #legend-left,
+  #legend-right {
+    display: none;
+  }
+
+  /* Show legend when active */
+  #legend-left.legend-visible,
+  #legend-right.legend-visible {
+    display: block;
+  }
+
+  /* Toggle button container — top right of map */
+  .legend-toggles {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 450;
+  }
+
+  .legend-toggle-btn {
+    width: 34px;
+    height: 34px;
+    background: #fff;
+    border: 2px solid rgba(0,0,0,0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+    color: #333;
+    line-height: 30px;
+    text-align: center;
+    padding: 0;
+    transition: var(--transition-smooth);
+  }
+
+  .legend-toggle-btn:hover {
+    background: #f4f4f4;
+  }
+
+  .legend-toggle-btn.active {
+    background: var(--secondary-blue);
+    color: #fff;
+    border-color: var(--secondary-blue);
+  }
+}
+
 /* Caption shared styles */
 .map-caption1 .intro-text,
 .map-caption2 .intro-text {
@@ -811,7 +867,10 @@ section:not(#data) {
 /* Narrow screens */
 @media (max-width: 991px) {
   #map-captions {
-    display: none;
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+    padding: 0;
   }
 
   .caption-info-btn {
@@ -1220,4 +1279,10 @@ section:not(#data) {
   .footer-logo {
       height: 40px;
   }
+}
+
+/* SIDE-BY-SIDE MAP DIVIDER */
+
+.leaflet-sbs-divider {
+  background-color: transparent !important;
 }

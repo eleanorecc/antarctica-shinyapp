@@ -167,6 +167,11 @@
         <button class="caption-info-btn" id="caption-info-btn" aria-label="Show captions">
           <span class="toggle-icon">i</span>
         </button>
+        <!-- Legend toggles — visible on narrow screens only -->
+        <div class="legend-toggles" id="legend-toggles">
+          <button class="legend-toggle-btn" id="legend-toggle-left" aria-label="Toggle left legend">L</button>
+          <button class="legend-toggle-btn" id="legend-toggle-right" aria-label="Toggle right legend">R</button>
+        </div>
       </div>
 
       <!-- Two-column caption box — wide screens -->
@@ -342,6 +347,21 @@
     <!--References/-->
 
     <script>
+      (function() {
+        function setupLegendToggle(btnId, legendId) {
+          var btn = document.getElementById(btnId);
+          if (!btn) return;
+          btn.addEventListener('click', function() {
+            var legend = document.getElementById(legendId);
+            if (!legend) return;
+            var visible = legend.classList.toggle('legend-visible');
+            btn.classList.toggle('active', visible);
+          });
+        }
+        setupLegendToggle('legend-toggle-left',  'legend-left');
+        setupLegendToggle('legend-toggle-right', 'legend-right');
+      })();
+
       (function() {
         var btn      = document.getElementById('caption-info-btn');
         var backdrop = document.getElementById('caption-modal-backdrop');

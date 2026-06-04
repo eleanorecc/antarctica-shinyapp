@@ -218,7 +218,7 @@ server <- function(input, output, session) {
       "palette.csv"
     ))
 
-    max_bins <- 15
+    max_bins <- 10
     p1bk <- unique(c(p1$breaks_lower, p1$breaks_upper))
     if(length(p1bk) > max_bins) {
       indices <- round(seq(1, length(p1bk), length.out = max_bins))
@@ -308,7 +308,7 @@ server <- function(input, output, session) {
       "palette.csv"
     ))
 
-    max_bins <- 15
+    max_bins <- 10
     p2bk <- unique(c(p2$breaks_lower, p2$breaks_upper))
     if(length(p2bk) > max_bins) {
       indices <- round(seq(1, length(p2bk), length.out = max_bins))
@@ -357,7 +357,7 @@ server <- function(input, output, session) {
       plotlyr, "palette.csv"
     ))
 
-    max_bins <- 15
+    max_bins <- 10
     p2bk <- unique(c(p2$breaks_lower, p2$breaks_upper))
     if(length(p2bk) > max_bins) {
       indices <- round(seq(1, length(p2bk), length.out = max_bins))
