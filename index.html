@@ -159,9 +159,10 @@
                 </p>
                 {{ shapefile_input }}
             </div>
-            <div class="mapbox1" id="map1ui">
-              {{ map1ui }}
+            <div class="mapbox" id="mapui">
+              {{ mapui }}
               {{ leftmap_input }}
+              {{ rightmap_input }}
               <button class="caption-toggle caption-toggle-1" onclick="toggleCaption('map-caption1')">
                 <span class="toggle-icon">i</span>
               </button>
@@ -170,13 +171,6 @@
                   {{ map1caption }}
                 </div>
               </div>
-            </div>
-            <div class="mapbox2" id="map2ui">
-              {{ map2ui }}
-              {{ rightmap_input }}
-              <button class="caption-toggle caption-toggle-2" onclick="toggleCaption('map-caption2')">
-                <span class="toggle-icon">i</span>
-              </button>
               <div class="map-caption2" id="map-caption2">
                 <div class="caption-content">
                   {{ map2caption }}

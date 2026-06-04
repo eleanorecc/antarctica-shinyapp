@@ -53,8 +53,7 @@ htmlTemplate(
 
   ## main content area
   # timeseries_ui = plotOutput("timeseries", height = "36vh"),
-  map1ui = leafletOutput(outputId = "map1", height = "100%"),
-  map2ui = leafletOutput(outputId = "map2", height = "100%"),
+  mapui = leafletOutput(outputId = "map", height = "100%"),
 
   map1caption = uiOutput("map1cap"),
   map2caption = uiOutput("map2cap")

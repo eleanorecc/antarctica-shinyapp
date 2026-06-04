@@ -8,6 +8,7 @@ library(bslib)
 library(shinyjs)
 library(leaflet)
 library(leaflet.extras)
+library(leaflet.extras2)
 library(leaflet.minicharts)
 library(curl)
 library(httr2)
@@ -296,6 +297,34 @@ renderCaption <- function(caption_data) {
     if(nzchar(caption_data$reference)) {
       tags$p(class = "caption-reference", caption_data$reference)
     }
+  )
+}
+
+## generate HTML for a custom positioned legend
+legendHTML <- function(palette_df, breaks) {
+  pal <- colorBin(
+    palette = palette_df$col,
+    domain  = range(breaks),
+    bins    = breaks,
+    pretty  = FALSE
+  )
+  colors <- pal(breaks[-length(breaks)] + diff(breaks) / 2)
+  labels <- sprintf("%.2g", breaks)
+  items  <- paste0(
+    '<div style="display:flex;align-items:center;margin-bottom:2px;">',
+    '<i style="background:', colors,
+    ';width:18px;height:8px;display:inline-block;margin-right:5px;"></i>',
+    '<span style="font-size:10px;">', labels[-length(labels)], ' &ndash; ', labels[-1], '</span>',
+    '</div>',
+    collapse = ""
+  )
+  paste0(
+    '<div class="legend-custom" style="',
+    'background:rgba(255,255,255,0.85);padding:6px 8px;',
+    'border-radius:4px;font-size:10px;line-height:1.4;',
+    'box-shadow:0 1px 5px rgba(0,0,0,0.4);">',
+    items,
+    '</div>'
   )
 }
 

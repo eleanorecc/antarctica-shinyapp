@@ -75,7 +75,7 @@ header {
   }
 }
 
-.box, .map-inputbox, #map1ui, #map2ui {
+.box, .map-inputbox, #mapui {
   animation: fadeInUp 0.6s ease-out;
 }
 
@@ -598,8 +598,7 @@ header {
 }
 
 /* Map layer dropdown positioning */
-#map1ui .shiny-input-container,
-#map2ui .shiny-input-container {
+#mapui .shiny-input-container {
   position: absolute;
   top: 10px;
   left: 10px;
@@ -607,8 +606,7 @@ header {
   width: 190px;
 }
 
-#map1ui .shiny-input-container select,
-#map2ui .shiny-input-container select {
+#mapui .shiny-input-container select {
   background-color: rgba(255, 255, 255, 0.95);
   box-shadow: var(--shadow-soft);
   border: none;
@@ -616,46 +614,24 @@ header {
 
 /* Shrink dropdown width on narrow screens */
 @media (max-width: 576px) {
-  #map1ui .shiny-input-container,
-  #map2ui .shiny-input-container {
+  #mapui .shiny-input-container {
     width: 140px;
   }
 
-  #map1ui .shiny-input-container select,
-  #map2ui .shiny-input-container select {
+  #mapui .shiny-input-container select {
     font-size: 9px;
   }
 }
 
-#map1ui .selectize-control,
-#map2ui .selectize-control {
+#mapui .selectize-control {
   z-index: 1000;
 }
 
-#map1ui .selectize-dropdown {
-  z-index: 2001 !important;
-}
-
-#map2ui .selectize-dropdown {
-  z-index: 1001;
-}
-
-/* Make selectize controls semi-transparent when tiles are displayed */
-.mapbox1 .selectize-control.has-tiles,
-.mapbox2 .selectize-control.has-tiles {
-  opacity: 0.5;
-  transition: opacity 0.3s ease;
-}
-
-.mapbox1 .selectize-control.has-tiles:hover,
-.mapbox2 .selectize-control.has-tiles:hover {
-   opacity: 1;
-}
+#mapui .selectize-dropdown { z-index: 2001 !important; }
 
 
 /* Ensure leaflet containers don't clip dropdowns */
-#map1ui .leaflet-container,
-#map2ui .leaflet-container {
+#mapui .leaflet-container {
   border-radius: var(--border-radius-md);
   overflow: hidden;
 }
@@ -829,22 +805,11 @@ header {
 }
 
 
-#map1ui {
+#mapui {
   position: fixed;
   top: 93px;
   left: 19vw;
-  width: 40vw;
-  height: 64vh;
-  z-index: 0;
-  border-radius: var(--border-radius-md);
-  overflow: visible;
-}
-
-#map2ui {
-  position: fixed;
-  top: 93px;
-  left: 60vw;
-  width: 40vw;
+  width: 81vw;
   height: 64vh;
   z-index: 0;
   border-radius: var(--border-radius-md);
@@ -852,20 +817,12 @@ header {
 }
 
 @media (max-width: 991px) {
-  #map1ui {
+  #mapui {
     position: fixed;
     top: 93px;
     left: 35vw;
     width: 65vw;
-    height: calc((100vh - 93px - 5px) / 2);
-    z-index: 0;
-  }
-  #map2ui {
-    position: fixed;
-    top: calc(93px + (100vh - 93px - 5px) / 2 + 5px);
-    left: 35vw;
-    width: 65vw;
-    height: calc((100vh - 93px - 5px) / 2);
+    height: calc(100vh - 93px);
     z-index: 0;
   }
 }

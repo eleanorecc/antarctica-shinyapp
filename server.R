@@ -66,14 +66,6 @@ server <- function(input, output, session) {
       attribution = "OpenStreetMap | GBIF",
       options = gbif_tile_options
     ) |>
-    addLayersControl(
-      overlayGroups = c("WOBEC Expedition", "Study Area", "Statistical Areas", "Points of Interest"),
-      position = "bottomleft"
-    ) |>
-    hideGroup("WOBEC Expedition") |>
-    hideGroup("Study Area") |>
-    hideGroup("Statistical Areas") |>
-    hideGroup("Points of Interest") |>
     addPolygons(
       data = asd,
       group = "Statistical Areas",
@@ -86,7 +78,7 @@ server <- function(input, output, session) {
       group = "WOBEC Expedition",
       color = "red", weight = 1,
       options = pathOptions(pane = "overlays")
-    ) |> 
+    ) |>
     addPolygons(
       data = wobec,
       group = "Study Area",
@@ -107,11 +99,32 @@ server <- function(input, output, session) {
       popup = "Kap Norvegia",
       fill = FALSE, weight = 12,
       options = pathOptions(pane = "overlays")
+    ) |>
+    hideGroup("WOBEC Expedition") |>
+    hideGroup("Study Area") |>
+    hideGroup("Statistical Areas") |>
+    hideGroup("Points of Interest") |>
+    ## placeholder tile groups for addSidebyside — populated by observers
+    addTiles(
+      group = "left-tiles",
+      urlTemplate = "about:blank",
+      options = tileOptions(tileSize = 256, noWrap = TRUE, tms = TRUE,
+                            continuousWorld = TRUE, pane = "customtiles")
+    ) |>
+    addTiles(
+      group = "right-tiles",
+      urlTemplate = "about:blank",
+      options = tileOptions(tileSize = 256, noWrap = TRUE, tms = TRUE,
+                            continuousWorld = TRUE, pane = "customtiles")
+    ) |>
+    addSidebyside(
+      layerId = "sbs",
+      leftId  = "left-tiles",
+      rightId = "right-tiles"
     )
 
-  ## two synced leaflet maps side-by-side
-  output$map1 <- renderLeaflet({ syncWith(basemap, "maps") })
-  output$map2 <- renderLeaflet({ syncWith(basemap, "maps") })
+  ## single map — syncWith() is removed entirely (not needed with one map instance)
+  output$map <- renderLeaflet({ basemap })
 
 
   ## render the captions
@@ -187,30 +200,27 @@ server <- function(input, output, session) {
 
   ## update left map tiles based on user selection ----
   observeEvent(input$tilesLeft, {
-    ## Clear taxon selection to allow caption to update
     updateSelectizeInput(session, "taxonKey", selected = character(0))
 
     p1 <- read.csv(file.path(
       dirData, str_replace_all(input$tilesLeft, "_", "/"),
       "palette.csv"
     ))
-    
-    ## Reduce to max 15 bins for legend display
+
     max_bins <- 15
     p1bk <- unique(c(p1$breaks_lower, p1$breaks_upper))
     if(length(p1bk) > max_bins) {
-      ## Select evenly-spaced subset of breaks
       indices <- round(seq(1, length(p1bk), length.out = max_bins))
       p1_legend_breaks <- p1bk[indices]
     } else {
       p1_legend_breaks <- p1bk
     }
 
-    leafletProxy("map1") |>
-      clearGroup("spp") |>
-      clearGroup("map1tiles") |>
+    leafletProxy("map") |>
+      removeTiles(layerId = "left-tiles") |>
       addTiles(
-        group = "map1tiles",
+        layerId = "left-tiles",
+        group  = "left-tiles",
         urlTemplate = sprintf(
           "%s/{z}/{x}/{-y}.png",
           str_replace_all(input$tilesLeft, "_", "/")
@@ -224,38 +234,22 @@ server <- function(input, output, session) {
           pane = "customtiles"
         )
       ) |>
-      clearControls() |>
-      addLegend(
-        position = "bottomright",
-        title = NULL,
-        pal = colorBin(
-          palette = p1$col,
-          domain = range(p1bk),
-          bins = p1_legend_breaks,
-          pretty = FALSE
-        ),
-        values = p1_legend_breaks,
-        opacity = 1
+      removeControl(layerId = "legend-left") |>
+      addControl(
+        layerId = "legend-left",
+        position = "bottomleft",
+        html = legendHTML(p1, p1_legend_breaks)
       )
-    
-    ## remove has-tiles class if no GBIF tiles are displayed
-    runjs("$('#tilesLeft').siblings('.selectize-control').removeClass('has-tiles');")
   }, ignoreNULL = TRUE)
 
   ## add GBIF occurrence tiles ----
-  ## Create debounced reactives to delay API calls until user stops typing/adjusting
   taxon_delayed <- debounce(reactive(input$taxonKey), 1000)
-  year_delayed <- debounce(reactive(input$yearRange), 1000)
+  year_delayed  <- debounce(reactive(input$yearRange), 1000)
 
   observeEvent(c(taxon_delayed(), year_delayed()), {
-    ## req stops execution if value is null or empty
-    ## avoids api calls with invalid or empty search terms
     req(taxon_delayed())
 
-    ## need to find taxon key given the species name
-    nm <- taxon_delayed() |>
-      str_to_title() |>
-      URLencode()
+    nm  <- taxon_delayed() |> str_to_title() |> URLencode()
     res <- paste0("https://api.gbif.org/v1/species/match?name=", nm) |>
       request() |>
       req_headers(user_agent = "DataSummaryWOBEC/1.0") |>
@@ -263,7 +257,7 @@ server <- function(input, output, session) {
 
     if(resp_status(res) < 400){
       taxa <- resp_body_json(res)
-      key <- taxa$usageKey
+      key  <- taxa$usageKey
     } else {
       key <- NULL
     }
@@ -280,46 +274,41 @@ server <- function(input, output, session) {
       )
       message(paste("GBIF API URL:", speciesOccurance))
 
-      leafletProxy("map1") |>
-        clearGroup("spp") |>
-        clearGroup("map1tiles") |>
-        clearControls() |>
+      leafletProxy("map") |>
+        removeTiles(layerId = "left-tiles") |>
         addTiles(
-          group = "spp",
+          layerId = "left-tiles",
+          group  = "left-tiles",
           urlTemplate = speciesOccurance,
           options = spp_options
-        )
-
-      ## add has-tiles to make selectize controls semi-transparent
-      runjs("$('#tilesLeft').siblings('.selectize-control').addClass('has-tiles');")
+        ) |>
+        removeControl(layerId = "legend-left")
     }
   })
 
   ## update right map tiles based on user selection ----
   observeEvent(input$tilesRight, {
-    ## Clear distAnt selection to allow caption to update
     updateSelectizeInput(session, "tilesDistAnt", selected = character(0))
-    
+
     p2 <- read.csv(file.path(
       dirData, str_replace_all(input$tilesRight, "_", "/"),
       "palette.csv"
     ))
 
-    ## Reduce to max 15 bins for legend display
     max_bins <- 15
     p2bk <- unique(c(p2$breaks_lower, p2$breaks_upper))
     if(length(p2bk) > max_bins) {
-      ## Select evenly-spaced subset of breaks
       indices <- round(seq(1, length(p2bk), length.out = max_bins))
       p2_legend_breaks <- p2bk[indices]
     } else {
       p2_legend_breaks <- p2bk
     }
 
-    leafletProxy("map2") |>
-      clearGroup("map2tiles") |>
+    leafletProxy("map") |>
+      removeTiles(layerId = "right-tiles") |>
       addTiles(
-        group = "map2tiles",
+        layerId = "right-tiles",
+        group  = "right-tiles",
         urlTemplate = sprintf(
           "%s/{z}/{x}/{-y}.png",
           str_replace_all(input$tilesRight, "_", "/")
@@ -333,22 +322,12 @@ server <- function(input, output, session) {
           pane = "customtiles"
         )
       ) |>
-      clearControls() |>
-      addLegend(
+      removeControl(layerId = "legend-right") |>
+      addControl(
+        layerId = "legend-right",
         position = "bottomright",
-        title = NULL,
-        pal = colorBin(
-          palette = p2$col,
-          domain = range(p2bk),
-          bins = p2_legend_breaks,
-          pretty = FALSE
-        ),
-        values = p2_legend_breaks,
-        opacity = 1
+        html = legendHTML(p2, p2_legend_breaks)
       )
-    
-    ## remove transparency when switching back to Copernicus tiles
-    runjs("$('#tilesRight').siblings('.selectize-control').removeClass('has-tiles');")
   })
 
   ## update map with distAnt data ----
@@ -360,29 +339,25 @@ server <- function(input, output, session) {
     plotlyr <- distAnt_delayed()
 
     p2 <- read.csv(file.path(
-      dirData, "distAnt", 
+      dirData, "distAnt",
       plotlyr, "palette.csv"
     ))
 
-    ## Reduce to max 15 bins for legend display
     max_bins <- 15
     p2bk <- unique(c(p2$breaks_lower, p2$breaks_upper))
     if(length(p2bk) > max_bins) {
-      ## Select evenly-spaced subset of breaks
       indices <- round(seq(1, length(p2bk), length.out = max_bins))
       p2_legend_breaks <- p2bk[indices]
     } else {
       p2_legend_breaks <- p2bk
     }
- 
-    leafletProxy("map2") |>
-      clearGroup("map2tiles") |>
+
+    leafletProxy("map") |>
+      removeTiles(layerId = "right-tiles") |>
       addTiles(
-        group = "map2tiles",
-        urlTemplate = sprintf(
-          "distAnt/%s/{z}/{x}/{-y}.png",
-          plotlyr
-        ),
+        layerId = "right-tiles",
+        group  = "right-tiles",
+        urlTemplate = sprintf("distAnt/%s/{z}/{x}/{-y}.png", plotlyr),
         options = tileOptions(
           tileSize = 256,
           noWrap = TRUE,
@@ -392,22 +367,12 @@ server <- function(input, output, session) {
           pane = "customtiles"
         )
       ) |>
-      clearControls() |>
-      addLegend(
+      removeControl(layerId = "legend-right") |>
+      addControl(
+        layerId = "legend-right",
         position = "bottomright",
-        title = NULL,
-        pal = colorBin(
-          palette = p2$col,
-          domain = range(p2bk),
-          bins = p2_legend_breaks,
-          pretty = FALSE
-        ),
-        values = p2_legend_breaks,
-        opacity = 1
+        html = legendHTML(p2, p2_legend_breaks)
       )
-    
-    ## has-tiles class to make selectize controls semi-transparent
-    runjs("$('#tilesRight').siblings('.selectize-control').addClass('has-tiles');")
   })
 
   ## handling user-uploaded data ----
@@ -450,18 +415,8 @@ server <- function(input, output, session) {
       message("no shapefile for mapping...")
     }
     if(!is.null(uploaded_data)){
-      ## add the uploaded layer to both maps
-      leafletProxy("map1") |>
-        clearGroup("uploaded_data") |>
-        addPolygons(
-          data = uploaded_data,
-          group = "uploaded_data",
-          col = "black",
-          weight = 1.5,
-          fillOpacity = 0,
-          options = list(pane = "owndata")
-        )
-      leafletProxy("map2") |>
+      ## add the uploaded layer to map
+      leafletProxy("map") |>
         clearGroup("uploaded_data") |>
         addPolygons(
           data = uploaded_data,
