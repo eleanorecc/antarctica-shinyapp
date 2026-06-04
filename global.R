@@ -187,43 +187,43 @@ allrasters <- list(
     `Sea Ice, Average 1998-2006` = "seaiceDays_all_19982006",
     `Sea Ice, Average 2007-2015` = "seaiceDays_all_20072015",
     `Sea Ice, Average 2016-2024` = "seaiceDays_all_20162024",
-    `Sea Ice, Change 2007-2015 vs 1998-2006` = "seaiceDays_all_20072015diff",
-    `Sea Ice, Change 2016-2024 vs 1998-2006` = "seaiceDays_all_20162024diff"
+    `Sea Ice, 2007-2015 vs 1998-2006` = "seaiceDays_all_20072015diff",
+    `Sea Ice, 2016-2024 vs 1998-2006` = "seaiceDays_all_20162024diff"
   ),
-  `Chlorophyll A Annual` = list(
-    `Chlorophyll A Annual, Average 1998-2006` = "chlorophyllA_all_19982006",
-    `Chlorophyll A Annual, Average 2007-2015` = "chlorophyllA_all_20072015",
-    `Chlorophyll A Annual, Average 2016-2024` = "chlorophyllA_all_20162024",
-    `Chlorophyll A Annual, Change 2007-2015 vs 1998-2006` = "chlorophyllA_all_20072015diff",
-    `Chlorophyll A Annual, Change 2016-2024 vs 1998-2006` = "chlorophyllA_all_20162024diff"
+  `Chl.A Annual` = list(
+    `Chl.A Annual, Average 1998-2006` = "chlorophyllA_all_19982006",
+    `Chl.A Annual, Average 2007-2015` = "chlorophyllA_all_20072015",
+    `Chl.A Annual, Average 2016-2024` = "chlorophyllA_all_20162024",
+    `Chl.A Annual, 2007-2015 vs 1998-2006` = "chlorophyllA_all_20072015diff",
+    `Chl.A Annual, 2016-2024 vs 1998-2006` = "chlorophyllA_all_20162024diff"
   ),
-  `Chlorophyll A Summer` = list(
-    `Chlorophyll A Summer, Average 1998-2006` = "chlorophyllA_summer_19982006",
-    `Chlorophyll A Summer, Average 2007-2015` = "chlorophyllA_summer_20072015",
-    `Chlorophyll A Summer, Average 2016-2024` = "chlorophyllA_summer_20162024",
-    `Chlorophyll A Summer, Change 2007-2015 vs 1998-2006` = "chlorophyllA_summer_20072015diff",
-    `Chlorophyll A Summer, Change 2016-2024 vs 1998-2006` = "chlorophyllA_summer_20162024diff"
+  `Chl.A Summer (JFM)` = list(
+    `Chl.A JFM, Average 1998-2006` = "chlorophyllA_summer_19982006",
+    `Chl.A JFM, Average 2007-2015` = "chlorophyllA_summer_20072015",
+    `Chl.A JFM, Average 2016-2024` = "chlorophyllA_summer_20162024",
+    `Chl.A JFM, 2007-2015 vs 1998-2006` = "chlorophyllA_summer_20072015diff",
+    `Chl.A JFM, 2016-2024 vs 1998-2006` = "chlorophyllA_summer_20162024diff"
   ),
-  `Chlorophyll A Winter` = list(
-    `Chlorophyll A Winter, Average 1998-2006` = "chlorophyllA_winter_19982006",
-    `Chlorophyll A Winter, Average 2007-2015` = "chlorophyllA_winter_20072015",
-    `Chlorophyll A Winter, Average 2016-2024` = "chlorophyllA_winter_20162024",
-    `Chlorophyll A Winter, Change 2007-2015 vs 1998-2006` = "chlorophyllA_winter_20072015diff",
-    `Chlorophyll A Winter, Change 2016-2024 vs 1998-2006` = "chlorophyllA_winter_20162024diff"
+  `Chl.A Winter (JAS)` = list(
+    `Chl.A JAS, Average 1998-2006` = "chlorophyllA_winter_19982006",
+    `Chl.A JAS, Average 2007-2015` = "chlorophyllA_winter_20072015",
+    `Chl.A JAS, Average 2016-2024` = "chlorophyllA_winter_20162024",
+    `Chl.A JAS, 2007-2015 vs 1998-2006` = "chlorophyllA_winter_20072015diff",
+    `Chl.A JAS, 2016-2024 vs 1998-2006` = "chlorophyllA_winter_20162024diff"
   ),
-  `Surface Salinity Annual` = list(
-    `Surface Salinity Annual, Average 1998-2006` = "surfaceSalinity_all_19982006",
-    `Surface Salinity Annual, Average 2007-2015` = "surfaceSalinity_all_20072015",
-    `Surface Salinity Annual, Average 2016-2024` = "surfaceSalinity_all_20162024",
-    `Surface Salinity Annual, Change 2007-2015 vs 1998-2006` = "surfaceSalinity_all_20072015diff",
-    `Surface Salinity Annual, Change 2016-2024 vs 1998-2006` = "surfaceSalinity_all_20162024diff"
+  `Surf. Sal. Annual` = list(
+    `Surf. Sal. Annual, Average 1998-2006` = "surfaceSalinity_all_19982006",
+    `Surf. Sal. Annual, Average 2007-2015` = "surfaceSalinity_all_20072015",
+    `Surf. Sal. Annual, Average 2016-2024` = "surfaceSalinity_all_20162024",
+    `Surf. Sal. Annual, 2007-2015 vs 1998-2006` = "surfaceSalinity_all_20072015diff",
+    `Surf. Sal. Annual, 2016-2024 vs 1998-2006` = "surfaceSalinity_all_20162024diff"
   ),
-  `Surface Salinity Summer` = list(
-    `Surface Salinity Summer, Average 1998-2006` = "surfaceSalinity_summer_19982006",
-    `Surface Salinity Summer, Average 2007-2015` = "surfaceSalinity_summer_20072015",
-    `Surface Salinity Summer, Average 2016-2024` = "surfaceSalinity_summer_20162024",
-    `Surface Salinity Summer, Change 2007-2015 vs 1998-2006` = "surfaceSalinity_summer_20072015diff",
-    `Surface Salinity Summer, Change 2016-2024 vs 1998-2006` = "surfaceSalinity_summer_20162024diff"
+  `Surf. Sal. Summer (JFM)` = list(
+    `Surf. Sal. JFM, Average 1998-2006` = "surfaceSalinity_summer_19982006",
+    `Surf. Sal. JFM, Average 2007-2015` = "surfaceSalinity_summer_20072015",
+    `Surf. Sal. JFM, Average 2016-2024` = "surfaceSalinity_summer_20162024",
+    `Surf. Sal. JFM, 2007-2015 vs 1998-2006` = "surfaceSalinity_summer_20072015diff",
+    `Surf. Sal. JFM, 2016-2024 vs 1998-2006` = "surfaceSalinity_summer_20162024diff"
   )
 )
 

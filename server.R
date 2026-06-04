@@ -57,7 +57,8 @@ server <- function(input, output, session) {
   ## make basemap ----
   basemap <- leaflet(options = c(map_options, leafletOptions(zoomControl = FALSE))) |>
     addMapPane("background", zIndex = 410) |>
-    addMapPane("customtiles", zIndex = 420)  |>
+    addMapPane("customtiles-left", zIndex = 420) |>
+    addMapPane("customtiles-right", zIndex = 421) |>
     addMapPane("overlays", zIndex = 430)  |>
     addMapPane("spp", zIndex = 440)  |>
     addMapPane("owndata", zIndex = 450) |>
@@ -106,16 +107,26 @@ server <- function(input, output, session) {
     hideGroup("Points of Interest") |>
     ## placeholder tile groups for addSidebyside — populated by observers
     addTiles(
-      group = "left-tiles",
+      layerId = "left-tiles",
+      group   = "left-tiles",
       urlTemplate = "about:blank",
-      options = tileOptions(tileSize = 256, noWrap = TRUE, tms = TRUE,
-                            continuousWorld = TRUE, pane = "customtiles")
+      options = tileOptions(
+        tileSize = 256,
+        noWrap = TRUE, tms = TRUE,
+        continuousWorld = TRUE,
+        pane = "customtiles-left"
+      )
     ) |>
     addTiles(
-      group = "right-tiles",
+      layerId = "right-tiles",
+      group   = "right-tiles",
       urlTemplate = "about:blank",
-      options = tileOptions(tileSize = 256, noWrap = TRUE, tms = TRUE,
-                            continuousWorld = TRUE, pane = "customtiles")
+      options = tileOptions(
+        tileSize = 256,
+        noWrap = TRUE, tms = TRUE,
+        continuousWorld = TRUE,
+        pane = "customtiles-right"
+      )
     ) |>
     addSidebyside(
       layerId = "sbs",
@@ -217,10 +228,10 @@ server <- function(input, output, session) {
     }
 
     leafletProxy("map") |>
-      removeTiles(layerId = "left-tiles") |>
+      clearGroup("left-tiles") |>
       addTiles(
         layerId = "left-tiles",
-        group  = "left-tiles",
+        group   = "left-tiles",
         urlTemplate = sprintf(
           "%s/{z}/{x}/{-y}.png",
           str_replace_all(input$tilesLeft, "_", "/")
@@ -231,7 +242,7 @@ server <- function(input, output, session) {
           opacity = 0.8,
           tms = TRUE,
           continuousWorld = TRUE,
-          pane = "customtiles"
+          pane = "customtiles-left"
         )
       ) |>
       removeControl(layerId = "legend-left") |>
@@ -239,7 +250,8 @@ server <- function(input, output, session) {
         layerId = "legend-left",
         position = "bottomleft",
         html = legendHTML(p1, p1_legend_breaks)
-      )
+      ) |>
+      addSidebyside(layerId = "sbs", leftId = "left-tiles", rightId = "right-tiles")
   }, ignoreNULL = TRUE)
 
   ## add GBIF occurrence tiles ----
@@ -275,14 +287,15 @@ server <- function(input, output, session) {
       message(paste("GBIF API URL:", speciesOccurance))
 
       leafletProxy("map") |>
-        removeTiles(layerId = "left-tiles") |>
+        clearGroup("left-tiles") |>
         addTiles(
           layerId = "left-tiles",
-          group  = "left-tiles",
+          group   = "left-tiles",
           urlTemplate = speciesOccurance,
           options = spp_options
         ) |>
-        removeControl(layerId = "legend-left")
+        removeControl(layerId = "legend-left") |>
+        addSidebyside(layerId = "sbs", leftId = "left-tiles", rightId = "right-tiles")
     }
   })
 
@@ -305,10 +318,10 @@ server <- function(input, output, session) {
     }
 
     leafletProxy("map") |>
-      removeTiles(layerId = "right-tiles") |>
+      clearGroup("right-tiles") |>
       addTiles(
         layerId = "right-tiles",
-        group  = "right-tiles",
+        group   = "right-tiles",
         urlTemplate = sprintf(
           "%s/{z}/{x}/{-y}.png",
           str_replace_all(input$tilesRight, "_", "/")
@@ -319,7 +332,7 @@ server <- function(input, output, session) {
           opacity = 0.8,
           tms = TRUE,
           continuousWorld = TRUE,
-          pane = "customtiles"
+          pane = "customtiles-right"
         )
       ) |>
       removeControl(layerId = "legend-right") |>
@@ -327,7 +340,8 @@ server <- function(input, output, session) {
         layerId = "legend-right",
         position = "bottomright",
         html = legendHTML(p2, p2_legend_breaks)
-      )
+      ) |>
+      addSidebyside(layerId = "sbs", leftId = "left-tiles", rightId = "right-tiles")
   })
 
   ## update map with distAnt data ----
@@ -353,10 +367,10 @@ server <- function(input, output, session) {
     }
 
     leafletProxy("map") |>
-      removeTiles(layerId = "right-tiles") |>
+      clearGroup("right-tiles") |>
       addTiles(
         layerId = "right-tiles",
-        group  = "right-tiles",
+        group   = "right-tiles",
         urlTemplate = sprintf("distAnt/%s/{z}/{x}/{-y}.png", plotlyr),
         options = tileOptions(
           tileSize = 256,
@@ -364,7 +378,7 @@ server <- function(input, output, session) {
           opacity = 0.8,
           tms = TRUE,
           continuousWorld = TRUE,
-          pane = "customtiles"
+          pane = "customtiles-right"
         )
       ) |>
       removeControl(layerId = "legend-right") |>
@@ -372,10 +386,132 @@ server <- function(input, output, session) {
         layerId = "legend-right",
         position = "bottomright",
         html = legendHTML(p2, p2_legend_breaks)
-      )
+      ) |>
+      addSidebyside(layerId = "sbs", leftId = "left-tiles", rightId = "right-tiles")
   })
 
-  ## handling user-uploaded data ----
+  ## overlay group visibility — driven by Box C multi-select ----
+  observeEvent(input$overlayGroups, {
+    all_groups <- c(
+      "Statistical Areas", "WOBEC Expedition", "Study Area",
+      "Points of Interest", "Marginal Ice Zone"
+    )
+    selected <- input$overlayGroups
+
+    proxy <- leafletProxy("map")
+    for(grp in all_groups) {
+      if(grp %in% selected){
+        proxy <- showGroup(proxy, grp)
+      } else {
+        proxy <- hideGroup(proxy, grp)
+      }
+    }
+  }, ignoreNULL = FALSE)
+
+
+  ## MIZ reactive state ----
+  fetch_miz <- function(mizDir, mizDate){
+    url <- paste0(
+      "https://usicecenter.gov/File/DownloadArchive?prd=16",
+      format(mizDate, "%m%d%Y")
+    )
+    tryCatch(
+      expr = {
+        ## here we need to create the directory
+        ## for the requested file to download and be saved into
+        dir.create(mizDir, showWarnings = FALSE)
+        req <- request(url) |>
+          req_headers(`User-Agent` = "ocean-src/wobec") |>
+          req_timeout(8) |> 
+          req_error(is_error = function(resp){ FALSE })
+        resp <- req_perform(req, path = file.path(mizDir, "miz.zip"))
+        if(resp_status(resp) >= 400){
+          NULL
+        } else {
+          unzip(file.path(mizDir, "miz.zip"), exdir = mizDir)
+          mizfile <- list.files(mizDir, pattern = "\\.shp$", full.names = TRUE, recursive = TRUE)
+          mizfile <- mizfile[[1]]
+          if(length(mizfile) == 1){
+            miz <- mizfile[[1]] |> 
+              st_read(quiet = TRUE) |> 
+              st_geometry()
+          } else {
+            NULL
+          }
+        }
+      }, 
+      error = function(e){ NULL }
+    )
+  }
+
+  mizdata <- reactive({
+    ## req ensures this code only runs when input (date) is changed
+    req(input$mizDate)
+
+    mizDir <- file.path(addData, "mizShapefile")
+
+    ## fetch and unzip the MIZ shapefile
+    result <- NULL
+    loaded_date <- NULL
+    for(i in seq(0, 6)){
+      candidate <- input$mizDate - i
+      result <- fetch_miz(mizDir, candidate)
+      if(!is.null(result)){
+        loaded_date <- candidate
+        break
+      }
+    }
+    if(!is.null(result)){
+      mizdata <- list(
+        data = result, 
+        date = loaded_date, 
+        status = "loaded"
+      )
+    } else {
+      mizdata <- list(
+        data = NULL, 
+        date = NULL, 
+        status = "unavailable"
+      )
+    }
+    unlink(mizDir, recursive = TRUE)
+    return(mizdata)
+  })
+
+  observe({
+    downloaded_data <- mizdata()
+    if(!is.null(downloaded_data) && !is.null(downloaded_data$data)){
+      message("MIZ data downloaded, adding to map...")
+      ## add the downloaded layer to map
+      leafletProxy("map") |>
+        clearGroup("Marginal Ice Zone") |>
+        addPolygons(
+          data = downloaded_data$data,
+          group = "Marginal Ice Zone",
+          col = "black",
+          weight = 1.5,
+          fillOpacity = 0,
+          options = list(pane = "overlays")
+        )
+    }
+  })
+  ## output$mizStatus <- renderText({
+  ##   state <- mizdata()
+  ##   if(is.null(state)) return("Loading...")
+  ##   switch(state$status,
+  ##     loading = "Loading...",
+  ##     loaded = paste0(
+  ##       "Loaded: ",
+  ##       format(state$date, "%Y-%m-%d"),
+  ##       ". See 'Marginal Ice Zone' overlay."
+  ##     ),
+  ##     unavailable = "Data not available.",
+  ##     ""
+  ##   )
+  ## })
+
+
+  ## handling user-uploaded shapefile vector ----
   shpdata <- reactive({
     ## req ensures this code only runs when a file is uploaded
     req(input$shapefile)
@@ -409,12 +545,12 @@ server <- function(input, output, session) {
 
   ## update when user uploads shapefile
   observe({
-    message("Shpfile exists, adding to map...")
     uploaded_data <- shpdata()
     if(is.null(uploaded_data)){
-      message("no shapefile for mapping...")
+      message("No shapefile for mapping...")
     }
     if(!is.null(uploaded_data)){
+      message("Shapefile uploaded, adding to map...")
       ## add the uploaded layer to map
       leafletProxy("map") |>
         clearGroup("uploaded_data") |>
@@ -428,25 +564,6 @@ server <- function(input, output, session) {
         )
     }
   })
-
-  ## overlay group visibility — driven by Box C multi-select ----
-  observeEvent(input$overlayGroups, {
-    all_groups <- c("Statistical Areas", "WOBEC Expedition", "Study Area",
-                    "Points of Interest", "Marginal Ice Zone")
-    selected  <- input$overlayGroups
-
-    proxy <- leafletProxy("map")
-    for (grp in all_groups) {
-      if (grp %in% selected) {
-        proxy <- proxy |> showGroup(grp)
-      } else {
-        proxy <- proxy |> hideGroup(grp)
-      }
-    }
-  }, ignoreNULL = FALSE)
-
-  ## stub output for MIZ status (Phase 3 will replace this) ----
-  output$mizStatus <- renderText({ "" })
 
   ## time series plots ----
   # output$timeseries <- renderPlot({

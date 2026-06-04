@@ -46,8 +46,10 @@ htmlTemplate(
   overlay_input = selectizeInput(
     inputId = "overlayGroups",
     label = NULL,
-    choices = c("Statistical Areas", "WOBEC Expedition", "Study Area",
-                "Points of Interest", "Marginal Ice Zone"),
+    choices = c(
+      "Statistical Areas", "WOBEC Expedition", "Study Area",
+      "Points of Interest", "Marginal Ice Zone"
+    ),
     selected = NULL,
     multiple = TRUE,
     options = list(placeholder = "Add overlay...")
@@ -55,9 +57,8 @@ htmlTemplate(
   miz_date_input = dateInput(
     inputId = "mizDate",
     label = NULL,
-    value = Sys.Date()
+    value = NA
   ),
-  miz_status_output = textOutput("mizStatus"),
   shapefile_input = fileInput(
     inputId = "shapefile",
     label = NULL,
