@@ -163,15 +163,31 @@
       <!-- Map -->
       <div class="mapbox" id="mapui">
         {{ mapui }}
-        <div class="map-caption1" id="map-caption1">
+        <!-- "i" button — visible on narrow screens only -->
+        <button class="caption-info-btn" id="caption-info-btn" aria-label="Show captions">
+          <span class="toggle-icon">i</span>
+        </button>
+      </div>
+
+      <!-- Two-column caption box — wide screens -->
+      <div id="map-captions">
+        <div class="map-caption1">
           <div class="caption-content">
             {{ map1caption }}
           </div>
         </div>
-        <div class="map-caption2" id="map-caption2">
+        <div class="map-caption2">
           <div class="caption-content">
             {{ map2caption }}
           </div>
+        </div>
+      </div>
+
+      <!-- Caption modal — narrow screens -->
+      <div id="caption-modal-backdrop" class="caption-modal-backdrop" style="display:none;">
+        <div class="caption-modal">
+          <button class="caption-modal-close" id="caption-modal-close" aria-label="Close">&#x2715;</button>
+          <div id="caption-modal-content"></div>
         </div>
       </div>
 
@@ -325,7 +341,38 @@
     </section>
     <!--References/-->
 
-    <!-- caption toggle JS removed in Phase 2 — captions are always visible below map -->
+    <script>
+      (function() {
+        var btn      = document.getElementById('caption-info-btn');
+        var backdrop = document.getElementById('caption-modal-backdrop');
+        var closeBtn = document.getElementById('caption-modal-close');
+        var modalContent = document.getElementById('caption-modal-content');
+        var dataSection = document.getElementById('data');
+
+        function isDataSectionVisible() {
+          var rect = dataSection.getBoundingClientRect();
+          return rect.top < window.innerHeight && rect.bottom > 0;
+        }
+
+        btn.addEventListener('click', function() {
+          var src = document.getElementById('map-captions');
+          modalContent.innerHTML =
+            '<div class="map-caption1">' + src.querySelector('.map-caption1').innerHTML + '</div>' +
+            '<hr class="caption-modal-divider">' +
+            '<div class="map-caption2">' + src.querySelector('.map-caption2').innerHTML + '</div>';
+          backdrop.style.display = 'flex';
+        });
+        closeBtn.addEventListener('click', function() {
+          backdrop.style.display = 'none';
+        });
+        backdrop.addEventListener('click', function(e) {
+          if (e.target === backdrop) backdrop.style.display = 'none';
+        });
+        window.addEventListener('scroll', function() {
+          if (!isDataSectionVisible()) backdrop.style.display = 'none';
+        });
+      })();
+    </script>
 
 </body>
 
