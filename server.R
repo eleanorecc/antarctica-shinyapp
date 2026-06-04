@@ -429,6 +429,25 @@ server <- function(input, output, session) {
     }
   })
 
+  ## overlay group visibility — driven by Box C multi-select ----
+  observeEvent(input$overlayGroups, {
+    all_groups <- c("Statistical Areas", "WOBEC Expedition", "Study Area",
+                    "Points of Interest", "Marginal Ice Zone")
+    selected  <- input$overlayGroups
+
+    proxy <- leafletProxy("map")
+    for (grp in all_groups) {
+      if (grp %in% selected) {
+        proxy <- proxy |> showGroup(grp)
+      } else {
+        proxy <- proxy |> hideGroup(grp)
+      }
+    }
+  }, ignoreNULL = FALSE)
+
+  ## stub output for MIZ status (Phase 3 will replace this) ----
+  output$mizStatus <- renderText({ "" })
+
   ## time series plots ----
   # output$timeseries <- renderPlot({
   #   plotvars <- c(input$tilesLeft, input$tilesRight) |>

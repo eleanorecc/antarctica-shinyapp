@@ -128,60 +128,68 @@
 
 
     <!--Data summary / Maps section-->
-    <section class="overlay full-height relative" id="data" style="height:140vh;padding-bottom:80px;">
+    <section class="overlay full-height relative" id="data">
       <div class="container">
           <div class="hidden-header">
             <h4>
-                Oceanographic Variables / 
-                Species Occurrence Records / 
+                Oceanographic Variables /
+                Species Occurrence Records /
                 Model Outputs
             </h4>
           </div>
       </div>
-      <div class="container">
-            <div class="map-inputbox">
-                <p class="input-label">Species Occurences</p>
-                <p class="input-description">
-                  Search GBIF using scientific name
-                </p>
-                {{ taxonkey_input }}
-                <p class="input-description" style="margin-top: 10px;">Filter years</p>
-                {{ gbif_years }}
-                <p class="input-label">Model Output</p>
-                <p class="input-description">
-                  Add a layer from SCAR DistAnt Ecological Model Output Repository
-                </p>
-                {{ distant_input }}
-                <br>
-                <p class="input-label">Upload Shapefile</p>
-                <p class="input-description">
-                  Upload a zipped shapefile (.zip) to view as an overlay on the map.
-                </p>
-                {{ shapefile_input }}
-            </div>
-            <div class="mapbox" id="mapui">
-              {{ mapui }}
-              {{ leftmap_input }}
-              {{ rightmap_input }}
-              <button class="caption-toggle caption-toggle-1" onclick="toggleCaption('map-caption1')">
-                <span class="toggle-icon">i</span>
-              </button>
-              <div class="map-caption1" id="map-caption1">
-                <div class="caption-content">
-                  {{ map1caption }}
-                </div>
-              </div>
-              <div class="map-caption2" id="map-caption2">
-                <div class="caption-content">
-                  {{ map2caption }}
-                </div>
-              </div>
-            </div>
+
+      <!-- Box A — left map inputs -->
+      <div class="map-inputbox-a">
+        <p class="input-label">Oceanographic Variables</p>
+        <p class="input-description">Time period average</p>
+        {{ boxa_left_input }}
+        <p class="input-label">Species Occurrences</p>
+        <p class="input-description">Search GBIF using scientific name</p>
+        {{ taxonkey_input }}
+        {{ gbif_years }}
+      </div>
+
+      <!-- Box B — right map inputs -->
+      <div class="map-inputbox-b">
+        <p class="input-label">Oceanographic Variables</p>
+        <p class="input-description">Time period average</p>
+        {{ boxb_right_input }}
+        <p class="input-label">Model Output</p>
+        <p class="input-description">From SCAR DistAnt Ecological Model Output Repository</p>
+        {{ distant_input }}
+      </div>
+
+      <!-- Map -->
+      <div class="mapbox" id="mapui">
+        {{ mapui }}
+        <div class="map-caption1" id="map-caption1">
+          <div class="caption-content">
+            {{ map1caption }}
+          </div>
+        </div>
+        <div class="map-caption2" id="map-caption2">
+          <div class="caption-content">
+            {{ map2caption }}
           </div>
         </div>
       </div>
+
+      <!-- Box C — shared overlays -->
+      <div class="map-inputbox-c">
+        <p class="input-label">Overlay</p>
+        <p class="input-description">Statistical areas, ice zone, and more</p>
+        {{ overlay_input }}
+        <p class="input-description" style="margin-top: 12px;">Marginal Ice Zone Date</p>
+        {{ miz_date_input }}
+        {{ miz_status_output }}
+        <p class="input-label">Upload Shapefile</p>
+        <p class="input-description">Upload a zipped shapefile (.zip) to view as an overlay.</p>
+        {{ shapefile_input }}
+      </div>
+
     </section>
-    <!--Intro section/-->
+    <!--Data summary / Maps section/-->
 
 
     <!--About the datas
@@ -318,17 +326,7 @@
     </section>
     <!--References/-->
 
-    <script>
-    function toggleCaption(captionId) {
-      var caption = document.getElementById(captionId);
-
-      if (caption.classList.contains('expanded')) {
-        caption.classList.remove('expanded');
-      } else {
-        caption.classList.add('expanded');
-      }
-    }
-    </script>
+    <!-- caption toggle JS removed in Phase 2 — captions are always visible below map -->
 
 </body>
 

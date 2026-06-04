@@ -63,6 +63,12 @@ header {
   position: relative;
 }
 
+/* Non-data sections sit above the fixed input boxes and map */
+header,
+section:not(#data) {
+  z-index: 2;
+}
+
 /* Fade-in animation for sections */
 @keyframes fadeInUp {
   from {
@@ -75,7 +81,7 @@ header {
   }
 }
 
-.box, .map-inputbox, #mapui {
+.box, .map-inputbox-a, .map-inputbox-b, .map-inputbox-c, #mapui {
   animation: fadeInUp 0.6s ease-out;
 }
 
@@ -452,57 +458,112 @@ header {
   width: 42vw;
 }
 
-.map-inputbox {
+/* Shared styles for all three input boxes */
+.map-inputbox-a,
+.map-inputbox-b,
+.map-inputbox-c {
   position: fixed;
-  padding: 20px;
-  top: 93px;
-  left: 0vw;
-  width: 18vw;
+  padding: 14px 16px;
+  left: 0;
+  width: 31vw;
   z-index: 0;
-  /* background: linear-gradient(180deg, rgba(14, 58, 93, 0.95), rgba(14, 58, 93, 0.85)); */
   background: linear-gradient(180deg, rgb(16, 55, 88), rgb(64, 93, 124));
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
-  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
   box-shadow: var(--shadow-medium);
+  overflow-y: auto;
 }
 
-.map-inputbox .input-label {
-  font-size: 16px;
+/* Box A: top — left edge flush, rounded top-right */
+.map-inputbox-a {
+  top: 93px;
+  height: calc((100vh - 93px) * 0.33);
+  border-radius: 0 var(--border-radius-md) 0 0;
+}
+
+/* Box B: middle — left edge flush, no rounding (sandwiched) */
+.map-inputbox-b {
+  top: calc(93px + (100vh - 93px) * 0.33 + 6px);
+  height: calc((100vh - 93px) * 0.27);
+  border-radius: 0;
+}
+
+/* Box C: bottom — left edge flush, rounded bottom-right */
+.map-inputbox-c {
+  top: calc(93px + (100vh - 93px) * 0.60 + 12px);
+  height: calc((100vh - 93px) * 0.40);
+  border-radius: 0 0 var(--border-radius-md) 0;
+}
+
+.map-inputbox-a .input-label,
+.map-inputbox-b .input-label,
+.map-inputbox-c .input-label {
+  font-size: 13px;
   color: rgba(240, 245, 250, 0.98);
-  padding-top: 10px;
-  margin-bottom: 2px;
+  padding-top: 4px;
+  padding-bottom: 0px;
+  margin-bottom: 0;
   font-weight: 500;
 }
 
-.map-inputbox .input-description {
-  font-size: 12px;
-  color: rgba(200, 210, 225, 0.9);
-  padding-top: 2px;
-  padding-bottom: 0px;
-  margin-bottom: 8px;
-  line-height: 1.4;
+
+.map-inputbox-c #mizDate {
+  font-size: 11px !important;
+  color: #333 !important;
 }
 
 @media (max-width: 991px) {
-  .map-inputbox {
+  .map-inputbox-c #mizDate {
+    font-size: 10px !important;
+  }
+}
+
+.map-inputbox-a .input-description,
+.map-inputbox-b .input-description,
+.map-inputbox-c .input-description {
+  font-size: 11px;
+  color: rgba(200, 210, 225, 0.9);
+  padding-top: 2px;
+  padding-bottom: 0;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+/* Mobile: A and B in a horizontal row above map; C below map */
+@media (max-width: 991px) {
+  .map-inputbox-a,
+  .map-inputbox-b {
     position: fixed;
-    padding: 15px;
     top: 93px;
-    left: 0vw;
-    width: 35vw;
+    width: 50vw;
+    height: 25vh;
+    overflow-y: auto;
     z-index: 0;
-    background: linear-gradient(180deg, rgba(14, 58, 93, 0.95), rgba(14, 58, 93, 0.85));
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
-    box-shadow: var(--shadow-medium);
   }
-  .map-inputbox .input-label {
-    font-size: 12px;
+
+  .map-inputbox-a {
+    left: 0;
+    width: calc(50vw - 3px);
+    border-radius: 0 0 var(--border-radius-sm) 0;
   }
-  .map-inputbox .input-description {
-    font-size: 10.5px;
+
+  .map-inputbox-b {
+    left: calc(50vw + 3px);
+    width: calc(50vw - 3px);
+    border-radius: 0 0 0 var(--border-radius-sm);
+  }
+
+  .map-inputbox-c {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: auto;
+    max-height: 20vh;
+    overflow-y: auto;
+    border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+    z-index: 0;
   }
 }
 
@@ -542,21 +603,27 @@ header {
 }
 
 .shiny-input-select {
-  font-size: 9px;
-  background-color: #fff;
-  border: 0px solid var(--light-blue);
-  border-radius: var(--border-radius-sm);
-  transition: var(--transition-smooth);
-}
-
-.shiny-input-select:focus {
-  outline: none;
-  border-color: var(--accent-green);
-  box-shadow: 0 0 0 3px rgba(152, 192, 30, 0.1);
+  font-size: 13px;
 }
 
 .shiny-input-container {
   padding-top: 5px;
+}
+
+.map-inputbox-a .shiny-input-container,
+.map-inputbox-b .shiny-input-container,
+.map-inputbox-c .shiny-input-container {
+  width: 95% !important;
+  padding-top: 0;
+  margin-bottom: 0;
+}
+
+
+.map-inputbox-a .irs,
+.map-inputbox-b .irs,
+.map-inputbox-c .irs {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .item {
@@ -574,6 +641,10 @@ header {
   .option {
     font-size: 9px;
   }
+}
+
+.selectize-dropdown {
+  z-index: 1000 !important;
 }
 
 .selectize-dropdown-content {
@@ -597,44 +668,6 @@ header {
   }
 }
 
-/* Map layer dropdown positioning */
-#mapui .shiny-input-container {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 1000;
-  width: 190px;
-}
-
-#mapui .shiny-input-container select {
-  background-color: rgba(255, 255, 255, 0.95);
-  box-shadow: var(--shadow-soft);
-  border: none;
-}
-
-/* Shrink dropdown width on narrow screens */
-@media (max-width: 576px) {
-  #mapui .shiny-input-container {
-    width: 140px;
-  }
-
-  #mapui .shiny-input-container select {
-    font-size: 9px;
-  }
-}
-
-#mapui .selectize-control {
-  z-index: 1000;
-}
-
-#mapui .selectize-dropdown { z-index: 2001 !important; }
-
-
-/* Ensure leaflet containers don't clip dropdowns */
-#mapui .leaflet-container {
-  border-radius: var(--border-radius-md);
-  overflow: hidden;
-}
 
 /* Compact leaflet legend */
 .leaflet .legend {
@@ -808,22 +841,23 @@ header {
 #mapui {
   position: fixed;
   top: 93px;
-  left: 19vw;
-  width: 81vw;
-  height: 64vh;
+  left: calc(31vw + 6px);
+  width: calc(69vw - 6px);
+  height: calc(100vh - 93px);
   z-index: 0;
   border-radius: var(--border-radius-md);
-  overflow: visible;
+  overflow: hidden;
 }
 
 @media (max-width: 991px) {
   #mapui {
     position: fixed;
-    top: 93px;
-    left: 35vw;
-    width: 65vw;
-    height: calc(100vh - 93px);
+    top: calc(93px + 25vh + 6px);
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - 93px - 25vh - 20vh - 6px);
     z-index: 0;
+    border-radius: 0;
   }
 }
 
@@ -920,6 +954,40 @@ header {
   visibility: hidden !important;
   opacity: 0 !important;
   height: 0 !important;
+}
+
+.irs--shiny.irs-with-grid {
+  height: 40px;
+}
+
+.irs--shiny .irs-bar {
+  background-color: #888;
+  border-top-color: #888;
+  border-bottom-color: #888;
+}
+
+.irs--shiny .irs-from,
+.irs--shiny .irs-to,
+.irs--shiny .irs-single {
+  background-color: #13395a;
+}
+
+/* Move year labels below the slider bar */
+.irs-from,
+.irs-to,
+.irs-single {
+  top: 38px !important;
+}
+
+.irs-min,
+.irs-max {
+  display: none !important;
+}
+
+.irs-from::before,
+.irs-to::before,
+.irs-single::before {
+  display: none;
 }
 
 /* Slider handles */

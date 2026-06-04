@@ -4,27 +4,11 @@ htmlTemplate(
   ## Enable shinyjs for JavaScript execution
   shinyjs_init = useShinyjs(),
 
-  ## header ----
-
-
-  ## stakeholders of the Weddell Sea ----
-
-
-  ## summary data ----
-  leftmap_input = selectInput(
+  ## Box A — left map inputs
+  boxa_left_input = selectInput(
     inputId = "tilesLeft",
     label = NULL,
     choices = allrasters
-  ),
-  rightmap_input = selectInput(
-    inputId = "tilesRight",
-    label = NULL,
-    choices = allrasters
-  ),
-  shapefile_input = fileInput(
-    inputId = "shapefile",
-    label = NULL,
-    accept = c(".zip")
   ),
   taxonkey_input = textInput(
     inputId = "taxonKey",
@@ -36,9 +20,16 @@ htmlTemplate(
     label = NULL,
     min = 1900,
     max = as.integer(format(Sys.Date(), "%Y")),
-    value = c(1960, as.integer(format(Sys.Date(), "%Y"))),
+    value = c(2000, 2020),
     step = 1,
     sep = ""
+  ),
+
+  ## Box B — right map inputs
+  boxb_right_input = selectInput(
+    inputId = "tilesRight",
+    label = NULL,
+    choices = allrasters
   ),
   distant_input = selectizeInput(
     inputId = "tilesDistAnt",
@@ -51,21 +42,31 @@ htmlTemplate(
     )
   ),
 
+  ## Box C — shared overlays
+  overlay_input = selectizeInput(
+    inputId = "overlayGroups",
+    label = NULL,
+    choices = c("Statistical Areas", "WOBEC Expedition", "Study Area",
+                "Points of Interest", "Marginal Ice Zone"),
+    selected = NULL,
+    multiple = TRUE,
+    options = list(placeholder = "Add overlay...")
+  ),
+  miz_date_input = dateInput(
+    inputId = "mizDate",
+    label = NULL,
+    value = Sys.Date()
+  ),
+  miz_status_output = textOutput("mizStatus"),
+  shapefile_input = fileInput(
+    inputId = "shapefile",
+    label = NULL,
+    accept = c(".zip")
+  ),
+
   ## main content area
-  # timeseries_ui = plotOutput("timeseries", height = "36vh"),
   mapui = leafletOutput(outputId = "map", height = "100%"),
 
   map1caption = uiOutput("map1cap"),
   map2caption = uiOutput("map2cap")
-
-  ## system graphic ----
-  # d3_flower_ui = d3Output("d3_flower", height = "100%")
-
-
-  ## resources ----
-
-
-
-  ## footer ----
-
 )
