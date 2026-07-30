@@ -328,22 +328,20 @@ legendHTML <- function(palette_df, breaks) {
   )
 }
 
-## add Polarstern expedition coordinates
-url_polarstern <- "https://follow-polarstern.awi.de/wp-json/data-api/v1/data?expedition=1637"
-
-# Create request and perform
-data <- request(url_polarstern) |> 
-  req_timeout(30) |> 
-  req_retry(max_tries = 3) |> 
-  req_perform() |> 
-  resp_body_json(simplifyVector = TRUE)
-
-coords_polarstern <- data$sensor |> 
-  distinct(date, longitude, latitude) |> 
-  filter(!is.na(longitude), !is.na(latitude)) |> 
-  arrange(date) |> 
+## Polarstern expedition coordinates
+## now that the cruise is finished, read from get_cruise_data script
+coords_wobec <- read.csv(file.path(dirData, "coords_polarstern_wobec.csv")) |> 
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326) |> 
   summarise(geometry = st_cast(st_combine(geometry), "LINESTRING"))
+
+coords_hafos <- read.csv(file.path(dirData, "coords_polarstern_hafos.csv")) |> 
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326) |> 
+  summarise(geometry = st_cast(st_combine(geometry), "LINESTRING"))
+
+
+## Cruise data
+cruise_data <- read.csv(file.path(dirData, "cruise_data.csv")) |>
+  st_as_sf(wkt = "geometry", crs = 4326)
 
 
 ## for deploying app
@@ -362,6 +360,9 @@ coords_polarstern <- data$sensor |>
 #       "www/style.css",
 #       "www/distAnt.csv",
 #       "www/tsData.csv",
+#       "www/coords_polarstern_wobec.csv",
+#       "www/coords_polarstern_hafos.csv",
+#       "www/cruise_data.csv",
 #       "www/distAnt",
 #       "www/chlorophyllA/all",
 #       "www/chlorophyllA/summer",

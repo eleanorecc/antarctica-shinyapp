@@ -75,9 +75,15 @@ server <- function(input, output, session) {
       options = pathOptions(pane = "overlays")
     ) |>
     addPolylines(
-      data = coords_polarstern,
+      data = coords_wobec,
       group = "WOBEC Expedition",
-      color = "red", weight = 1,
+      color = "#a52600", weight = 1,
+      options = pathOptions(pane = "overlays")
+    ) |>
+    addPolylines(
+      data = coords_hafos,
+      group = "HAFOS Expedition",
+      color = "#71022e", weight = 1,
       options = pathOptions(pane = "overlays")
     ) |>
     addPolygons(
@@ -102,6 +108,7 @@ server <- function(input, output, session) {
       options = pathOptions(pane = "overlays")
     ) |>
     hideGroup("WOBEC Expedition") |>
+    hideGroup("HAFOS Expedition") |>
     hideGroup("Study Area") |>
     hideGroup("Statistical Areas") |>
     hideGroup("Points of Interest") |>
@@ -393,7 +400,7 @@ server <- function(input, output, session) {
   ## overlay group visibility — driven by Box C multi-select ----
   observeEvent(input$overlayGroups, {
     all_groups <- c(
-      "Statistical Areas", "WOBEC Expedition", "Study Area",
+      "Statistical Areas", "WOBEC Expedition", "HAFOS Expedition", "Study Area",
       "Points of Interest", "Marginal Ice Zone"
     )
     selected <- input$overlayGroups

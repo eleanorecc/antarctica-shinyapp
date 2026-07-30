@@ -47,8 +47,8 @@ htmlTemplate(
     inputId = "overlayGroups",
     label = NULL,
     choices = c(
-      "Statistical Areas", "WOBEC Expedition", "Study Area",
-      "Points of Interest", "Marginal Ice Zone"
+      "Statistical Areas", "WOBEC Expedition", "HAFOS Expedition", 
+      "Study Area", "Points of Interest", "Marginal Ice Zone"
     ),
     selected = NULL,
     multiple = TRUE,
