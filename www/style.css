@@ -662,8 +662,14 @@ section:not(#data) {
   letter-spacing: 0.5px;
 }
 
+.selectize-input,
+.selectize-input input {
+  font-size: 11px;
+}
+
 @media (max-width: 991px) {
-  .selectize-input {
+  .selectize-input,
+  .selectize-input input {
     font-size: 10px;
   }
 }

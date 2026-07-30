@@ -59,6 +59,19 @@ htmlTemplate(
     label = NULL,
     value = NA
   ),
+  wobec_device_input = selectizeInput(
+    inputId = "wobecDevices", 
+    label = NULL,
+    choices = devices_wobec, 
+    selected = NULL,
+    multiple = TRUE,
+    options = list(placeholder = "WOBEC (2025/12/15 - 2026/2/2) sampling by method/device...")
+  ),
+  hafos_device_input = selectizeInput(
+    inputId = "hafosDevices", label = NULL,
+    choices = devices_hafos, selected = NULL, multiple = TRUE,
+    options = list(placeholder = "HAFOS (2024/12/24 - 2025/3/10) sampling by method/device...")
+  ),
   shapefile_input = fileInput(
     inputId = "shapefile",
     label = NULL,

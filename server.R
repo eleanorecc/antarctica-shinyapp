@@ -111,7 +111,41 @@ server <- function(input, output, session) {
     hideGroup("HAFOS Expedition") |>
     hideGroup("Study Area") |>
     hideGroup("Statistical Areas") |>
-    hideGroup("Points of Interest") |>
+    hideGroup("Points of Interest")
+
+  ## cruise device layers — one group per (cruise, method_device), hidden by default ----
+  cruise_colors <- c(wobec = "#a52600", hafos = "#71022e")
+
+  for (cru in c("wobec", "hafos")) {
+    devices <- if (cru == "wobec") devices_wobec else devices_hafos
+    for (dev in devices) {
+      subset_data <- cruise_data |> filter(cruise == cru, method_device == dev)
+      group_name <- paste(cru, dev, sep = "__")
+
+      points <- subset_data[st_geometry_type(subset_data) == "POINT", ]
+      lines  <- subset_data[st_geometry_type(subset_data) == "LINESTRING", ]
+
+      if (nrow(points) > 0) {
+        basemap <- basemap |>
+          addCircleMarkers(
+            data = points, group = group_name,
+            color = cruise_colors[[cru]], radius = 2, weight = 1,
+            options = pathOptions(pane = "overlays")
+          )
+      }
+      if (nrow(lines) > 0) {
+        basemap <- basemap |>
+          addPolylines(
+            data = lines, group = group_name,
+            color = cruise_colors[[cru]], weight = 3,
+            options = pathOptions(pane = "overlays")
+          )
+      }
+      basemap <- basemap |> hideGroup(group_name)
+    }
+  }
+
+  basemap <- basemap |>
     ## placeholder tile groups for addSidebyside — populated by observers
     addTiles(
       layerId = "left-tiles",
@@ -408,6 +442,34 @@ server <- function(input, output, session) {
     proxy <- leafletProxy("map")
     for(grp in all_groups) {
       if(grp %in% selected){
+        proxy <- showGroup(proxy, grp)
+      } else {
+        proxy <- hideGroup(proxy, grp)
+      }
+    }
+  }, ignoreNULL = FALSE)
+
+  ## WOBEC device visibility — driven by Box C selectize ----
+  observeEvent(input$wobecDevices, {
+    selected <- input$wobecDevices
+    proxy <- leafletProxy("map")
+    for (dev in devices_wobec) {
+      grp <- paste("wobec", dev, sep = "__")
+      if (dev %in% selected) {
+        proxy <- showGroup(proxy, grp)
+      } else {
+        proxy <- hideGroup(proxy, grp)
+      }
+    }
+  }, ignoreNULL = FALSE)
+
+  ## HAFOS device visibility — driven by Box C selectize ----
+  observeEvent(input$hafosDevices, {
+    selected <- input$hafosDevices
+    proxy <- leafletProxy("map")
+    for (dev in devices_hafos) {
+      grp <- paste("hafos", dev, sep = "__")
+      if (dev %in% selected) {
         proxy <- showGroup(proxy, grp)
       } else {
         proxy <- hideGroup(proxy, grp)

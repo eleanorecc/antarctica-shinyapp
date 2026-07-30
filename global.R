@@ -343,6 +343,23 @@ coords_hafos <- read.csv(file.path(dirData, "coords_polarstern_hafos.csv")) |>
 cruise_data <- read.csv(file.path(dirData, "cruise_data.csv")) |>
   st_as_sf(wkt = "geometry", crs = 4326)
 
+## vectors of devices for selectize inputs
+devices_wobec <- cruise_data |> 
+  st_drop_geometry() |> 
+  filter(cruise == "wobec") |> 
+  group_by(method_device) |> 
+  summarize(count = n()) |> 
+  arrange(desc(count)) |> 
+  pull(method_device)
+
+devices_hafos <- cruise_data |> 
+  st_drop_geometry() |> 
+  filter(cruise == "hafos") |> 
+  group_by(method_device) |> 
+  summarize(count = n()) |> 
+  arrange(desc(count)) |> 
+  pull(method_device)
+
 
 ## for deploying app
 ## only include these files!
