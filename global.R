@@ -301,7 +301,9 @@ renderCaption <- function(caption_data) {
 }
 
 ## generate HTML for a custom positioned legend
-legendHTML <- function(palette_df, breaks) {
+## side: "left" or "right" — controls which corner-icon variant is used
+legendHTML <- function(palette_df, breaks, side = c("left", "right")) {
+  side <- match.arg(side)
   pal <- colorBin(
     palette = palette_df$col,
     domain  = range(breaks),
@@ -311,7 +313,7 @@ legendHTML <- function(palette_df, breaks) {
   colors <- pal(breaks[-length(breaks)] + diff(breaks) / 2)
   labels <- sprintf("%.2g", breaks)
   items  <- paste0(
-    '<div style="display:flex;align-items:center;margin-bottom:2px;">',
+    '<div style="display:flex;align-items:center;margin-bottom:1px;">',
     '<i style="background:', colors,
     ';width:18px;height:8px;display:inline-block;margin-right:5px;"></i>',
     '<span style="font-size:10px;">', labels[-length(labels)], ' &ndash; ', labels[-1], '</span>',
@@ -319,11 +321,11 @@ legendHTML <- function(palette_df, breaks) {
     collapse = ""
   )
   paste0(
-    '<div class="legend-custom" style="',
-    'background:rgba(255,255,255,0.85);padding:6px 8px;',
-    'border-radius:4px;font-size:10px;line-height:1.4;',
-    'box-shadow:0 1px 5px rgba(0,0,0,0.4);">',
-    items,
+    '<div class="legend-custom legend-', side, '">',
+    '<a href="#" class="legend-arrow" role="button" aria-label="Toggle legend" onclick="',
+    'event.preventDefault();this.closest(\'.legend-custom\').classList.toggle(\'legend-collapsed\');',
+    '"><i class="fa-solid fa-up-right-from-square"></i></a>',
+    '<div class="legend-items">', items, '</div>',
     '</div>'
   )
 }

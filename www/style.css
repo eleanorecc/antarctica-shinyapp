@@ -157,7 +157,7 @@ section:not(#data) {
 
 /* Leaflet attribution links - darker grey to match OSM/GBIF attributions */
 .overlay a {
-    color: #666666;
+    color: #2e3134;
 }
 
 .mainmenu-area .logo {
@@ -467,7 +467,7 @@ section:not(#data) {
   left: 0;
   width: 31vw;
   z-index: 0;
-  background: linear-gradient(180deg, rgb(16, 55, 88), rgb(64, 93, 124));
+  background: linear-gradient(180deg, rgb(11, 42, 68), rgb(64, 93, 124));
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   box-shadow: var(--shadow-medium);
@@ -483,14 +483,14 @@ section:not(#data) {
 
 /* Box B: middle — left edge flush, no rounding (sandwiched) */
 .map-inputbox-b {
-  top: calc(93px + (100vh - 93px) * 0.33 + 6px);
+  top: calc(93px + (100vh - 93px) * 0.33 + 1px);
   height: calc((100vh - 93px) * 0.27);
   border-radius: 0;
 }
 
 /* Box C: bottom — left edge flush, rounded bottom-right */
 .map-inputbox-c {
-  top: calc(93px + (100vh - 93px) * 0.60 + 12px);
+  top: calc(93px + (100vh - 93px) * 0.60 + 2px);
   height: calc((100vh - 93px) * 0.40);
   border-radius: 0 0 var(--border-radius-md) 0;
 }
@@ -534,7 +534,8 @@ section:not(#data) {
   .map-inputbox-a,
   .map-inputbox-b {
     position: fixed;
-    top: 93px;
+    /* Approximates navbar bottom: logo (width:15vw, ~500x123 aspect) + its padding + toggler padding */
+    top: calc(3.7vw + 30px);
     width: 50vw;
     height: 25vh;
     overflow-y: auto;
@@ -564,36 +565,6 @@ section:not(#data) {
     overflow-y: auto;
     border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
     z-index: 0;
-  }
-}
-
-.hidden-header {
-  position: fixed;
-  background: linear-gradient(90deg, rgba(191, 211, 218, 0.95), rgba(191, 211, 218, 0.4));
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: var(--primary-blue);
-  top: 6px;
-  left: 0;
-  width: 100vw;
-  z-index: 0;
-  padding: 20px;
-  height: 80px;
-}
-
-.hidden-header h4 {
-  font-size: 1.6rem;
-  letter-spacing: -1px;
-  color: #0e3556;
-  font-weight: 400;
-}
-
-@media (max-width: 991px) {
-  .hidden-header h4 {
-    font-size: 0.9rem;
-    line-height: 1.1;
-    font-weight: 500;
-    padding-right: 100px;
   }
 }
 
@@ -681,67 +652,118 @@ section:not(#data) {
   font-size: 10px;
 }
 
+.leaflet .info {
+  padding: 0 0;
+}
+
 .leaflet .legend i {
-  width: 18px;
-  height: 8px;
-  margin-right: 5px;
+  width: 17px;
+  height: 17px;
+  margin-right: 0px;
+}
+
+.fa-solid, .fas {
+  font-weight: 900;
+  font-size: 18px;
 }
 
 /* MAPS */
 
-/* Legend toggles — hidden on wide screens */
-.legend-toggles {
+/* Custom legend control — swatches + collapse arrow, self-contained */
+.legend-custom {
+  position: relative;
+  background: #fff0;
+  padding: 5px 5px;
+  font-size: 10px;
+  line-height: 1.2;
+}
+
+.legend-arrow {
   display: none;
 }
 
+/* Same box as caption-info-btn (Leaflet's default .leaflet-bar a), written
+   out explicitly rather than relying on nested/inherited Leaflet classes,
+   since .legend-arrow lives inside Leaflet's own addControl() wrapper and
+   ambient .leaflet-bar/.leaflet-control classes don't apply predictably there. */
 @media (max-width: 991px) {
-  /* Hide legends by default on narrow screens */
-  #legend-left,
-  #legend-right {
-    display: none;
+  /* Legend swatches collapse behind an arrow tab anchored in the map corner.
+     Arrow stays at the bottom (column-reverse) so it doesn't move when the
+     box opens/closes — the swatches expand upward above it instead. */
+  .legend-custom:not(.legend-collapsed) {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-start;
   }
 
-  /* Show legend when active */
-  #legend-left.legend-visible,
-  #legend-right.legend-visible {
+  /* Right legend: toggle sits bottom-right, swatch box aligned to the right */
+  .legend-right.legend-custom:not(.legend-collapsed) {
+    align-items: flex-end;
+  }
+
+  .legend-items {
     display: block;
   }
 
-  /* Toggle button container — top right of map */
-  .legend-toggles {
-    display: flex;
-    flex-direction: row;
-    gap: 4px;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 450;
-  }
-
-  .legend-toggle-btn {
-    width: 34px;
-    height: 34px;
-    background: #fff;
-    border: 2px solid rgba(0,0,0,0.2);
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 700;
-    color: #333;
-    line-height: 30px;
-    text-align: center;
+  .legend-custom.legend-collapsed {
     padding: 0;
-    transition: var(--transition-smooth);
+    background: transparent;
+    border: none;
   }
 
-  .legend-toggle-btn:hover {
-    background: #f4f4f4;
+  .legend-custom.legend-collapsed .legend-items {
+    display: none;
   }
 
-  .legend-toggle-btn.active {
-    background: var(--secondary-blue);
-    color: #fff;
-    border-color: var(--secondary-blue);
+  .legend-arrow,
+  .caption-info-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    background-color: #fff;
+    border: none;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.65);
+    text-decoration: none;
+    color: black;
+    font-size: 14px;
+  }
+
+  .legend-arrow:hover,
+  .caption-info-btn:hover {
+    background-color: #f4f4f4;
+  }
+
+  .legend-custom:not(.legend-collapsed) .legend-arrow {
+    margin-top: 6px;
+  }
+
+  /* Single fa-square-up-right icon, oriented per corner via transform:
+     collapsed-left -> up-right (unrotated)
+     open-left      -> down-right (rotate 90deg)
+     collapsed-right -> up-left (mirrored)
+     open-right     -> down-left (mirrored + rotate 90deg) */
+  .legend-arrow i {
+    display: inline-block;
+    transform-origin: center;
+  }
+
+  .legend-left .legend-arrow i {
+    transform: rotate(90deg);
+  }
+
+  .legend-left.legend-collapsed .legend-arrow i {
+    transform: rotate(0deg);
+  }
+
+  .legend-right .legend-arrow i {
+    transform: scaleX(-1) rotate(90deg);
+  }
+
+  .legend-right.legend-collapsed .legend-arrow i {
+    transform: scaleX(-1) rotate(0deg);
   }
 }
 
@@ -785,7 +807,7 @@ section:not(#data) {
 /* Two-column caption box — wide screens */
 #map-captions {
   position: fixed;
-  top: calc(100vh - 160px);
+  top: calc(100vh - 140px);
   bottom: 0;
   left: calc(31vw + 6px);
   width: calc(69vw - 6px);
@@ -817,42 +839,29 @@ section:not(#data) {
   align-self: stretch;
 }
 
-/* "i" button — hidden on wide screens */
+/* Info button — hidden on wide screens */
 .caption-info-btn {
   display: none;
 }
 
-.toggle-icon {
-  color: #333;
-  font-size: 18px;
-  font-style: italic;
-  font-weight: bold;
-  font-family: serif;
-}
-
-/* Modal — hidden by default, shown via JS */
-.caption-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 2000;
-  align-items: center;
-  justify-content: center;
-}
-
-.caption-modal {
-  position: relative;
+/* Popout — hidden by default, shown via JS. Same top-right corner as the info button */
+.caption-popout {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
   background: rgba(240, 245, 250, 0.97);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-radius: var(--border-radius-sm);
+  box-shadow: 0 1px 5px rgba(0,0,0,0.65);
   padding: 20px 18px;
-  width: 90vw;
-  max-height: 80vh;
+  width: min(85vw, 340px);
+  max-height: 60vh;
   overflow-y: auto;
 }
 
-.caption-modal-close {
+.caption-popout-close {
   position: absolute;
   top: 10px;
   right: 12px;
@@ -880,25 +889,11 @@ section:not(#data) {
   }
 
   .caption-info-btn {
-    display: block;
+    display: flex;
     position: absolute;
     top: 10px;
-    left: 10px;
-    width: 34px;
-    height: 34px;
+    right: 10px;
     z-index: 450;
-    background: #fff;
-    border: 2px solid rgba(0,0,0,0.2);
-    border-radius: 4px;
-    cursor: pointer;
-    padding: 0;
-    line-height: 30px;
-    text-align: center;
-    transition: var(--transition-smooth);
-  }
-
-  .caption-info-btn:hover {
-    background: #f4f4f4;
   }
 }
 
@@ -921,7 +916,7 @@ section:not(#data) {
 #mapui {
   position: fixed;
   top: 93px;
-  bottom: 164px;
+  bottom: 144px;
   left: calc(31vw + 6px);
   width: calc(69vw - 6px);
   z-index: 0;
@@ -937,7 +932,8 @@ section:not(#data) {
 @media (max-width: 991px) {
   #mapui {
     position: fixed;
-    top: calc(93px + 25vh + 6px);
+    /* Flush with the bottom edge of map-inputbox-a/b (top: 3.7vw + 30px, height: 25vh) */
+    top: calc(3.7vw + 30px + 25vh);
     bottom: 20vh;
     left: 0;
     width: 100vw;
@@ -1290,5 +1286,5 @@ section:not(#data) {
 /* SIDE-BY-SIDE MAP DIVIDER */
 
 .leaflet-sbs-divider {
-  background-color: transparent !important;
+  width: 2px !important;
 }

@@ -290,7 +290,7 @@ server <- function(input, output, session) {
       addControl(
         layerId = "legend-left",
         position = "bottomleft",
-        html = legendHTML(p1, p1_legend_breaks)
+        html = legendHTML(p1, p1_legend_breaks, side = "left")
       ) |>
       addSidebyside(layerId = "sbs", leftId = "left-tiles", rightId = "right-tiles")
   }, ignoreNULL = TRUE)
@@ -380,7 +380,7 @@ server <- function(input, output, session) {
       addControl(
         layerId = "legend-right",
         position = "bottomright",
-        html = legendHTML(p2, p2_legend_breaks)
+        html = legendHTML(p2, p2_legend_breaks, side = "right")
       ) |>
       addSidebyside(layerId = "sbs", leftId = "left-tiles", rightId = "right-tiles")
   })
@@ -426,7 +426,7 @@ server <- function(input, output, session) {
       addControl(
         layerId = "legend-right",
         position = "bottomright",
-        html = legendHTML(p2, p2_legend_breaks)
+        html = legendHTML(p2, p2_legend_breaks, side = "right")
       ) |>
       addSidebyside(layerId = "sbs", leftId = "left-tiles", rightId = "right-tiles")
   })
