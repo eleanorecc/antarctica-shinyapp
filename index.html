@@ -67,17 +67,17 @@
                     <h2 style="text-align:left;">Summary Data for<br>Stakeholder Workshops</h2>
                 </div>
             </div>
-            <div class="box left-box">
+            <div class="box left-box box-1">
                 <p class="intro-text">
                     The Weddell Sea is a <span class="highlight-green">uniquely biodiverse and pristine</span> area of the Southern Ocean surrounding Antarctica. To better protect this region which is crucial for climate regulation and food provision and home to many rare and vulnerable species, the Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR) are working to establish a <span class="highlight-blue">Weddell Sea Marine Protected Area</span> (WSMPA).
                 </p>
             </div>
-            <div class="box left-box" style="width:78vw">
+            <div class="box left-box box-2">
                 <p class="intro-text">
                     Realizing that <span class="highlight-green">no systematic ecosystem monitoring exists</span> in the Eastern Weddell Sea, scientists from 11 institutes across 8 countries have joined forces together with stakeholders from economy, conservation and society to design and initiate a long-term ecosystem observatory – the <span class="highlight-blue">Weddell Sea Observatory of Biodiversity and Ecosystem Change</span> (WOBEC) – with the aim to support global biodiversity goals, establish a baseline for measuring changes, and strengthen the WSMPA process.
                 </p>
             </div>
-            <div class="box left-box" style="width:81vw">
+            <div class="box left-box box-3">
                 <p class="intro-text">
                     The purpose of this digital application is to provide <span class="highlight-green">easy access to summary datasets</span> on already-existing biogeochemical and physical oceanographic variables, prior species observations and model output data, for use in stakeholder workshops as a basis for exploration and discussion.
                 </p>
@@ -279,32 +279,10 @@
       <div class="absolute hero-image"></div>
       <div class="container">
         <div class="references-container">
-          <h3 class="references-title">Resources and Links</h3>
+          <h3 class="references-title">Resources &amp; Links</h3>
 
           <div class="references-grid">
             <div class="reference-category">
-              <h4 class="category-title">Data Sources</h4>
-              <ul class="reference-list">
-                <li>
-                  <strong>Copernicus Marine Service</strong>
-                  <br>Oceanographic and biogeochemical data
-                  <br><a href="https://data.marine.copernicus.eu/products" target="_blank">data.marine.copernicus.eu/products</a>
-                </li>
-                <li>
-                  <strong>GBIF</strong>
-                  <br>Species occurrence records
-                  <br><a href="https://www.gbif.org/en" target="_blank">gbif.org</a>
-                </li>
-                <li>
-                  <strong>SCAR distAnt</strong>
-                  <br>Species and ecological modeling outputs
-                  <br><a href="https://source.coop/repositories/scar/distant" target="_blank">source.coop/repositories/scar/distant</a>
-                </li>
-              </ul>
-            </div>
-
-            <div class="reference-category">
-              <h4 class="category-title">Learn More</h4>
               <ul class="reference-list">
                 <li>
                   <strong>WOBEC Official Website</strong>
@@ -316,16 +294,45 @@
                   <br>Available via Zenodo
                   <br><a href="https://doi.org/10.5281/zenodo.15040396" target="_blank">doi.org/10.5281/zenodo.15040396</a>
                 </li>
-              </ul>
-            </div>
-
-            <div class="reference-category">
-              <h4 class="category-title">Code</h4>
-              <ul class="reference-list">
                 <li>
                   <strong>GitHub Repository</strong>
                   <br>Source code for data preparation and this application
                   <br><a href="https://github.com/eleanorecc/antarctica-shinyapp" target="_blank">github.com/eleanorecc/antarctica-shinyapp</a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="reference-category">
+              <ul class="reference-list">
+                <li>
+                  <strong>Copernicus Marine Service</strong>
+                  <br>Oceanographic and biogeochemical data
+                  <br><a href="https://data.marine.copernicus.eu/products" target="_blank">data.marine.copernicus.eu/products</a>
+                </li>
+                <li>
+                  <strong>SCAR distAnt</strong>
+                  <br>Species and ecological modeling outputs
+                  <br><a href="https://source.coop/repositories/scar/distant" target="_blank">source.coop/repositories/scar/distant</a>
+                </li>
+                <li>
+                  <strong>GBIF</strong>
+                  <br>Species occurrence records
+                  <br><a href="https://www.gbif.org/en" target="_blank">gbif.org</a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="reference-category">
+              <ul class="reference-list">
+                <li>
+                  <strong>PS152 (WOBEC) Cruise Data</strong>
+                  <br>Sampling event data via PANGAEA
+                  <br><a href="https://www.pangaea.de/expeditions/events/PS152" target="_blank">pangaea.de/expeditions/events/PS152</a>
+                </li>
+                <li>
+                  <strong>PS146 (HAFOS) Cruise Data</strong>
+                  <br>Sampling event data via PANGAEA
+                  <br><a href="https://www.pangaea.de/expeditions/events/PS146" target="_blank">pangaea.de/expeditions/events/PS146</a>
                 </li>
               </ul>
             </div>
@@ -362,6 +369,19 @@
           });
         });
         observer.observe(mapui, { childList: true, subtree: true });
+
+        // Insertion-time collapse only catches legends added while already narrow;
+        // also collapse existing legends when the window is resized down past the breakpoint.
+        var wasNarrow = window.innerWidth <= 991;
+        window.addEventListener('resize', function() {
+          var isNarrow = window.innerWidth <= 991;
+          if (isNarrow && !wasNarrow) {
+            mapui.querySelectorAll('.legend-custom').forEach(function(node) {
+              node.classList.add('legend-collapsed');
+            });
+          }
+          wasNarrow = isNarrow;
+        });
       })();
 
       (function() {
