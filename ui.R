@@ -5,10 +5,13 @@ htmlTemplate(
   shinyjs_init = useShinyjs(),
 
   ## Box A — left map inputs
-  boxa_left_input = selectInput(
+  boxa_left_input = selectizeInput(
     inputId = "tilesLeft",
     label = NULL,
-    choices = allrasters
+    choices = allrasters,
+    options = list(
+      onInitialize = I('function() { this.$control_input.attr("readonly", "readonly"); }')
+    )
   ),
   taxonkey_input = textInput(
     inputId = "taxonKey",
@@ -26,10 +29,13 @@ htmlTemplate(
   ),
 
   ## Box B — right map inputs
-  boxb_right_input = selectInput(
+  boxb_right_input = selectizeInput(
     inputId = "tilesRight",
     label = NULL,
-    choices = allrasters
+    choices = allrasters,
+    options = list(
+      onInitialize = I('function() { this.$control_input.attr("readonly", "readonly"); }')
+    )
   ),
   distant_input = selectizeInput(
     inputId = "tilesDistAnt",
@@ -47,12 +53,16 @@ htmlTemplate(
     inputId = "overlayGroups",
     label = NULL,
     choices = c(
-      "Statistical Areas", "WOBEC Expedition", "HAFOS Expedition", 
+      "Statistical Areas", "WOBEC Expedition", "HAFOS Expedition",
       "Study Area", "Points of Interest", "Marginal Ice Zone"
     ),
     selected = NULL,
     multiple = TRUE,
-    options = list(placeholder = "Add overlay...")
+    options = list(
+      placeholder = "Add overlay...",
+      plugins = list("remove_button"),
+      onInitialize = I('function() { this.$control_input.attr("readonly", "readonly"); }')
+    )
   ),
   miz_date_input = dateInput(
     inputId = "mizDate",
@@ -60,17 +70,25 @@ htmlTemplate(
     value = NA
   ),
   wobec_device_input = selectizeInput(
-    inputId = "wobecDevices", 
+    inputId = "wobecDevices",
     label = NULL,
-    choices = devices_wobec, 
+    choices = devices_wobec,
     selected = NULL,
     multiple = TRUE,
-    options = list(placeholder = "WOBEC (2025/12/15 - 2026/2/2) sampling by method/device...")
+    options = list(
+      placeholder = "WOBEC sampling by device...",
+      plugins = list("remove_button"),
+      onInitialize = I('function() { this.$control_input.attr("readonly", "readonly"); }')
+    )
   ),
   hafos_device_input = selectizeInput(
     inputId = "hafosDevices", label = NULL,
     choices = devices_hafos, selected = NULL, multiple = TRUE,
-    options = list(placeholder = "HAFOS (2024/12/24 - 2025/3/10) sampling by method/device...")
+    options = list(
+      placeholder = "HAFOS sampling by device...",
+      plugins = list("remove_button"),
+      onInitialize = I('function() { this.$control_input.attr("readonly", "readonly"); }')
+    )
   ),
   shapefile_input = fileInput(
     inputId = "shapefile",

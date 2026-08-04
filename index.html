@@ -36,23 +36,11 @@
     <div class="mainmenu-area" data-spy="affix" data-offset-top="100">
         <div class="container">
           <div class="col-sm-12 side-menu">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#primary-menu" aria-controls="primary-menu" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-                <!--Logo-->
-                <div class="header-img-container">
-                    <!--<img class="header-logo" src="images/WOBEC_logo_fullsize_new.png" alt="WOBEC Logo">-->
-                    <img class="header-logo" src="images/WOBEC-simpleLogo-Blue-Small.png" alt="WOBEC Logo" style="width:15vw; padding-bottom:10px;">
-                </div>
-                <div class="collapse navbar-collapse" id="primary-menu">
-                    <ul class="nav navbar-nav">
-                      <li class="active"><a class="nav-link" href="#welcome">Welcome</a></li>
-                      <!--<li><a class="nav-link" href="#wobec">WOBEC</a></li>-->
-                      <li><a class="nav-link" href="#data">Explore Data</a></li>
-                      <li><a class="nav-link" href="#overview">Overview</a></li>
-                      <li><a class="nav-link" href="#more">Learn More</a></li>
-                    </ul>
-                </div>
-            </button>
+            <!--Logo-->
+            <div class="header-img-container">
+                <!--<img class="header-logo" src="images/WOBEC_logo_fullsize_new.png" alt="WOBEC Logo">-->
+                <img class="header-logo" src="images/WOBEC-simpleLogo-Blue-Small.png" alt="WOBEC Logo" style="width:min(15vw, 250px); padding-bottom:10px;">
+            </div>
           </div>
         </div>
     </div>
@@ -296,7 +284,7 @@
                 </li>
                 <li>
                   <strong>GitHub Repository</strong>
-                  <br>Source code for data preparation and this application
+                  <br>Source code for this application and its data
                   <br><a href="https://github.com/eleanorecc/antarctica-shinyapp" target="_blank">github.com/eleanorecc/antarctica-shinyapp</a>
                 </li>
               </ul>
@@ -325,12 +313,12 @@
             <div class="reference-category">
               <ul class="reference-list">
                 <li>
-                  <strong>PS152 (WOBEC) Cruise Data</strong>
+                  <strong>WOBEC (PS152) Cruise Data</strong>
                   <br>Sampling event data via PANGAEA
                   <br><a href="https://www.pangaea.de/expeditions/events/PS152" target="_blank">pangaea.de/expeditions/events/PS152</a>
                 </li>
                 <li>
-                  <strong>PS146 (HAFOS) Cruise Data</strong>
+                  <strong>HAFOS (PS146) Cruise Data</strong>
                   <br>Sampling event data via PANGAEA
                   <br><a href="https://www.pangaea.de/expeditions/events/PS146" target="_blank">pangaea.de/expeditions/events/PS146</a>
                 </li>
@@ -412,6 +400,10 @@
             '<div class="map-caption1">' + src.querySelector('.map-caption1').innerHTML + '</div>' +
             '<hr class="caption-modal-divider">' +
             '<div class="map-caption2">' + src.querySelector('.map-caption2').innerHTML + '</div>';
+          var title1 = popoutContent.querySelector('.map-caption1 .caption-title');
+          if (title1) title1.insertAdjacentHTML('afterbegin', '<span class="caption-side-label">(LEFT) </span>');
+          var title2 = popoutContent.querySelector('.map-caption2 .caption-title');
+          if (title2) title2.insertAdjacentHTML('afterbegin', '<span class="caption-side-label">(RIGHT) </span>');
           popout.style.display = 'block';
         });
         closeBtn.addEventListener('click', closePopout);
@@ -424,6 +416,13 @@
         window.addEventListener('scroll', function() {
           if (!isDataSectionVisible()) closePopout();
         });
+      })();
+
+      (function() {
+        // mizDate's datepicker input still needs to be tappable to open the
+        // calendar, but typing isn't useful here - block the mobile keyboard.
+        var mizInput = document.querySelector('#mizDate input.form-control');
+        if (mizInput) mizInput.setAttribute('readonly', 'readonly');
       })();
     </script>
 

@@ -21,6 +21,9 @@
   --border-radius-sm: 12px;
   --border-radius-md: 20px;
   --border-radius-lg: 40px;
+
+  /* Desktop navbar-bottom offset: header-logo width (min(15vw,250px)) * its 123/500 aspect ratio + 30px padding/chrome, matching the logo's inline width style in index.html */
+  --navbar-bottom-desktop: calc(min(15vw, 250px) * 123 / 500 + 30px);
 }
 
 * {
@@ -168,6 +171,10 @@ section:not(#data) {
     padding-left: 0;
 }
 
+.navbar-toggler-icon {
+    height: 0;
+}
+
 .mainmenu-area .logo h2 {
     margin-bottom: 0;
 }
@@ -234,6 +241,7 @@ section:not(#data) {
 
 .header-img-container {
   max-width: 50vw;
+  padding-top: 0.8rem;
 }
 
 .header-img-container .header-logo {
@@ -497,22 +505,22 @@ section:not(#data) {
 
 /* Box A: top — left edge flush, rounded top-right */
 .map-inputbox-a {
-  top: 93px;
-  height: calc((100vh - 93px) * 0.33);
+  top: var(--navbar-bottom-desktop);
+  height: calc((100vh - var(--navbar-bottom-desktop)) * 0.33);
   border-radius: 0 var(--border-radius-md) 0 0;
 }
 
 /* Box B: middle — left edge flush, no rounding (sandwiched) */
 .map-inputbox-b {
-  top: calc(93px + (100vh - 93px) * 0.33 + 1px);
-  height: calc((100vh - 93px) * 0.27);
+  top: calc(var(--navbar-bottom-desktop) + (100vh - var(--navbar-bottom-desktop)) * 0.33 + 1px);
+  height: calc((100vh - var(--navbar-bottom-desktop)) * 0.27);
   border-radius: 0;
 }
 
 /* Box C: bottom — left edge flush, rounded bottom-right */
 .map-inputbox-c {
-  top: calc(93px + (100vh - 93px) * 0.60 + 2px);
-  height: calc((100vh - 93px) * 0.40);
+  top: calc(var(--navbar-bottom-desktop) + (100vh - var(--navbar-bottom-desktop)) * 0.60 + 2px);
+  height: calc((100vh - var(--navbar-bottom-desktop)) * 0.40);
   border-radius: 0 0 var(--border-radius-md) 0;
 }
 
@@ -552,9 +560,16 @@ section:not(#data) {
     font-size: 10px;
   }
 
-  .map-inputbox-c .form-control,
-  .map-inputbox-c #mizDate {
+  .map-inputbox-c .form-control {
     font-size: 10px !important;
+  }
+
+  /* #mizDate is dateInput's wrapper div - the real <input> has no id of
+     its own, so target it via descendant selector. Kept at 16px
+     (overriding the .form-control rule above) to avoid mobile
+     zoom-on-focus, since this is a real text-entry field. */
+  .map-inputbox-c #mizDate input.form-control {
+    font-size: 16px !important;
   }
 
   .map-inputbox-c .input-group-btn,
@@ -602,7 +617,11 @@ section:not(#data) {
   }
 
   .map-inputbox-c {
-    position: fixed;
+    /* absolute (not fixed) so it stays anchored to #data's box and scrolls
+       with the page instead of the viewport - if the browser auto-zooms on
+       input focus, a fixed box gets pushed off-screen and becomes
+       unreachable, but an absolute one doesn't. */
+    position: absolute;
     top: auto;
     bottom: 0;
     left: 0;
@@ -686,10 +705,18 @@ section:not(#data) {
 }
 
 @media (max-width: 991px) {
-  .selectize-input,
-  .selectize-input input {
+  .selectize-input {
     font-size: 10px;
   }
+
+  /* iOS/Android auto-zoom the viewport on focus when an input's font-size
+     is under 16px, and don't reset zoom back out once a value is picked.
+     Keep the focusable text-entry element itself at 16px+ to prevent that,
+     even though the surrounding control stays visually compact. */
+  .selectize-input input {
+    font-size: 16px;
+  }
+
 }
 
 
@@ -825,6 +852,7 @@ section:not(#data) {
 .map-caption2 a {
   color: var(--secondary-blue);
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .caption-title {
@@ -920,6 +948,10 @@ section:not(#data) {
   line-height: 1;
 }
 
+.caption-side-label {
+  color: #98c01e;
+}
+
 .caption-modal-divider {
   border: none;
   border-top: 1px solid rgba(0,0,0,0.15);
@@ -962,7 +994,7 @@ section:not(#data) {
 
 #mapui {
   position: fixed;
-  top: 93px;
+  top: var(--navbar-bottom-desktop);
   bottom: 144px;
   left: calc(31vw + 6px);
   width: calc(69vw - 6px);
@@ -1075,6 +1107,14 @@ section:not(#data) {
   font-size: 12px;
 }
 
+@media (max-width: 991px) {
+  /* Prevent mobile auto-zoom-on-focus (triggered by <16px inputs), which
+     doesn't reset back out once a value is picked. */
+  .form-control {
+    font-size: 16px;
+  }
+}
+
 /* Year range slider - hide grid for cleaner look */
 .irs-grid,
 .irs-grid-pol,
@@ -1180,7 +1220,7 @@ section:not(#data) {
 .reference-list {
   list-style: none;
   padding: 0;
-  margin: 10px 0 0 0;
+  margin: 0;
 }
 
 .reference-list li {

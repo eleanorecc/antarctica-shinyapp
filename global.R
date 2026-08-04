@@ -177,53 +177,53 @@ maud_rise_center <- data.frame(lat = -65.46003868, lon = 2.95221053) |>
 
 ## for leaflet map
 ## and for processing spatial data
-zooms <- 0:6
+zooms <- 0:8
 extent <- 12367396.2185
 resolutions <- 2*extent/256/2^zooms
 dims <- rep(256*2^5, 2)
 
 allrasters <- list(
-  `Days with >15% Sea Ice` = list(
-    `Sea Ice, Average 1998-2006` = "seaiceDays_all_19982006",
-    `Sea Ice, Average 2007-2015` = "seaiceDays_all_20072015",
-    `Sea Ice, Average 2016-2024` = "seaiceDays_all_20162024",
-    `Sea Ice, 2007-2015 vs 1998-2006` = "seaiceDays_all_20072015diff",
-    `Sea Ice, 2016-2024 vs 1998-2006` = "seaiceDays_all_20162024diff"
+  `Number of Days with >15% Sea Ice` = list(
+    `T0: 1998-2006` = "seaiceDays_all_19982006",
+    `2007-2015` = "seaiceDays_all_20072015",
+    `2016-2024` = "seaiceDays_all_20162024",
+    `2007-2015 minus T0` = "seaiceDays_all_20072015diff",
+    `2016-2024 minus T0` = "seaiceDays_all_20162024diff"
   ),
-  `Chl.A Annual` = list(
-    `Chl.A Annual, Average 1998-2006` = "chlorophyllA_all_19982006",
-    `Chl.A Annual, Average 2007-2015` = "chlorophyllA_all_20072015",
-    `Chl.A Annual, Average 2016-2024` = "chlorophyllA_all_20162024",
-    `Chl.A Annual, 2007-2015 vs 1998-2006` = "chlorophyllA_all_20072015diff",
-    `Chl.A Annual, 2016-2024 vs 1998-2006` = "chlorophyllA_all_20162024diff"
+  `Annual Chlorophyll A` = list(
+    `T0: 1998-2006` = "chlorophyllA_all_19982006",
+    `2007-2015` = "chlorophyllA_all_20072015",
+    `2016-2024` = "chlorophyllA_all_20162024",
+    `2007-2015 minus T0` = "chlorophyllA_all_20072015diff",
+    `2016-2024 minus T0` = "chlorophyllA_all_20162024diff"
   ),
-  `Chl.A Summer (JFM)` = list(
-    `Chl.A JFM, Average 1998-2006` = "chlorophyllA_summer_19982006",
-    `Chl.A JFM, Average 2007-2015` = "chlorophyllA_summer_20072015",
-    `Chl.A JFM, Average 2016-2024` = "chlorophyllA_summer_20162024",
-    `Chl.A JFM, 2007-2015 vs 1998-2006` = "chlorophyllA_summer_20072015diff",
-    `Chl.A JFM, 2016-2024 vs 1998-2006` = "chlorophyllA_summer_20162024diff"
+  `Summer Chlorophyll A (January-March)` = list(
+    `T0: 1998-2006` = "chlorophyllA_summer_19982006",
+    `2007-2015` = "chlorophyllA_summer_20072015",
+    `2016-2024` = "chlorophyllA_summer_20162024",
+    `2007-2015 minus T0` = "chlorophyllA_summer_20072015diff",
+    `2016-2024 minus T0` = "chlorophyllA_summer_20162024diff"
   ),
-  `Chl.A Winter (JAS)` = list(
-    `Chl.A JAS, Average 1998-2006` = "chlorophyllA_winter_19982006",
-    `Chl.A JAS, Average 2007-2015` = "chlorophyllA_winter_20072015",
-    `Chl.A JAS, Average 2016-2024` = "chlorophyllA_winter_20162024",
-    `Chl.A JAS, 2007-2015 vs 1998-2006` = "chlorophyllA_winter_20072015diff",
-    `Chl.A JAS, 2016-2024 vs 1998-2006` = "chlorophyllA_winter_20162024diff"
+  `Winter Chlorophyll A (July-September)` = list(
+    `T0: 1998-2006` = "chlorophyllA_winter_19982006",
+    `2007-2015` = "chlorophyllA_winter_20072015",
+    `2016-2024` = "chlorophyllA_winter_20162024",
+    `2007-2015 minus T0` = "chlorophyllA_winter_20072015diff",
+    `2016-2024 minus T0` = "chlorophyllA_winter_20162024diff"
   ),
-  `Surf. Sal. Annual` = list(
-    `Surf. Sal. Annual, Average 1998-2006` = "surfaceSalinity_all_19982006",
-    `Surf. Sal. Annual, Average 2007-2015` = "surfaceSalinity_all_20072015",
-    `Surf. Sal. Annual, Average 2016-2024` = "surfaceSalinity_all_20162024",
-    `Surf. Sal. Annual, 2007-2015 vs 1998-2006` = "surfaceSalinity_all_20072015diff",
-    `Surf. Sal. Annual, 2016-2024 vs 1998-2006` = "surfaceSalinity_all_20162024diff"
+  `Annual Surface Salinity` = list(
+    `T0: 1998-2006` = "surfaceSalinity_all_19982006",
+    `2007-2015` = "surfaceSalinity_all_20072015",
+    `2016-2024` = "surfaceSalinity_all_20162024",
+    `2007-2015 minus T0` = "surfaceSalinity_all_20072015diff",
+    `2016-2024 minus T0` = "surfaceSalinity_all_20162024diff"
   ),
-  `Surf. Sal. Summer (JFM)` = list(
-    `Surf. Sal. JFM, Average 1998-2006` = "surfaceSalinity_summer_19982006",
-    `Surf. Sal. JFM, Average 2007-2015` = "surfaceSalinity_summer_20072015",
-    `Surf. Sal. JFM, Average 2016-2024` = "surfaceSalinity_summer_20162024",
-    `Surf. Sal. JFM, 2007-2015 vs 1998-2006` = "surfaceSalinity_summer_20072015diff",
-    `Surf. Sal. JFM, 2016-2024 vs 1998-2006` = "surfaceSalinity_summer_20162024diff"
+  `Summer Surface Salinity (January-March)` = list(
+    `T0: 1998-2006` = "surfaceSalinity_summer_19982006",
+    `2007-2015` = "surfaceSalinity_summer_20072015",
+    `2016-2024` = "surfaceSalinity_summer_20162024",
+    `2007-2015 minus T0` = "surfaceSalinity_summer_20072015diff",
+    `2016-2024 minus T0` = "surfaceSalinity_summer_20162024diff"
   )
 )
 
@@ -311,7 +311,22 @@ legendHTML <- function(palette_df, breaks, side = c("left", "right")) {
     pretty  = FALSE
   )
   colors <- pal(breaks[-length(breaks)] + diff(breaks) / 2)
-  labels <- sprintf("%.2g", breaks)
+  ## sea-ice-days ranges span >30 (0-366 raw, ~50-300 for diffs) while
+  ## chlorophyll/salinity stay well under that - use whole integers for the
+  ## former (never needs sub-day precision or scientific notation). Tighter
+  ## spreads (e.g. chlorophyll/salinity's sub-1 ranges) need 4 decimals to
+  ## stay meaningful; wider small spreads use 2. Drop the outer breaks
+  ## (often extreme outliers) so a couple of far-flung bin edges don't
+  ## distort how tightly packed the legend entries actually are.
+  inner_breaks <- if (length(breaks) > 3) breaks[-c(1, length(breaks))] else breaks
+  spread <- diff(range(inner_breaks))
+  labels <- if (spread > 30) {
+    sprintf("%d", round(breaks))
+  } else if (spread < 4) {
+    sprintf("%.4f", breaks)
+  } else {
+    sprintf("%.2f", breaks)
+  }
   items  <- paste0(
     '<div style="display:flex;align-items:center;margin-bottom:1px;">',
     '<i style="background:', colors,

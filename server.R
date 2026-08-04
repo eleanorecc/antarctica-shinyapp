@@ -26,8 +26,8 @@ server <- function(input, output, session) {
     ## center the Weddell sea
     center = c(-75, -45),
     zoom = 3,
-    minZoom = 3,
-    maxZoom = 4,
+    minZoom = 2,
+    maxZoom = 7,
     crs = epsg_3031,
     worldCopyJump = FALSE,
     preferCanvas = TRUE
@@ -77,13 +77,13 @@ server <- function(input, output, session) {
     addPolylines(
       data = coords_wobec,
       group = "WOBEC Expedition",
-      color = "#a52600", weight = 1,
+      color = "#000000", weight = 1, opacity = 1,
       options = pathOptions(pane = "overlays")
     ) |>
     addPolylines(
       data = coords_hafos,
       group = "HAFOS Expedition",
-      color = "#71022e", weight = 1,
+      color = "#999999", weight = 1, opacity = 1,
       options = pathOptions(pane = "overlays")
     ) |>
     addPolygons(
@@ -114,7 +114,7 @@ server <- function(input, output, session) {
     hideGroup("Points of Interest")
 
   ## cruise device layers — one group per (cruise, method_device), hidden by default ----
-  cruise_colors <- c(wobec = "#a52600", hafos = "#71022e")
+  cruise_colors <- c(wobec = "#000000", hafos = "#999999")
 
   for (cru in c("wobec", "hafos")) {
     devices <- if (cru == "wobec") devices_wobec else devices_hafos
@@ -129,7 +129,9 @@ server <- function(input, output, session) {
         basemap <- basemap |>
           addCircleMarkers(
             data = points, group = group_name,
-            color = cruise_colors[[cru]], radius = 2, weight = 1,
+            color = cruise_colors[[cru]], radius = 3, weight = 1.5,
+            opacity = if (cru == "wobec") 0.6 else 0.8,
+            fillOpacity = if (cru == "wobec") 0.6 else 0.8,
             options = pathOptions(pane = "overlays")
           )
       }
@@ -137,7 +139,7 @@ server <- function(input, output, session) {
         basemap <- basemap |>
           addPolylines(
             data = lines, group = group_name,
-            color = cruise_colors[[cru]], weight = 3,
+            color = cruise_colors[[cru]], weight = 3.5, opacity = 1,
             options = pathOptions(pane = "overlays")
           )
       }
@@ -557,7 +559,7 @@ server <- function(input, output, session) {
         addPolygons(
           data = downloaded_data$data,
           group = "Marginal Ice Zone",
-          col = "black",
+          color = "white",
           weight = 1.5,
           fillOpacity = 0,
           options = list(pane = "overlays")
