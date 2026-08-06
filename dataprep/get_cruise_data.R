@@ -11,8 +11,8 @@
 ## PS152 (WOBEC): 2025-12-15 (Walvis Bay, Namibia) – 2026-02-02 (Punta Arenas, Chile) 
 url_polarstern_wobec <- "https://follow-polarstern.awi.de/wp-json/data-api/v1/data?expedition=1637"
 
-## PS146 (HAFOS): 2024-12-24 (Walvis Bay, Namibia) – 2025-03-10 (Stanley, Falkland Island (Malvinas)) 
-url_polarstern_hafos <- "https://onexpedition.awi.de/wp-json/data-api/v1/data?expedition=1250"
+## PS129 (HAFOS): 2022-03-03 (Cape Town, South Africa) – 2022-04-27 (Punta Arenas, Chile)
+url_polarstern_hafos <- "https://onexpedition.awi.de/wp-json/data-api/v1/data?expedition=192"
 
 ## Create request and perform
 get_cruise_data <- function(url, save_filename) {
@@ -41,7 +41,7 @@ get_cruise_data(url_polarstern_hafos, "coords_polarstern_hafos.csv")
 
 ## two relevant cruises for the app, PANGEA entries urls
 ## https://www.pangaea.de/expeditions/events/PS152
-## https://www.pangaea.de/expeditions/events/PS146
+## https://www.pangaea.de/expeditions/events/PS129
 
 ## can look for other cruises with PANGEA records
 ## https://www.pangaea.de/expeditions/
@@ -81,7 +81,7 @@ track_linestring <- function(lon_start, lat_start, lon_end, lat_end, track) {
 clean_table <- function(dir_rawdata) {
 
   # x <- "/Users/eleanorecampbell/Downloads/events_PS152.tab"
-  # x <- "/Users/eleanorecampbell/Downloads/events_PS146.tab"
+  # x <- "/Users/eleanorecampbell/Downloads/events_PS129.tab"
 
   rawdata <- list.files(dir_rawdata, pattern = "events_PS.*tab$", full.names = TRUE) |>
     lapply(function(x){

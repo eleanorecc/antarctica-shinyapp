@@ -76,7 +76,7 @@ htmlTemplate(
     selected = NULL,
     multiple = TRUE,
     options = list(
-      placeholder = "WOBEC sampling by device...",
+      placeholder = "WOBEC/2025 sampling by device...",
       plugins = list("remove_button"),
       onInitialize = I('function() { this.$control_input.attr("readonly", "readonly"); }')
     )
@@ -85,7 +85,7 @@ htmlTemplate(
     inputId = "hafosDevices", label = NULL,
     choices = devices_hafos, selected = NULL, multiple = TRUE,
     options = list(
-      placeholder = "HAFOS sampling by device...",
+      placeholder = "HAFOS/2022 sampling by device...",
       plugins = list("remove_button"),
       onInitialize = I('function() { this.$control_input.attr("readonly", "readonly"); }')
     )
