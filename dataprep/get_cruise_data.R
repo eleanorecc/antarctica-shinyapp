@@ -36,6 +36,19 @@ get_cruise_data <- function(url, save_filename) {
 get_cruise_data(url_polarstern_wobec, "coords_polarstern_wobec.csv")
 get_cruise_data(url_polarstern_hafos, "coords_polarstern_hafos.csv")
 
+## Okay, so the WOBEC and HAFOS cruise tracks 
+## from the onexpedition.awi expedition numbers 1637 and 192 are longer than they should be,
+## need to go and delete rows from the csv files...
+
+## Coords, from the PANGEA entries:
+
+## WOBEC start 2025-12-15 at Walvis Bay (-22.94975	14.49775), 
+## end 2026-02-02 at Punta Arenas (-52.66985	-69.98174)
+
+## HAFOS start 2022-03-03 at Cape Town (-33.91051	18.43687), 
+## end 2022-04-27 at Punta Arenas (-52.50574	-68.51902)
+
+
 
 ## PANGEA datasets
 
@@ -139,3 +152,4 @@ clean_table <- function(dir_rawdata) {
   )
 }
 
+clean_table("/Users/eleanorecampbell/Downloads/")
