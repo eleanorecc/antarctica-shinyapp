@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Sunburst preview</title>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    #sunburst-box { width: 900px; height: 900px; margin: 20px auto; font-size: 10px; }
+    #sunburst-box svg { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <div id="sunburst-box"></div>
+
+  <script src="./sunburst-data.js"></script>
+  <script>
+    // Shim the globals r2d3 normally injects into sunburst.js:
+    // svg, data, options, width, height, div.
+    const div = document.getElementById("sunburst-box");
+    const width = div.clientWidth;
+    const height = div.clientHeight;
+    const svg = d3.select(div).append("svg")
+      .attr("viewBox", [0, 0, width, height]);
+    const options = { addViewDepth: 0 };
+
+    d3.csv("./parameters.csv").then(function (rawRows) {
+      window.data = rawRows; // sunburst.js reads the `data` global directly
+      const script = document.createElement("script");
+      script.src = "./sunburst.js";
+      document.body.appendChild(script);
+    });
+  </script>
+</body>
+</html>

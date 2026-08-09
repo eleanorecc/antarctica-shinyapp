@@ -100,5 +100,7 @@ htmlTemplate(
   mapui = leafletOutput(outputId = "map", height = "100%"),
 
   map1caption = uiOutput("map1cap"),
-  map2caption = uiOutput("map2cap")
+  map2caption = uiOutput("map2cap"),
+
+  sunburst_output = d3Output(outputId = "sunburst", height = "100%")
 )

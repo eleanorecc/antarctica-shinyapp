@@ -437,7 +437,6 @@ section:not(#data) {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: var(--transition-smooth);
   font-size: 14px;
   border-radius: var(--border-radius-md);
 }

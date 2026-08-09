@@ -658,23 +658,21 @@ server <- function(input, output, session) {
   #     )
   # })
 
-  ## flowerplot ----
-  # output$d3_flower <- renderD3({
-  #   flower_json <- fromJSON(
-  #     file.path(dirData, "flowerplot/flowerplot.json"),
-  #     simplifyVector = FALSE
-  #   )
-  #
-  #   r2d3(
-  #     data = flower_json,
-  #     script = file.path(dirData, "flowerplot/flowerplot.js"),
-  #     d3_version = "6",
-  #     options = list(
-  #       plotYear = "BalticSea",
-  #       addViewDepth = 0
-  #     )
-  #   )
-  # })
+  ## sunburst (EV / ecosystem-service goal matrix) ----
+  output$sunburst <- renderD3({
+    sunburst_data <- read.csv(
+      file.path(dirData, "sunburst-parameters", "parameters.csv"),
+      stringsAsFactors = FALSE
+    )
+
+    r2d3(
+      data = jsonlite::fromJSON(jsonlite::toJSON(sunburst_data)),
+      script = file.path(dirData, "sunburst-parameters", "sunburst.js"),
+      dependencies = file.path(dirData, "sunburst-parameters", "sunburst-data.js"),
+      d3_version = "6",
+      options = list(addViewDepth = 0)
+    )
+  })
 
   session$onSessionEnded(function() {
     unlink(addData, recursive = TRUE, force = TRUE)
